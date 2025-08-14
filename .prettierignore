@@ -1,0 +1,23 @@
+# Node
+node_modules
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Build output
+.nuxt
+.output
+.dist
+.cache
+.temp
+
+# Static assets
+public
+static
+
+# Logs & misc
+*.log
+
+# Env & konfigi
+.env
+.env.*
