@@ -6,4 +6,10 @@ export default defineNuxtConfig({
   typescript: {
     typeCheck: true,
   },
+  runtimeConfig: {
+    public: {
+      environment: process.env.ENV || "development",
+    },
+    mongoDbUri: process.env.MONGODB_URI,
+  },
 });
