@@ -11,5 +11,7 @@ export default defineNuxtConfig({
       environment: process.env.ENV || "development",
     },
     mongoDbUri: process.env.MONGODB_URI,
+    jwtSecret: process.env.JWT_SECRET,
+    jwtLifetime: process.env.JWT_LIFETIME
   },
 });
