@@ -1,5 +1,8 @@
 import { connectDB } from "../db/connect";
 
+/**
+ * Nitro plugin to connect to MongoDB
+ */
 export default defineNitroPlugin(async () => {
   const config = useRuntimeConfig();
 
