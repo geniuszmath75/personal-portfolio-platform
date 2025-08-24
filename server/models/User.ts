@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import type { UserSchema } from "../../types";
+import { UserSchemaRole } from "../types/enums";
+import type { UserModel, IUser, IUserMethods } from "../types/index.d.ts";
 
-const UserSchema = new mongoose.Schema<UserSchema>({
+const UserSchema = new mongoose.Schema<IUser, UserModel, IUserMethods>({
   email: {
     type: String,
     required: [true, "Email is required"],
@@ -26,8 +27,8 @@ const UserSchema = new mongoose.Schema<UserSchema>({
   },
   role: {
     type: String,
-    enum: ["ADMIN"],
-    default: "ADMIN",
+    enum: UserSchemaRole,
+    default: UserSchemaRole.ADMIN,
   },
   avatar: {
     type: String,
@@ -36,12 +37,12 @@ const UserSchema = new mongoose.Schema<UserSchema>({
 
 // Create a JWT token for the logged-in user
 UserSchema.methods.createJWT = function (): string {
-  const config = useRuntimeConfig();
+  const { jwtSecret, jwtLifetime } = useRuntimeConfig();
   return jwt.sign(
     { userId: this._id, email: this.email, role: this.role },
-    config.jwtSecret,
+    jwtSecret,
     {
-      expiresIn: config.jwtLifetime,
+      expiresIn: jwtLifetime,
     },
   );
 };
@@ -55,4 +56,7 @@ UserSchema.methods.comparePassword = async function (
   return isMatch;
 };
 
-export const User = mongoose.model<UserSchema>("User", UserSchema);
+export const User: UserModel = mongoose.model<IUser, UserModel>(
+  "User",
+  UserSchema,
+);
