@@ -12,6 +12,6 @@ export default defineNuxtConfig({
     },
     mongoDbUri: process.env.MONGODB_URI,
     jwtSecret: process.env.JWT_SECRET,
-    jwtLifetime: process.env.JWT_LIFETIME
+    jwtLifetime: process.env.JWT_LIFETIME,
   },
 });
