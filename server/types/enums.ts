@@ -13,3 +13,13 @@ export enum ISectionType {
   HERO = "HERO",
   CONTACT = "CONTACT",
 }
+
+/**
+ * Represents the kinds of blocks that can be included in a section.
+ */
+export enum BlockKind {
+  PARAGRAPH = "PARAGRAPH",
+  IMAGE = "IMAGE",
+  BUTTON = "BUTTON",
+  GROUP = "GROUP",
+}

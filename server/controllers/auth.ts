@@ -41,7 +41,6 @@ export default defineEventHandler(async (event) => {
     token,
   };
 
-  // Set the response status and return the response
-  setResponseStatus(event, 200);
+  // Return the response
   return response;
 });

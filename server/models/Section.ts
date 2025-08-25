@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { ISectionType } from "../types/enums";
+import { ISectionType, BlockKind } from "../types/enums";
 import type {
   ISection,
   SectionModel,
@@ -8,6 +8,7 @@ import type {
   ButttonBlock,
   GroupBlockItem,
   GroupBlock,
+  BaseBlock,
 } from "../types/index.d.ts";
 
 const ParagraphBlockSchema = new mongoose.Schema<ParagraphBlock>(
@@ -71,6 +72,13 @@ const GroupBlockSchema = new mongoose.Schema<GroupBlock>(
   { _id: false },
 );
 
+const BaseBlockSchema = new mongoose.Schema<BaseBlock>({
+  kind: {
+    type: String,
+    required: true,
+  }
+}, { _id: false, discriminatorKey: "kind"})
+
 const SectionSchema = new mongoose.Schema<ISection, SectionModel>({
   title: {
     type: String,
@@ -94,12 +102,15 @@ const SectionSchema = new mongoose.Schema<ISection, SectionModel>({
     required: true,
   },
   blocks: [
-    ParagraphBlockSchema,
-    ImageBlockSchema,
-    ButtonBlockSchema,
-    GroupBlockSchema,
+    BaseBlockSchema
   ],
 });
+
+// Discriminators for different block types
+SectionSchema.path<mongoose.Schema.Types.Subdocument>('blocks').discriminator(BlockKind.PARAGRAPH, ParagraphBlockSchema);
+SectionSchema.path<mongoose.Schema.Types.Subdocument>('blocks').discriminator(BlockKind.IMAGE, ImageBlockSchema);
+SectionSchema.path<mongoose.Schema.Types.Subdocument>('blocks').discriminator(BlockKind.BUTTON, ButtonBlockSchema);
+SectionSchema.path<mongoose.Schema.Types.Subdocument>('blocks').discriminator(BlockKind.GROUP, GroupBlockSchema);
 
 export const Section: SectionModel = mongoose.model<ISection, SectionModel>(
   "Section",

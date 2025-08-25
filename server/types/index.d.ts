@@ -1,6 +1,6 @@
 import type { Model } from "mongoose";
 import type { StringValue } from "ms";
-import type { UserSchemaRole, ISectionType } from "./enums";
+import type { UserSchemaRole, ISectionType, BlockKind } from "./enums";
 
 /********
  * USER
@@ -84,15 +84,31 @@ export interface ISection {
   /**
    * Contains the blocks of the various elements that make up the section.
    */
-  blocks: (ParagraphBlock | ImageBlock | ButttonBlock | GroupBlock)[];
+  blocks: Block[];
 }
 
 // TYPES OF SECTION BLOCKS
 
 /**
+ * Represents all possible block types that can be included in a section.
+ */
+export type Block = ParagraphBlock | ImageBlock | ButttonBlock | GroupBlock;
+
+/**
+ * Base interface for all block types
+ */
+export interface BaseBlock {
+  /**
+   * The kind of block, which determines its structure and content.
+   */
+  kind: BlockKind;
+}
+
+/**
  * Represents a block of text paragraphs in a section.
  */
-export type ParagraphBlock = {
+export interface ParagraphBlock extends BaseBlock {
+  kind: BlockKind.PARAGRAPH;
   /**
    * Contains the text paragraphs for the section.
    */
@@ -102,7 +118,8 @@ export type ParagraphBlock = {
 /**
  * Represents a block of images in a section.
  */
-export type ImageBlock = {
+export interface ImageBlock extends BaseBlock {
+  kind: BlockKind.IMAGE;
   /**
    * Contains the images names for the section.
    */
@@ -112,7 +129,8 @@ export type ImageBlock = {
 /**
  * Represents a block of buttons in a section.
  */
-export type ButttonBlock = {
+export interface ButttonBlock extends BaseBlock {
+  kind: BlockKind.BUTTON;
   /**
    * Contains the buttons for the section.
    */
@@ -123,7 +141,8 @@ export type ButttonBlock = {
  * Represents a group block in a section, which can contain multiple items with
  * related information (e.g., icons and labels).
  */
-export type GroupBlock = {
+export interface GroupBlock extends BaseBlock {
+  kind: BlockKind.GROUP;
   /**
    * Contains the name of the group.
    */
