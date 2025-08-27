@@ -21,3 +21,6 @@ static
 # Env & konfigi
 .env
 .env.*
+
+# Code coverage
+/test/coverage

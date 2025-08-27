@@ -28,3 +28,6 @@ tsconfig.tsbuildinfo
 
 # Tailwind CSS .js file
 tailwind.config.js
+
+# Code coverage
+test/coverage/

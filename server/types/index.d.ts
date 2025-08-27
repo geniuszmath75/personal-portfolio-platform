@@ -113,7 +113,7 @@ export interface ParagraphBlock extends BaseBlock {
    * Contains the text paragraphs for the section.
    */
   paragraphs: string[];
-};
+}
 
 /**
  * Represents a block of images in a section.
@@ -124,7 +124,7 @@ export interface ImageBlock extends BaseBlock {
    * Contains the images names for the section.
    */
   images: string[];
-};
+}
 
 /**
  * Represents a block of buttons in a section.
@@ -135,7 +135,7 @@ export interface ButttonBlock extends BaseBlock {
    * Contains the buttons for the section.
    */
   buttons: string[];
-};
+}
 
 /**
  * Represents a group block in a section, which can contain multiple items with
@@ -152,7 +152,7 @@ export interface GroupBlock extends BaseBlock {
    * Contains the elements of the group.
    */
   items: GroupBlockItem[];
-};
+}
 
 /**
  * Represents an item in a group block, which includes an icon and a label.

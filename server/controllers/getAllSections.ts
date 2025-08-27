@@ -4,4 +4,4 @@ export default defineEventHandler(async (event) => {
   const sections = await Section.find();
 
   return { sections: sections, count: sections.length };
-})
+});

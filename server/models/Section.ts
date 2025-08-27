@@ -72,12 +72,15 @@ const GroupBlockSchema = new mongoose.Schema<GroupBlock>(
   { _id: false },
 );
 
-const BaseBlockSchema = new mongoose.Schema<BaseBlock>({
-  kind: {
-    type: String,
-    required: true,
-  }
-}, { _id: false, discriminatorKey: "kind"})
+const BaseBlockSchema = new mongoose.Schema<BaseBlock>(
+  {
+    kind: {
+      type: String,
+      required: true,
+    },
+  },
+  { _id: false, discriminatorKey: "kind" },
+);
 
 const SectionSchema = new mongoose.Schema<ISection, SectionModel>({
   title: {
@@ -101,16 +104,26 @@ const SectionSchema = new mongoose.Schema<ISection, SectionModel>({
     type: Number,
     required: true,
   },
-  blocks: [
-    BaseBlockSchema
-  ],
+  blocks: [BaseBlockSchema],
 });
 
 // Discriminators for different block types
-SectionSchema.path<mongoose.Schema.Types.Subdocument>('blocks').discriminator(BlockKind.PARAGRAPH, ParagraphBlockSchema);
-SectionSchema.path<mongoose.Schema.Types.Subdocument>('blocks').discriminator(BlockKind.IMAGE, ImageBlockSchema);
-SectionSchema.path<mongoose.Schema.Types.Subdocument>('blocks').discriminator(BlockKind.BUTTON, ButtonBlockSchema);
-SectionSchema.path<mongoose.Schema.Types.Subdocument>('blocks').discriminator(BlockKind.GROUP, GroupBlockSchema);
+SectionSchema.path<mongoose.Schema.Types.Subdocument>("blocks").discriminator(
+  BlockKind.PARAGRAPH,
+  ParagraphBlockSchema,
+);
+SectionSchema.path<mongoose.Schema.Types.Subdocument>("blocks").discriminator(
+  BlockKind.IMAGE,
+  ImageBlockSchema,
+);
+SectionSchema.path<mongoose.Schema.Types.Subdocument>("blocks").discriminator(
+  BlockKind.BUTTON,
+  ButtonBlockSchema,
+);
+SectionSchema.path<mongoose.Schema.Types.Subdocument>("blocks").discriminator(
+  BlockKind.GROUP,
+  GroupBlockSchema,
+);
 
 export const Section: SectionModel = mongoose.model<ISection, SectionModel>(
   "Section",
