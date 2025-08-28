@@ -15,8 +15,17 @@ const ParagraphBlockSchema = new mongoose.Schema<ParagraphBlock>(
   {
     paragraphs: {
       type: [String],
-      required: true,
-      minLength: 1,
+      validate: [
+        {
+          validator: (arr: string[]) =>
+            arr.every((paragraph) => paragraph.length >= 1),
+          message: "Each paragraph must be at least 1 character long.",
+        },
+        {
+          validator: (arr: string[]) => arr.length > 0,
+          message: "At least one paragraph is required.",
+        },
+      ],
     },
   },
   { _id: false },
@@ -26,8 +35,16 @@ const ImageBlockSchema = new mongoose.Schema<ImageBlock>(
   {
     images: {
       type: [String],
-      required: true,
-      minLength: 5,
+      validate: [
+        {
+          validator: (arr: string[]) => arr.every((img) => img.length >= 5),
+          message: "Each image must be at least 5 character long.",
+        },
+        {
+          validator: (arr: string[]) => arr.length > 0,
+          message: "At least one image is required.",
+        },
+      ],
     },
   },
   { _id: false },
@@ -37,8 +54,16 @@ const ButtonBlockSchema = new mongoose.Schema<ButttonBlock>(
   {
     buttons: {
       type: [String],
-      required: true,
-      minLength: 1,
+      validate: [
+        {
+          validator: (arr: string[]) => arr.every((img) => img.length >= 1),
+          message: "Each button must be at least 1 character long.",
+        },
+        {
+          validator: (arr: string[]) => arr.length > 0,
+          message: "At least one button is required.",
+        },
+      ],
     },
   },
   { _id: false },
@@ -48,13 +73,11 @@ const GroupBlockItemSchema = new mongoose.Schema<GroupBlockItem>(
   {
     icon: {
       type: String,
-      required: true,
-      minLength: 1,
+      required: [true, "Icon is required."],
     },
     label: {
       type: String,
-      required: true,
-      minLength: 1,
+      required: [true, "Label is required."],
     },
   },
   { _id: false },
@@ -64,8 +87,7 @@ const GroupBlockSchema = new mongoose.Schema<GroupBlock>(
   {
     header: {
       type: String,
-      required: false,
-      minLength: 1,
+      minLength: [1, "Group block header must be at least 1 character long."],
     },
     items: [GroupBlockItemSchema],
   },
@@ -76,7 +98,7 @@ const BaseBlockSchema = new mongoose.Schema<BaseBlock>(
   {
     kind: {
       type: String,
-      required: true,
+      required: [true, "Base block kind is required."],
     },
   },
   { _id: false, discriminatorKey: "kind" },
@@ -85,24 +107,23 @@ const BaseBlockSchema = new mongoose.Schema<BaseBlock>(
 const SectionSchema = new mongoose.Schema<ISection, SectionModel>({
   title: {
     type: String,
-    required: true,
-    minLength: 3,
-    maxLength: 64,
+    required: [true, "Title is required"],
+    minLength: [3, "Title must be at least 3 character long."],
+    maxLength: [64, "Title must be at most 64 character long."],
   },
   slug: {
     type: String,
-    required: true,
+    required: [true, "Slug is required"],
     unique: true,
   },
   type: {
     type: String,
-    required: true,
     enum: ISectionType,
     default: ISectionType.HERO,
   },
   order: {
     type: Number,
-    required: true,
+    required: [true, "Order is required"],
   },
   blocks: [BaseBlockSchema],
 });
