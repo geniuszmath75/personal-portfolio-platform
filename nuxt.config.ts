@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     "@nuxt/icon",
     "@pinia/nuxt",
     "@nuxt/test-utils/module",
+    "@nuxt/fonts",
   ],
   typescript: {
     typeCheck: true,
