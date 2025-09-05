@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Section } from "../../server/models/Section";
 import { useH3TestUtils } from "../setup";
 import { createMockH3Event } from "../mock/h3-event";
-import { ISectionType } from "../../server/types/enums";
+import { ISectionType } from "../../shared/types/enums";
 
 vi.mock("../../server/models/Section");
 

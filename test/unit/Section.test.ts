@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Section } from "../../server/models/Section";
-import { ISectionType, BlockKind } from "../../server/types/enums";
+import { ISectionType, BlockKind } from "../../shared/types/enums";
 
 describe("Section model", () => {
   /**

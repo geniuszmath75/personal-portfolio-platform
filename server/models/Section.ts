@@ -1,15 +1,15 @@
 import mongoose from "mongoose";
-import { ISectionType, BlockKind } from "../types/enums";
+import { ISectionType, BlockKind } from "../../shared/types/enums";
 import type {
   ISection,
-  SectionModel,
   ParagraphBlock,
   ImageBlock,
   ButttonBlock,
   GroupBlockItem,
   GroupBlock,
   BaseBlock,
-} from "../types/index.d.ts";
+} from "../../shared/types/index.d.ts";
+import type { SectionModel } from "../types";
 
 const ParagraphBlockSchema = new mongoose.Schema<ParagraphBlock>(
   {
