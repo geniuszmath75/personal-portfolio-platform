@@ -6,6 +6,7 @@ export default <Partial<Config>>{
     extend: {
       boxShadow: {
         primary: "2px 4px 4px 4px rgba(28, 35, 33, 0.15)",
+        secondary: "2px 4px 4px 4px rgba(238, 241, 239, 0.15)",
         additional: "2px 4px 4px 4px rgba(255, 64, 0, 0.15)",
       },
     },
@@ -50,6 +51,9 @@ export default <Partial<Config>>{
     },
     fontFamily: {
       default: ["Poppins", "sans-serif"],
+      accentOne: ["Noto Sans", "sans-serif"],
+      accentTwo: ["Courier Prime", "monospace"],
+      accentThree: ["Pacifico", "cursive"],
     },
   },
   plugins: [],
