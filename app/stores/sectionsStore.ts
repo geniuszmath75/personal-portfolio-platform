@@ -29,16 +29,12 @@ export const useSectionsStore = defineStore("sections", {
      * @async
      */
     async fetchSections(): Promise<void> {
-      const { finishLoading, startLoading } = useLoadingStore();
       const { baseApiPath } = useRuntimeConfig().public;
-      startLoading();
       try {
         const res = await $fetch<SectionsResponse>(`${baseApiPath}/sections`);
         this.setSections(res.sections);
       } catch (error) {
         console.error("Failed to fetch sections:", error);
-      } finally {
-        finishLoading();
       }
     },
   },
