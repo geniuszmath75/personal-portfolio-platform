@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed bg-primary-500 w-full h-20">
+  <div class="fixed bg-primary-500 w-full h-16 md:h-20 z-40">
     <div class="h-full flex justify-between">
       <!-- Home -->
       <div class="flex items-center">
@@ -48,32 +48,32 @@
 
         <!-- LogIn panel-->
         <Transition
-          enter-active-class="transition duration-300 ease-out"
+          enter-active-class="transition duration-150 ease-out"
           enter-from-class="opacity-0 -translate-y-2"
           enter-to-class="opacity-100 translate-y-0"
-          leave-active-class="transition duration-200 ease-in"
+          leave-active-class="transition duration-150 ease-in"
           leave-from-class="opacity-100 translate-y-0"
           leave-to-class="opacity-0 -translate-y-2"
         >
           <div
             v-if="isAccountPanelOpen"
             ref="accountPanelRef"
-            class="absolute top-full right-2 w-64 min-h-26 mt-2 rounded-3xl bg-primary-500 flex flex-col justify-center items-center"
+            class="absolute top-full right-2 w-64 min-h-26 mt-2 rounded-3xl bg-primary-400 flex flex-col justify-center items-center"
           >
             <div
               class="flex flex-col justify-center items-center space-y-2 py-6"
             >
               <NuxtLink to="/login" class="w-48">
                 <div
-                  class="relative flex items-center justify-center bg-additional-500 h-12 rounded-3xl shadow-additional hover:bg-additional-600"
+                  class="relative flex items-center justify-center bg-additional-500 h-12 rounded-3xl shadow-primary hover:bg-additional-600"
                 >
                   <Icon
                     name="mdi:login"
-                    class="absolute left-4 text-primary-500"
+                    class="absolute left-4 text-secondary-500"
                     size="1.5em"
                   />
 
-                  <span class="text-secondary-500 font-semibold">LOG IN</span>
+                  <span class="text-primary-500 font-semibold">LOG IN</span>
                 </div>
               </NuxtLink>
             </div>
@@ -95,10 +95,10 @@
       <!-- Mobile menu -->
       <Teleport to="body">
         <Transition
-          enter-active-class="transition duration-300 ease-out"
+          enter-active-class="transition duration-150 ease-out"
           enter-from-class="opacity-0"
           enter-to-class="opacity-100"
-          leave-active-class="transition duration-200 ease-in"
+          leave-active-class="transition duration-150 ease-in"
           leave-from-class="opacity-100"
           leave-to-class="opacity-0"
         >
@@ -120,7 +120,7 @@
               :to="link.to"
               :class="
                 'h-20 w-full flex items-center justify-center text-secondary-500 font-semibold text-xl ' +
-                (currentPath === '/projects'
+                (currentPath === link.to
                   ? 'bg-primary-400'
                   : 'hover:bg-primary-400')
               "

@@ -1,5 +1,16 @@
 <template>
-  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-    <h1>Welcome to the Home Page</h1>
+  <div class="flex flex-col">
+    <SectionContent
+      v-for="section in orderedSections"
+      :key="section._id"
+      :section="section"
+    />
   </div>
 </template>
+
+<script setup lang="ts">
+const sectionStore = useSectionsStore();
+const { orderedSections } = storeToRefs(sectionStore);
+
+await callOnce("sections", () => sectionStore.fetchSections());
+</script>

@@ -16,6 +16,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       environment: process.env.ENV || "development",
+      baseApiPath: process.env.BASE_API_PATH,
     },
     mongoDbUri: process.env.MONGODB_URI,
     jwtSecret: process.env.JWT_SECRET,
