@@ -12,7 +12,8 @@
     "test:nuxt": "vitest --project nuxt",
     "coverage": "vitest run --coverage",
     "lint": "eslint .",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,vue,html,css,scss,json,md,mjs,cjs}\""
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,vue,html,css,scss,json,md,mjs,cjs}\"",
+    "version": "auto-changelog -p && git add CHANGELOG.md"
   },
   "dependencies": {
     "@nuxt/eslint": "^1.8.0",
@@ -50,5 +51,19 @@
     "typescript": "^5.9.2",
     "vitest": "^3.2.4",
     "vue-tsc": "^3.0.5"
+  },
+  "auto-changelog": {
+    "template": "custom-template.hbs",
+    "commitLimit": false,
+    "replaceText": {
+      "(^feat(?:\\([^)]*\\))?:)": "",
+      "(^fix(?:\\([^)]*\\))?:)": "",
+      "(^chore(?:\\([^)]*\\))?:)": "",
+      "(^docs(?:\\([^)]*\\))?:)": "",
+      "(^refactor(?:\\([^)]*\\))?:)": "",
+      "(^test(?:\\([^)]*\\))?:)": "",
+      "(^style(?:\\([^)]*\\))?:)": "",
+      "(^perf(?:\\([^)]*\\))?:)": ""
+    }
   }
 }
