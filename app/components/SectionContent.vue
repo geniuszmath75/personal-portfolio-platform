@@ -207,7 +207,7 @@
           <div class="flex items-center justify-center">
             <NuxtLink
               v-for="(item, j) in block.items.filter((i) =>
-                i.label.startsWith('http'),
+                i.label.startsWith('https'),
               )"
               :key="'item-' + i + '-' + j"
               :to="item.label"
@@ -232,44 +232,9 @@
 
 <script setup lang="ts">
 import type { ISection as Section } from "~~/shared/types";
+import { checkItemColSpan } from "~/utils/checkItemColSpan";
+
 const { section } = defineProps<{
   section: Section;
 }>();
-
-/**
- * Checks the total quantity of items in grid layout and returns proper
- * 'col-span-*' property value.
- *
- * @param index - index of current item in grid
- * @param totalItems - total number of items in grid
- * @param rowItems - number of items in the row. Function works only for
- * rowItems = 3
- */
-const checkItemColSpan = (
-  index: number,
-  totalItems: number,
-  rowItems = 3,
-): string => {
-  // Calculate how many items are in the last row
-  const lastRowCount =
-    totalItems % rowItems === 0 ? rowItems : totalItems % rowItems;
-
-  // Calculate the starting index of the last row
-  const firstIndexOfLastRow = totalItems - lastRowCount;
-
-  if (index < firstIndexOfLastRow) {
-    return "col-span-4";
-  }
-
-  // One element in a row
-  if (lastRowCount === 1) {
-    return "col-span-12";
-  }
-  // Two elements in a row
-  if (lastRowCount === 2) {
-    return "col-span-6";
-  }
-
-  return "col-span-4";
-};
 </script>
