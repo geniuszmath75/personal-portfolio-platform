@@ -1,6 +1,7 @@
 import type { Model } from "mongoose";
 import type { StringValue } from "ms";
 import type { UserSchemaRole } from "./enums";
+import type { IProject } from "~~/shared/types";
 
 /********
  * USER
@@ -67,6 +68,11 @@ export type SectionModel = Model<ISection, object>;
  * Represents a Mongoose model for the IUser schema.
  */
 export type UserModel = Model<IUser, object, IUserMethods>;
+
+/**
+ * Represents a Mongoose model for the IProject schema
+ */
+export type ProjectModel = Model<IProject, object>;
 
 /***********
  * CONFIGURATION

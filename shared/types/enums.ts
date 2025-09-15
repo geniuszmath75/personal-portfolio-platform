@@ -16,3 +16,31 @@ export enum BlockKind {
   BUTTON = "BUTTON",
   GROUP = "GROUP",
 }
+
+/**
+ * Represents the types of project source
+ */
+export enum ProjectSourceType {
+  /**
+   * Project created at university
+   */
+  UNIVERSITY = "UNIVERSITY",
+
+  /**
+   * Project created for a company (as employee)
+   */
+  COMPANY = "COMPANY",
+
+  /**
+   * Project created in the free time (learning new skills/technologies or improving existing ones)
+   */
+  HOBBY = "HOBBY",
+}
+
+/**
+ * Represents the types of project status
+ */
+export enum ProjectStatusType {
+  IN_PROGRESS = "IN PROGRESS",
+  COMPLETED = "COMPLETED",
+}

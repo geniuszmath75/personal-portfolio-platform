@@ -1,4 +1,4 @@
-import type { ISectionType, BlockKind } from "./enums";
+import type { ISectionType, BlockKind, ProjectSourceType, ProjectStatusType } from "./enums";
 
 /********
  * SECTION
@@ -125,4 +125,77 @@ export type GroupBlockItem = {
  */
 export interface SectionsResponse {
   sections: ISection[];
+}
+
+/********
+ * PROJECT
+ *
+ * Represents a project in /projects page.
+ ********/
+
+export interface IProject {
+  /**
+   * The unique identifier for the project
+   */
+  _id: string;
+
+  /**
+   * The title of the project
+   */
+  title: string;
+
+  /**
+   * The list of technologies used in the project
+   */
+  technologies: string[];
+
+  /**
+   * The project start date
+   */
+  startDate: Date;
+
+  /**
+   * The project finish date
+   */
+  endDate?: Date;
+
+  /**
+   * The short decription of the project
+   */
+  shortDescription: string;
+
+  /**
+   * The long description of the project
+   */
+  longDescription: string;
+
+  /**
+   * The link to the project repo on GitHub
+   */
+  githubLink?: string | null;
+
+  /**
+   * The source of the project (the purpose of )
+   */
+  projectSource: ProjectSourceType;
+
+  /**
+   * The link to the project website
+   */
+  websiteLink?: string | null;
+
+  /**
+   * The main image of the project
+   */
+  mainImage: string;
+
+  /**
+   * List of other images of the project (showing other project aspects)
+   */
+  otherImages?: string[];
+
+  /**
+   * The status of the project
+   */
+  status: ProjectStatusType
 }
