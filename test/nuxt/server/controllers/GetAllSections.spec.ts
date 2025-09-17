@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Section } from "../../server/models/Section";
-import { useH3TestUtils } from "../setup";
-import { createMockH3Event } from "../mock/h3-event";
-import { ISectionType } from "../../shared/types/enums";
+import { Section } from "../../../../server/models/Section";
+import { useH3TestUtils } from "../../../setup";
+import { createMockH3Event } from "../../../mock/h3-event";
+import { ISectionType } from "../../../../shared/types/enums";
 
-vi.mock("../../server/models/Section");
+vi.mock("../../../../server/models/Section");
 
 useH3TestUtils();
 
@@ -49,7 +49,7 @@ describe("GetAllSections controller", async () => {
     vi.clearAllMocks();
   });
 
-  const handler = await import("../../server/api/v1/sections/index.get");
+  const handler = await import("../../../../server/api/v1/sections/index.get");
 
   it("should return empty array and count 0 when no sections found", async () => {
     // Arrange: mock DB to return empty list
