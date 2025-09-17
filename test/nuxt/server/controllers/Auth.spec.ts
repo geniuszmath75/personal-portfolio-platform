@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useH3TestUtils } from "../setup";
-import { createMockH3Event } from "../mock/h3-event";
-import { UserSchemaRole } from "../../server/types/enums";
-import { User } from "../../server/models/User";
+import { useH3TestUtils } from "../../../setup";
+import { createMockH3Event } from "../../../mock/h3-event";
+import { UserSchemaRole } from "../../../../server/types/enums";
+import { User } from "../../../../server/models/User";
 
-vi.mock("../server/models/User");
+vi.mock("../../../../server/models/User");
 
 useH3TestUtils();
 
@@ -20,7 +20,7 @@ describe("Auth controller", async () => {
     vi.clearAllMocks();
   });
 
-  const handler = await import("../../server/api/v1/auth/login.post");
+  const handler = await import("../../../../server/api/v1/auth/login.post");
 
   it("should throw 400 if email or password missing", async () => {
     // Arrange: create mock event without password

@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import { connectDB } from "../../server/db/connect";
+import { connectDB } from "../../../server/db/connect";
 
 let mongoServer: MongoMemoryServer;
 
