@@ -1,4 +1,25 @@
-import type { ISectionType, BlockKind, ProjectSourceType, ProjectStatusType } from "./enums";
+import type {
+  ISectionType,
+  BlockKind,
+  ProjectSourceType,
+  ProjectStatusType,
+} from "./enums";
+
+/**
+ * Represents the image properties
+ */
+
+export interface Image {
+  /**
+   * Path to image source file
+   */
+  srcPath: string;
+
+  /**
+   * Alternative text describing the image
+   */
+  altText: string;
+}
 
 /********
  * SECTION
@@ -187,15 +208,15 @@ export interface IProject {
   /**
    * The main image of the project
    */
-  mainImage: string;
+  mainImage: Image;
 
   /**
    * List of other images of the project (showing other project aspects)
    */
-  otherImages?: string[];
+  otherImages?: Image[];
 
   /**
    * The status of the project
    */
-  status: ProjectStatusType
+  status: ProjectStatusType;
 }
