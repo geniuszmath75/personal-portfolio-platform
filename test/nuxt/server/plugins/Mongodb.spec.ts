@@ -12,16 +12,16 @@ import {
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
-import { useH3TestUtils } from "../setup";
-import { connectDB } from "../../server/db/connect";
+import { useH3TestUtils } from "../../../setup";
+import { connectDB } from "../../../../server/db/connect";
 
 useH3TestUtils();
 
-vi.mock("../../server/db/connect", () => ({
+vi.mock("../../../../server/db/connect", () => ({
   connectDB: vi.fn(),
 }));
 
-type MongodbPlugin = typeof import("../../server/plugins/mongodb");
+type MongodbPlugin = typeof import("../../../../server/plugins/mongodb");
 
 let mongoServer: MongoMemoryServer;
 let mongodbPlugin: MongodbPlugin;
@@ -42,7 +42,7 @@ describe("mongodb plugin", async () => {
     mockNuxtImport("useRuntimeConfig", () => useRuntimeConfigMock);
 
     // Import plugin after mocking
-    mongodbPlugin = await import("../../server/plugins/mongodb");
+    mongodbPlugin = await import("../../../../server/plugins/mongodb");
   });
 
   afterAll(async () => {

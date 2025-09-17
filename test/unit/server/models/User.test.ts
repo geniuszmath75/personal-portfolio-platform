@@ -1,7 +1,7 @@
 import { beforeEach, describe, vi, it, expect } from "vitest";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { User } from "../../server/models/User";
+import { User } from "../../../../server/models/User";
 import mongoose from "mongoose";
 
 // Type for mocking jwt.sign
