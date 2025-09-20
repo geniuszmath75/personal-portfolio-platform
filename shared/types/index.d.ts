@@ -220,3 +220,18 @@ export interface IProject {
    */
   status: ProjectStatusType;
 }
+
+/**
+ * Represents basic information about project
+ */
+export type BasicProjectInformation = Pick<
+  IProject,
+  "_id" | "title" | "technologies" | "shortDescription" | "mainImage"
+>;
+
+/**
+ * Response format for list of Projects objects from the API.
+ */
+export interface ProjectsResponse {
+  projects: IProject[];
+}
