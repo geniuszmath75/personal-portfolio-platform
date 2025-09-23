@@ -235,3 +235,53 @@ export type BasicProjectInformation = Pick<
 export interface ProjectsResponse {
   projects: IProject[];
 }
+
+/**
+ * PaginationProperties
+ *
+ * Represents pagination metadata returned from API responses.
+ */
+export interface PaginationProperties {
+  /**
+   * Current page number in the result set (starting from 1).
+   */
+  page: number;
+
+  /**
+   * Maximum number of items returned per page.
+   */
+  limit: number;
+
+  /**
+   * Number of the previous page, or null if the current page is
+   * the first one.
+   */
+  prevPage: number | null;
+
+  /**
+   * Number of the next page, or null if the current page is the
+   * last one.
+   */
+  nextPage: number | null;
+
+  /**
+   * Total number of documents/items matching the query.
+   */
+  totalDocuments: number;
+
+  /**
+   * Total number of pages available, based on `totalDocuments`
+   * and `limit`.
+   */
+  totalPages: number;
+}
+
+/**
+ * Derived type for query options returned in getPaginationParams server util.
+ */
+export type PaginationQuery = Pick<PaginationProperties, "page" | "limit"> & {
+  /**
+   * Number of items to skip (calculated from page and limit).
+   */
+  skip: number;
+};
