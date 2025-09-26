@@ -233,7 +233,20 @@ export type BasicProjectInformation = Pick<
  * Response format for list of Projects objects from the API.
  */
 export interface ProjectsResponse {
+  /**
+   * List of projects
+   */
   projects: IProject[];
+
+  /**
+   * Number of returned projects
+   */
+  count: number;
+
+  /**
+   * Pagination metadata
+   */
+  pagination: PaginationProperties;
 }
 
 /**
