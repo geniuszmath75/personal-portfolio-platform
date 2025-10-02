@@ -1,9 +1,11 @@
 import type {
   BasicProjectInformation,
+  Image,
   PaginationProperties,
-  IProject as Project,
+  ProjectResponse,
   ProjectsResponse,
-} from "~~/shared/types";
+} from "#shared/types";
+import { unionBy } from "lodash";
 
 export const useProjectsStore = defineStore("projects", {
   state: () => {
@@ -11,7 +13,12 @@ export const useProjectsStore = defineStore("projects", {
       /**
        * List of projects
        */
-      projects: [] as Project[],
+      projects: [] as ValidatedProject[],
+
+      /**
+       * Selected project details
+       */
+      projectDetails: null as ValidatedProject | null,
 
       /**
        * Pagination information for the current project list
@@ -45,6 +52,41 @@ export const useProjectsStore = defineStore("projects", {
         mainImage: p.mainImage,
       }));
     },
+    /**
+     * Merged list of project images.
+     *
+     * @param state - store state
+     * @returns array of images without duplicates
+     */
+    imageList(state): Image[] {
+      return unionBy(
+        state.projectDetails?.mainImage ? [state.projectDetails.mainImage] : [],
+        state.projectDetails?.otherImages,
+        "srcPath",
+      );
+    },
+
+    /**
+     * Formatted start date as YYYY-MM-DD
+     *
+     * @param state - store state
+     * @returns formatted start date or null if not available
+     */
+    formattedStartDate(state): string | null {
+      return (
+        state.projectDetails?.startDate.toISOString().split("T")[0] || null
+      );
+    },
+
+    /**
+     * Formatted end date as YYYY-MM-DD
+     *
+     * @param state - store state
+     * @returns formatted end date or null if not available
+     */
+    formattedEndDate(state): string | null {
+      return state.projectDetails?.endDate?.toISOString().split("T")[0] || null;
+    },
   },
   actions: {
     /**
@@ -52,19 +94,30 @@ export const useProjectsStore = defineStore("projects", {
      * @param projectsArray - updated list of projects
      * @param projectCount - updated number of project count
      */
-    setProjects(projectsArray: Project[], projectCount: number): void {
+    setProjects(projectsArray: ValidatedProject[], projectCount: number): void {
       this.projects = projectsArray;
       this.projectCount = projectCount;
     },
+
+    /**
+     * Update selected project details
+     * @param project - updated project details
+     */
+    setProjectDetails(project: ValidatedProject): void {
+      this.projectDetails = project;
+    },
+
     /**
      * Update pagination state
      * @param pagination updated pagination metadata
      */
+
     setPagination(pagination: PaginationProperties): void {
       this.pagination = pagination;
     },
+
     /**
-     * Fetches projects and sets the response to 'projects' state
+     * Fetches projects and sets the response to `projects` state
      * @param page - current page number in result set
      * @param limit - number of items returned per page.
      * @async
@@ -81,14 +134,44 @@ export const useProjectsStore = defineStore("projects", {
           },
         });
 
+        // validate response data
+        const validatedProjects = res.projects.map((project) =>
+          projectSchema.parse(project),
+        );
+
         // update store state with response data
-        this.setProjects(res.projects, res.count);
+        this.setProjects(validatedProjects, res.count);
         this.setPagination(res.pagination);
 
         this.loading = false;
       } catch (e) {
         this.loading = false;
         console.error("Failed to fetch projects:", e);
+      }
+    },
+
+    /**
+     * Fetches project details and sets the response to `projectDetails`
+     * state
+     * @param projectId - id of searched project
+     */
+    async fetchProject(projectId: string): Promise<void> {
+      const { baseApiPath } = useRuntimeConfig().public;
+      this.loading = true;
+
+      try {
+        const res = await $fetch<ProjectResponse>(
+          `${baseApiPath}/projects/${projectId}`,
+        );
+
+        // validate response data
+        const validatedProject = projectSchema.parse(res.project);
+
+        this.setProjectDetails(validatedProject);
+        this.loading = false;
+      } catch (e) {
+        this.loading = false;
+        console.error("Failed to fetch project details:", e);
       }
     },
   },

@@ -250,6 +250,16 @@ export interface ProjectsResponse {
 }
 
 /**
+ * Response format for Project details object from the API
+ */
+export interface ProjectResponse {
+  /**
+   * Project details
+   */
+  project: IProject;
+}
+
+/**
  * PaginationProperties
  *
  * Represents pagination metadata returned from API responses.
