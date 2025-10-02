@@ -6,7 +6,8 @@ export default <Partial<Config>>{
     extend: {
       boxShadow: {
         primary: "2px 4px 4px 4px rgba(28, 35, 33, 0.15)",
-        secondary: "2px 4px 4px 4px rgba(238, 241, 239, 0.15)",
+        secondary: "2px 2px 4px 4px rgba(238, 241, 239, 0.15",
+        secondaryTwo: "0px 0px 4px 4px rgba(238, 241, 239, 0.2)",
         additional: "2px 4px 4px 4px rgba(255, 64, 0, 0.15)",
       },
     },
@@ -47,6 +48,26 @@ export default <Partial<Config>>{
         800: "#991F00",
         900: "#731500",
         950: "#4A0C00",
+      },
+      success: {
+        100: "#E9F7F4",
+        300: "#AFE0D1",
+        500: "#4FB286",
+      },
+      info: {
+        100: "#DCF1F2",
+        300: "#83C7CC",
+        500: "#0D7882",
+      },
+      warning: {
+        100: "#FCF7ED",
+        300: "#F0D4B6",
+        500: "#D97D54",
+      },
+      error: {
+        100: "#FCF4ED",
+        300: "#F0C5B1",
+        500: "#D9534F",
       },
     },
     fontFamily: {

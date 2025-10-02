@@ -57,3 +57,57 @@ export type CarouselComposableProps = WithDefaults<
   | "autoplay"
   | "dotPlacement"
 >;
+
+/**
+ * BASE TIMELINE
+ *
+ * Props for the BaseTimeline component
+ */
+export interface BaseTimelineProps {
+  /**
+   * Whether the timeline is displayed horizontally
+   */
+  horizontal?: boolean;
+
+  /**
+   * Placement of the timeline items
+   */
+  itemPlacement?: "left" | "right";
+
+  /**
+   * Size of the timeline component
+   */
+  size?: "medium" | "large";
+}
+
+/**
+ * BASE TIMELINE ITEM
+ *
+ * Props for the BaseTimelineItem component
+ */
+export interface BaseTimelineItemProps {
+  /**
+   * Content of the timeline item
+   */
+  content?: string;
+
+  /**
+   * Datetime associated with the timeline item (can be null)
+   */
+  time?: string | null;
+
+  /**
+   * Title of the timeline item
+   */
+  title?: string;
+
+  /**
+   * Type of the timeline item (affects styling)
+   */
+  type?: "default" | "success" | "info" | "warning" | "error";
+
+  /**
+   * Whether this item is the last in the timeline (affects connector rendering)
+   */
+  isLast?: boolean;
+}
