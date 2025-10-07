@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col shadow-secondary rounded-2xl h-[37rem] hover:md:scale-105 hover:md:text-[105%] md:transition md:duration-200"
+    class="flex flex-col shadow-secondaryOne rounded-2xl h-[37rem] hover:md:scale-105 hover:md:text-[105%] md:transition md:duration-200"
   >
     <!-- Project main image -->
     <div class="flex-shrink-0 h-1/2 w-full">

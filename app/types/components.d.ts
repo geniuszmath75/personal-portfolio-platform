@@ -111,3 +111,35 @@ export interface BaseTimelineItemProps {
    */
   isLast?: boolean;
 }
+
+/**
+ * BASE TAG
+ *
+ * Props for the BaseTag component
+ */
+export interface BaseTagProps {
+  /**
+   * Whether the tag has a border
+   */
+  bordered?: boolean;
+
+  /**
+   * Whether the tag is rounded
+   */
+  rounded?: boolean;
+
+  /**
+   * Size of the tag component
+   */
+  size?: "small" | "medium" | "large";
+
+  /**
+   * Type of the tag component (affects styling)
+   */
+  type?: "default" | "primary" | "info" | "success" | "warning" | "error";
+
+  /**
+   * Whether the tag has dashed border.
+   */
+  dashed?: boolean;
+}

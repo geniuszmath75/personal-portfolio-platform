@@ -5,7 +5,7 @@
   >
     <!--Dot / Icon -->
     <div
-      class="relative flex items-center justify-center rounded-full border-2 shadow-secondaryTwo after:absolute"
+      class="relative flex items-center justify-center rounded-full border-2 shadow-secondaryOne after:absolute"
       :class="[getDotTypeClasses, getLineConnectorClasses, getDotSizeClasses]"
     >
       <slot name="icon" />
