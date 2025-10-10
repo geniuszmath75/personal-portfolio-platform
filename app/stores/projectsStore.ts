@@ -1,11 +1,4 @@
-import type {
-  BasicProjectInformation,
-  Image,
-  PaginationProperties,
-  ProjectResponse,
-  ProjectsResponse,
-} from "#shared/types";
-import { unionBy } from "lodash";
+import { camelCase, startCase, unionBy } from "lodash";
 
 export const useProjectsStore = defineStore("projects", {
   state: () => {
@@ -67,6 +60,49 @@ export const useProjectsStore = defineStore("projects", {
     },
 
     /**
+     * List of available project links (e.g., GitHub, Website).
+     *
+     * @param state - store state
+     * @returns array of link objects with label, icon and url
+     */
+    linkPropertiesList(state): {
+      label: string;
+      icon: string;
+      url: string;
+    }[] {
+      const details = state.projectDetails;
+      if (!details) return [];
+
+      // Collect all link URLs (future fields can be added here)
+      const linkUrls = [details?.githubLink, details?.websiteLink];
+
+      // Map each valid link to a display object (label, icon, url)
+      const nullableLinks = linkUrls.map((url) => {
+        if (!url) return null;
+
+        // Determine link domain type (GitHub or general website)
+        const linkDomain = url?.includes("github.com") ? "github" : "website";
+
+        // Generate label from domain name, e.g. "GitHub Link"
+        const label = startCase(camelCase(linkDomain)) + "  Link";
+
+        // Pick an appropriate icon
+        const icon = linkDomain === "github" ? "mdi:github" : "mdi:link";
+
+        return {
+          label,
+          icon,
+          url,
+        };
+      });
+
+      // Remove null entries
+      const links = nullableLinks.filter(isDefinedAndNotNull);
+
+      return links;
+    },
+
+    /**
      * Formatted start date as YYYY-MM-DD
      *
      * @param state - store state
@@ -86,6 +122,58 @@ export const useProjectsStore = defineStore("projects", {
      */
     formattedEndDate(state): string | null {
       return state.projectDetails?.endDate?.toISOString().split("T")[0] || null;
+    },
+
+    /**
+     * Visual properties of the project's status.
+     *
+     * @param state - store state
+     * @returns status object with icon and type
+     */
+    getProjectStatusProperties(state): {
+      status: ProjectStatusType;
+      icon: string;
+      type: "success" | "info";
+    } {
+      const status =
+        state.projectDetails?.status || ProjectStatusType.COMPLETED;
+      switch (status) {
+        case ProjectStatusType.IN_PROGRESS:
+          return {
+            status,
+            icon: "material-symbols:hourglass-top",
+            type: "info",
+          };
+        default:
+          return {
+            status,
+            icon: "mdi:check-circle",
+            type: "success",
+          };
+      }
+    },
+
+    /**
+     * Visual properties of the project's source.
+     *
+     * @param state - store state
+     * @returns source object with type and icon
+     */
+    getProjectSourceProperties(state): {
+      source: ProjectSourceType;
+      icon: string;
+    } {
+      const source =
+        state.projectDetails?.projectSource || ProjectSourceType.HOBBY;
+
+      switch (source) {
+        case ProjectSourceType.COMPANY:
+          return { source, icon: "mdi:company" };
+        case ProjectSourceType.UNIVERSITY:
+          return { source, icon: "mdi:school" };
+        default:
+          return { source, icon: "mdi:local-florist" };
+      }
     },
   },
   actions: {
