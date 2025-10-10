@@ -143,3 +143,25 @@ export interface BaseTagProps {
    */
   dashed?: boolean;
 }
+
+/**
+ * PROJECT PANEL
+ *
+ * Props for the ProjectPanel component
+ */
+export interface ProjectPanelProps {
+  /**
+   * Heading name of the panel
+   */
+  heading?: string;
+
+  /**
+   * Whether the panel has full width
+   */
+  fullWidth?: boolean;
+
+  /**
+   * Type of the panel component (affect styling)
+   */
+  type?: "primary" | "secondary";
+}
