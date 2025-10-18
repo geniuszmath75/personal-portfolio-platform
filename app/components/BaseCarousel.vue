@@ -56,7 +56,6 @@
 import type { BaseCarouselProps } from "~/types/components";
 
 const props = withDefaults(defineProps<BaseCarouselProps>(), {
-  currentIndex: undefined,
   defaultIndex: 0,
   totalElements: 1,
   showArrow: false,

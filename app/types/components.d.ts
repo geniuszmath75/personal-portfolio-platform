@@ -10,11 +10,6 @@ type WithDefaults<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
  */
 export interface BaseCarouselProps {
   /**
-   * Current active index (for controlled component)
-   */
-  currentIndex?: number;
-
-  /**
    * Default active index (for uncontrolled component)
    */
   defaultIndex?: number;

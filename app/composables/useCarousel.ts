@@ -11,19 +11,6 @@ export function useCarousel(props: CarouselComposableProps) {
    */
   let intervalId: NodeJS.Timeout | null = null;
 
-  /**
-   * Sync internal index with external control when provided
-   */
-  watch(
-    () => props.currentIndex,
-    (newVal) => {
-      if (typeof newVal === "number") {
-        internalIndex.value = newVal;
-      }
-    },
-    { immediate: true },
-  );
-
   // CLASSES:
 
   /**
@@ -33,16 +20,14 @@ export function useCarousel(props: CarouselComposableProps) {
     switch (props.dotPlacement) {
       case "top":
         return "top-4 left-1/2 transform -translate-x-1/2";
-      case "bottom":
-        return props.showArrow
-          ? "bottom-4 left-4"
-          : "bottom-4 left-1/2 transform -translate-x-1/2";
       case "left":
         return "left-4 top-1/2 transform -translate-y-1/2 flex-col";
       case "right":
         return "right-4 top-1/2 transform -translate-y-1/2 flex-col";
       default:
-        return "bottom-4 left-1/2 transform -translate-x-1/2";
+        return props.showArrow
+          ? "bottom-4 left-4"
+          : "bottom-4 left-1/2 transform -translate-x-1/2";
     }
   });
 

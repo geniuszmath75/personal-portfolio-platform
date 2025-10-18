@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ProjectSourceType, ProjectStatusType } from "#shared/types/enums";
+import { ProjectSourceType, ProjectStatusType } from "../../shared/types/enums";
 
 /**
  * Schema for validating project data.
@@ -15,9 +15,19 @@ export const projectSchema = z.object({
     .transform((dateStr) => (dateStr ? new Date(dateStr) : null)),
   shortDescription: z.string(),
   longDescription: z.string(),
-  githubLink: z.url().nullable(),
+  githubLink: z
+    .url({
+      protocol: /^https?$/,
+      hostname: z.regexes.domain,
+    })
+    .nullable(),
   projectSource: z.enum(ProjectSourceType).default(ProjectSourceType.HOBBY),
-  websiteLink: z.url().nullable(),
+  websiteLink: z
+    .url({
+      protocol: /^https?$/,
+      hostname: z.regexes.domain,
+    })
+    .nullable(),
   mainImage: z.object({
     srcPath: z.string().regex(/\.(png|jpe?g|webp|svg)$/i, "Invalid image URL"),
     altText: z.string(),
