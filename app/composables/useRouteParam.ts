@@ -8,7 +8,7 @@
 export function useRouteParam(param: string): string {
   const value = useRoute().params[param];
   if (typeof value !== "string") {
-    throw new Error(`Route param "${value}" is required and must be a string.`);
+    throw new Error(`Route param "${param}" is required and must be a string.`);
   }
   return value;
 }
