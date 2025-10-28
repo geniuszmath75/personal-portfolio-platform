@@ -9,7 +9,10 @@
     </div>
 
     <!-- Arrow navigation -->
-    <div v-if="showArrow" class="absolute flex gap-2 right-4 bottom-4 px-4">
+    <div
+      v-if="showArrow"
+      :class="['absolute flex gap-2 px-4', arrowPlacementClasses]"
+    >
       <slot
         name="arrow"
         :total="totalElements"
@@ -34,7 +37,10 @@
     </div>
 
     <!-- Dots navigation -->
-    <div v-if="showDots" :class="['absolute flex gap-2', dotPlacementClasses]">
+    <div
+      v-if="showDots"
+      :class="['absolute flex flex-wrap gap-2', dotPlacementClasses]"
+    >
       <slot
         name="dots"
         :total="totalElements"
@@ -73,6 +79,7 @@ const {
   prevElement,
   nextElement,
   getCurrentIndex,
+  arrowPlacementClasses,
 } = useCarousel(props);
 
 /**

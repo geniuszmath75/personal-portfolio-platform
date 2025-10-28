@@ -25,9 +25,18 @@ export function useCarousel(props: CarouselComposableProps) {
       case "right":
         return "right-4 top-1/2 transform -translate-y-1/2 flex-col";
       default:
-        return props.showArrow
-          ? "bottom-4 left-4"
-          : "bottom-4 left-1/2 transform -translate-x-1/2";
+        return "bottom-4 left-1/2 transform -translate-x-1/2";
+    }
+  });
+
+  /**
+   * Calculate CSS classes for arrow navigation placement
+   */
+  const arrowPlacementClasses = computed(() => {
+    if (props.dotPlacement.match(/top|bottom/)) {
+      return "left-0 top-1/2 justify-between w-full";
+    } else {
+      return "right-4 bottom-4";
     }
   });
 
@@ -116,5 +125,6 @@ export function useCarousel(props: CarouselComposableProps) {
     prevElement,
     nextElement,
     getCurrentIndex,
+    arrowPlacementClasses,
   };
 }
