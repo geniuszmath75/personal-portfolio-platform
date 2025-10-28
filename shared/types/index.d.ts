@@ -219,6 +219,11 @@ export interface IProject {
    * The status of the project
    */
   status: ProjectStatusType;
+
+  /**
+   * List of gained experience
+   */
+  gainedExperience: string[];
 }
 
 /**

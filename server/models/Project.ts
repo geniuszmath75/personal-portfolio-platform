@@ -83,6 +83,20 @@ const ProjectSchema = new mongoose.Schema<IProject, ProjectModel>({
     enum: ProjectStatusType,
     default: ProjectStatusType.COMPLETED,
   },
+  gainedExperience: {
+    type: [String],
+    validate: [
+      {
+        validator: (arr: string[]) => arr.every((exp) => exp.length > 1),
+        message:
+          "Each experience description must be at least 1 character long.",
+      },
+      {
+        validator: (arr: string[]) => arr.length > 0,
+        message: "At least one experience description is required.",
+      },
+    ],
+  },
 });
 
 export const Project: ProjectModel = mongoose.model<IProject, ProjectModel>(
