@@ -43,6 +43,7 @@ export const projectSchema = z.object({
     )
     .optional(),
   status: z.enum(ProjectStatusType).default(ProjectStatusType.COMPLETED),
+  gainedExperience: z.array(z.string()),
 });
 
 /**

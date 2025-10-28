@@ -123,16 +123,14 @@
 
       <!-- Gained experience panel -->
       <ProjectPanel heading="GAINED EXPERIENCE">
-        <div class="ml-4">
+        <div class="flex ml-4 h-full items-center">
           <ul class="list-disc">
-            <li class="text-secondary-500 text-sm md:text-base">
-              First experience
-            </li>
-            <li class="text-secondary-500 text-sm md:text-base">
-              Second experience
-            </li>
-            <li class="text-secondary-500 text-sm md:text-base">
-              Third experience
+            <li
+              v-for="(experience, i) in projectDetails?.gainedExperience"
+              :key="'experience-' + i"
+              class="text-secondary-500 text-sm md:text-base"
+            >
+              {{ experience }}
             </li>
           </ul>
         </div>
