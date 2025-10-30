@@ -1,6 +1,42 @@
 ## Changelog
 
-### [v0.2.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.1.0...v0.2.0) - 
+### [v0.3.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.2.0...v0.3.0) - 30 October 2025
+
+#### New Features
+
+-  add BaseTimeline, BaseTimelineItem components, useTimeline, useTimelineItem composables and types for components props. Add additional colors and shadow in tailwind config [`9c2e40f`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/9c2e40f6a5ac16e60a403662ffa51908f39fec03)
+-  add BaseCarousel component, useCarousel composable and components.d.ts for type definitions [`108a703`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/108a703d232dc577e24b802c7feb3cd5d2664a00)
+-  add single project page [`f693837`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/f693837a76bdb6deea8d0b957ec3ec8e5fdad77f)
+-  add validateProject util, getters and action for single project details. [`28318f2`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/28318f232572cc0853059c8fc64d5076e7ae6d7c)
+-  add BaseTag component and useTag composable [`88f35e0`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/88f35e0efb2e48422d4b7f6d0d129603ff3cc3ad)
+-  add composables for handling browser clipboard and router params [`a8e6b74`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/a8e6b74d0da1943ee9a0d0ff88a722dc0dc176c3)
+-  add new getters in projectsStore [`b996d6a`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/b996d6a0d039fe77b1c7c535695af66e14852f59)
+-  add /projects/:id returning single project details [`78a386b`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/78a386bcf1c36b48c2d65700327e050d63b4494c)
+-  add gainedExperience field to Project model [`f90f93b`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/f90f93bc467d651b68a9c5b93c0b7cdab6624619)
+-  replace hardcoded list with data returned from API in 'Gained Experience' panel [`857de1c`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/857de1c3c50d2a266be71d6da820434c7b9faa3b)
+
+#### Chores And Housekeeping
+
+-  fix file name. Install vue-composable-tester and vite-tsconfig-paths dependencies [`525a361`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/525a3611450d70cacb23b3375b9295337e11f361)
+-  update dependencies (including vulnarable version of happy-dom from 18.0.1 to 20.0.8) [`b5686da`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/b5686da222cb103a7248efb37aadc274fb659555)
+
+#### Refactoring and Updates
+
+-  remove unused fields, watchers. Improve projectSchema link validation [`4adeaa1`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/4adeaa11343a79add35ab13e6f5b2f2f7516f5b6)
+-  improve BaseCarousel visibility on mobile view [`bfd9654`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/bfd9654be144c9605550532818ae8153998269d6)
+-  fix file name typo and error message [`d391bfa`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/d391bfac1bd8ce5bea6aa245696524d009a38ca7)
+
+#### Changes to Test Assests
+
+-  add or update unit tests with Nuxt environment for BaseCarousel, BaseTag, BaseTimeline, NoResults, ProjectPanel components, their composables and toastNotification, validateProject utils and ProjectStore [`6ebf835`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/6ebf835f108a3ad332f277ecbd71e58d1ab708a9)
+-  add unit tests with Nuxt environment for useCarousel and gainedExperience field from Project model [`ec6e6d8`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/ec6e6d87273c3a2a0e7dd552d541db2680fb450b)
+-  add unit tests with Nuxt environment for /projects/[id].get endpoint and getSingleProject controller [`0921b23`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/0921b23034f4f8aa858efa6f32917680b351bf6d)
+
+#### Tidying of Code eg Whitespace
+
+-  visual fixes in CHANGELOG template [`22a2792`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/22a2792da6756ceb71cb2fa72b5d583c4b8a3f62)
+
+### [v0.2.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.1.0...v0.2.0) - 27 September 2025
 
 #### New Features
 
@@ -53,7 +89,6 @@
 -  configure connection with MongoDB database [`3f256eb`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/3f256ebf756cd99d86b40e575ac6ab6416e6bea8)
 -  auto-changelog configuration [`68bb018`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/68bb018edb226b1b88b4536a3ab80451c43ebf8f)
 -  configure Pinia plugin [`b212827`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/b212827c80f7cdc87d16179d8ce695ae0281e5d8)
--  release 0.1.0 [`9b079d6`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/9b079d67d264eeb3e1e49bdb031927ad199f4440)
 -  add three custom fontFamilies and boxShadows to tailwind.config.ts. Set fontFamily to font-default in default.vue [`c76462d`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/c76462dfa91247209fab1f4d439d4dd51b00712c)
 -  change app name in package.json [`02cbebf`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/02cbebffc2ec249c9212c1ad4953444558f09a71)
 -  add comments for DB connection methods [`a2d277b`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/a2d277bf03448a917d7942a312343a187b04c41d)
