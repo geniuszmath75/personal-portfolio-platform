@@ -19,6 +19,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -38,6 +39,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -60,6 +62,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -86,6 +89,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -107,6 +111,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -132,6 +137,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -158,6 +164,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -178,6 +185,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -197,6 +205,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -222,6 +231,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -245,6 +255,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -269,6 +280,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -291,6 +303,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -313,6 +326,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -340,6 +354,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -363,6 +378,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -389,6 +405,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -409,6 +426,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -433,6 +451,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -456,6 +475,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -478,6 +498,7 @@ describe("Project model", () => {
         shortDescription: "Short description",
         longDescription:
           "Lorem ipsum dolor sit amet consectetur adipiscing elit quisque faucibus ex sapien.",
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -504,6 +525,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.jpg",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -523,6 +545,7 @@ describe("Project model", () => {
           altText: "image.jpg",
         },
         otherImages: [],
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -542,6 +565,7 @@ describe("Project model", () => {
           altText: "image.jpg",
         },
         otherImages: [{ srcPath: "invalid.txt", altText: "Alt" }],
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -568,6 +592,7 @@ describe("Project model", () => {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
@@ -588,10 +613,60 @@ describe("Project model", () => {
           altText: "image.png",
         },
         status: "INVALID_STATUS",
+        gainedExperience: ["Experience 1"],
       });
 
       const validationError = project.validateSync();
       expect(validationError?.errors.status).toBeDefined();
+    });
+  });
+
+  /**
+   * GAINED EXPERIENCE
+   */
+  describe("gainedExperience", () => {
+    it("should reject empty experience array", () => {
+      const project: HydratedDocument<IProject> = new Project({
+        title: "Test title",
+        technologies: [],
+        startDate: new Date("2025-09-01"),
+        shortDescription: "Short description",
+        longDescription:
+          "Lorem ipsum dolor sit amet consectetur adipiscing elit quisque faucibus ex sapien.",
+        mainImage: {
+          srcPath: "/images/projects/image.jpg",
+          altText: "image.png",
+        },
+        gainedExperience: [],
+      });
+
+      const validationError = project.validateSync();
+      expect(validationError?.errors.gainedExperience).toBeDefined();
+      expect(validationError?.errors.gainedExperience.message).toBe(
+        "At least one experience description is required.",
+      );
+    });
+
+    it("should reject too short experience name", () => {
+      const project: HydratedDocument<IProject> = new Project({
+        title: "Test title",
+        technologies: ["", "Vue"],
+        startDate: new Date("2025-09-01"),
+        shortDescription: "Short description",
+        longDescription:
+          "Lorem ipsum dolor sit amet consectetur adipiscing elit quisque faucibus ex sapien.",
+        mainImage: {
+          srcPath: "/images/projects/image.jpg",
+          altText: "image.png",
+        },
+        gainedExperience: [""],
+      });
+
+      const validationError = project.validateSync();
+      expect(validationError?.errors.gainedExperience).toBeDefined();
+      expect(validationError?.errors.gainedExperience.message).toBe(
+        "Each experience description must be at least 1 character long.",
+      );
     });
   });
 });

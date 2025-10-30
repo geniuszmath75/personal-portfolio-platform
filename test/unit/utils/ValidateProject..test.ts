@@ -22,6 +22,7 @@ const validProject = {
     { srcPath: "img2.webp", altText: "Alt 2" },
   ],
   status: ProjectStatusType.COMPLETED,
+  gainedExperience: ["Experience 1"],
 };
 
 describe("validateProject util", () => {
@@ -143,6 +144,22 @@ describe("validateProject util", () => {
       projectSchema.parse({
         ...validProject,
         technologies: [123],
+      }),
+    ).toThrowError();
+  });
+
+  it("should reject when gained experience is not an array of strings", () => {
+    expect(() =>
+      projectSchema.parse({
+        ...validProject,
+        gainedExperience: "Experience 1,Experience 2",
+      }),
+    ).toThrowError();
+
+    expect(() =>
+      projectSchema.parse({
+        ...validProject,
+        gainedExperience: [123],
       }),
     ).toThrowError();
   });

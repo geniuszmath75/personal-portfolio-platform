@@ -62,16 +62,35 @@ describe("useCarousel", () => {
       },
     );
 
-    it("should use different bottom placement when showArrow=true", () => {
-      const { result } = mount(() =>
-        useCarousel({
-          ...testCarouselProps,
-          dotPlacement: "bottom",
-          showArrow: true,
-        }),
-      );
-      expect(result.dotPlacementClasses.value).toBe("bottom-4 left-4");
-    });
+    it.each([
+      {
+        placement: "top",
+        expected: "left-0 top-1/2 justify-between w-full",
+      },
+      {
+        placement: "bottom",
+        expected: "left-0 top-1/2 justify-between w-full",
+      },
+      {
+        placement: "left",
+        expected: "right-4 bottom-4",
+      },
+      {
+        placement: "right",
+        expected: "right-4 bottom-4",
+      },
+    ])(
+      "should return correct arrowPlacementClasses for $placement placement",
+      ({ placement, expected }) => {
+        const { result } = mount(() =>
+          useCarousel({
+            ...testCarouselProps,
+            dotPlacement: placement,
+          }),
+        );
+        expect(result.arrowPlacementClasses.value).toBe(expected);
+      },
+    );
   });
 
   describe("COMPUTED: carouselTransformStyle", () => {
