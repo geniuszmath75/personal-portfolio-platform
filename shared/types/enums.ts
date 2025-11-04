@@ -1,10 +1,11 @@
 /**
- * Represents the types of sections that can be created on the main page.
+ * Represents the types of sections that can be created in the app.
  */
 export enum ISectionType {
   SKILLS = "SKILLS",
   HERO = "HERO",
   CONTACT = "CONTACT",
+  ABOUT_ME = "ABOUT_ME",
 }
 
 /**
