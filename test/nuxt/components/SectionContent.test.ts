@@ -11,7 +11,15 @@ describe("SectionContent", () => {
       blocks: [
         { kind: "PARAGRAPH", paragraphs: ["Welcome", "Subtext here"] },
         { kind: "BUTTON", buttons: ["PROJECTS", "ABOUT"] },
-        { kind: "IMAGE", images: ["hero.png"] },
+        {
+          kind: "IMAGE",
+          images: [
+            {
+              srcPath: "hero.png",
+              altText: "hero image",
+            },
+          ],
+        },
       ],
     };
 
@@ -26,7 +34,7 @@ describe("SectionContent", () => {
     expect(screen.getByText("ABOUT").getAttribute("href")).toBe("/about");
 
     // Image
-    expect(screen.getByAltText("hero.png").getAttribute("src")).toBe(
+    expect(screen.getByAltText("hero image").getAttribute("src")).toBe(
       "/images/hero.png",
     );
   });

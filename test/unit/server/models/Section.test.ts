@@ -193,22 +193,6 @@ describe("Section model", () => {
           "At least one image is required.",
         );
       });
-
-      it("should reject too short image", () => {
-        const section = new Section({
-          title: "Test title",
-          slug: "test-slug",
-          type: ISectionType.HERO,
-          order: 1,
-          blocks: [{ kind: BlockKind.IMAGE, images: [".png"] }],
-        });
-
-        const validationError = section.validateSync();
-        expect(validationError?.errors["blocks.0.images"]).toBeDefined();
-        expect(validationError?.errors["blocks.0.images"].message).toBe(
-          "Each image must be at least 5 character long.",
-        );
-      });
     });
 
     /**
