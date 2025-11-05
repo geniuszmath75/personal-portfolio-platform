@@ -81,4 +81,21 @@ describe("GetAllSections controller", async () => {
       count: 2,
     });
   });
+
+  it("should call Section.find with correct home section types", async () => {
+    // Arrange: prepare mock to return empty list
+    vi.mocked(Section.find).mockResolvedValue([]);
+
+    const event = createMockH3Event({});
+
+    // Act: call controller
+    await handler.default(event);
+
+    // Assert: verify Section.find called with correct types
+    expect(Section.find).toHaveBeenCalledWith({
+      type: {
+        $in: [ISectionType.CONTACT, ISectionType.HERO, ISectionType.SKILLS],
+      },
+    });
+  });
 });
