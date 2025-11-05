@@ -14,13 +14,13 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const section = await Section.find({ slug });
+  const section = await Section.findOne({ slug });
 
   if (!section) {
     throw createError({
       statusCode: 404,
       statusMessage: "Not Found",
-      message: `Section with slug ${slug} not found.`,
+      message: `Section with slug '${slug}' not found.`,
     });
   }
 
