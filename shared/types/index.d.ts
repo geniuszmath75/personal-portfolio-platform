@@ -95,7 +95,7 @@ export interface ImageBlock extends BaseBlock {
   /**
    * Contains the images names for the section.
    */
-  images: string[];
+  images: Image[];
 }
 
 /**

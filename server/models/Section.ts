@@ -10,6 +10,7 @@ import type {
   BaseBlock,
 } from "../../shared/types/index.d.ts";
 import type { SectionModel } from "../types";
+import { ImageSchema } from "./Image";
 
 const ParagraphBlockSchema = new mongoose.Schema<ParagraphBlock>(
   {
@@ -34,14 +35,10 @@ const ParagraphBlockSchema = new mongoose.Schema<ParagraphBlock>(
 const ImageBlockSchema = new mongoose.Schema<ImageBlock>(
   {
     images: {
-      type: [String],
+      type: [ImageSchema],
       validate: [
         {
-          validator: (arr: string[]) => arr.every((img) => img.length >= 5),
-          message: "Each image must be at least 5 character long.",
-        },
-        {
-          validator: (arr: string[]) => arr.length > 0,
+          validator: (arr) => arr.length > 0,
           message: "At least one image is required.",
         },
       ],

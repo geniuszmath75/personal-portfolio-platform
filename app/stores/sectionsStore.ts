@@ -1,4 +1,4 @@
-import type { ISection as Section, SectionsResponse } from "~~/shared/types";
+import type { SectionsResponse } from "~~/shared/types";
 
 export const useSectionsStore = defineStore("sections", {
   state: () => {
@@ -6,7 +6,7 @@ export const useSectionsStore = defineStore("sections", {
       /**
        * List of main page sections
        */
-      sections: [] as Section[],
+      sections: [] as ValidatedSection[],
     };
   },
   getters: {
@@ -16,12 +16,12 @@ export const useSectionsStore = defineStore("sections", {
      * @param state - store state
      * @returns array of sections ordered in the way they should appear on page
      */
-    orderedSections(state): Section[] {
+    orderedSections(state): ValidatedSection[] {
       return state.sections.slice().sort((a, b) => a.order - b.order);
     },
   },
   actions: {
-    setSections(sectionsArray: Section[]): void {
+    setSections(sectionsArray: ValidatedSection[]): void {
       this.sections = sectionsArray;
     },
     /**
@@ -32,7 +32,12 @@ export const useSectionsStore = defineStore("sections", {
       const { baseApiPath } = useRuntimeConfig().public;
       try {
         const res = await $fetch<SectionsResponse>(`${baseApiPath}/sections`);
-        this.setSections(res.sections);
+
+        const validatedSections = res.sections.map((section) =>
+          sectionSchema.parse(section),
+        );
+
+        this.setSections(validatedSections);
       } catch (error) {
         console.error("Failed to fetch sections:", error);
       }

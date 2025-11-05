@@ -71,8 +71,8 @@
           <img
             v-for="(img, j) in block.images"
             :key="'img-' + i + '-' + j"
-            :src="'/images/' + img"
-            :alt="img"
+            :src="'/images/' + img.srcPath"
+            :alt="img.altText"
             class="max-w-[70%] md:max-w-80 lg:max-w-lg rounded-2xl shadow-lg shadow-primary-400"
           />
         </template>
