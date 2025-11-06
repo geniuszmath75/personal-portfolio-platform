@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { setActivePinia } from "pinia";
 import { createTestPinia } from "../../setup";
 import { useSectionsStore } from "../../../app/stores/sectionsStore";
-import type { ISection } from "../../../shared/types";
+import type { ValidatedSection } from "../../../app/utils/validateSection";
 import { ISectionType } from "../../../shared/types/enums";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
 
@@ -18,7 +18,7 @@ mockNuxtImport("useRuntimeConfig", () => {
 });
 
 describe("sectionsStore", () => {
-  const mockSections: ISection[] = [
+  const mockSections: ValidatedSection[] = [
     {
       _id: "1",
       slug: "hero",
@@ -65,7 +65,7 @@ describe("sectionsStore", () => {
     const store = useSectionsStore();
 
     store.setSections(mockSections);
-    const ordered = store.orderedSections.map((s: ISection) => s.title);
+    const ordered = store.orderedSections.map((s: ValidatedSection) => s.title);
 
     expect(ordered).toEqual(["Contact", "Hero", "Skills"]);
   });

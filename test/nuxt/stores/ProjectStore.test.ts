@@ -44,6 +44,7 @@ describe("projectsStore", () => {
       },
       projectSource: ProjectSourceType.HOBBY,
       status: ProjectStatusType.IN_PROGRESS,
+      gainedExperience: ["Testing", "State Management"],
     },
     {
       _id: "2",
@@ -61,6 +62,7 @@ describe("projectsStore", () => {
       },
       projectSource: ProjectSourceType.UNIVERSITY,
       status: ProjectStatusType.COMPLETED,
+      gainedExperience: ["Backend Development", "APIs"],
     },
   ];
 
