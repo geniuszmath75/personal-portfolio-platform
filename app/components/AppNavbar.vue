@@ -170,7 +170,7 @@ const accountIconRef = ref<HTMLElement | null>(null);
  */
 const navLinks = [
   { to: "/projects", label: "PROJECTS" },
-  { to: "/about", label: "ABOUT" },
+  { to: "/about-me", label: "ABOUT ME" },
 ];
 
 /**

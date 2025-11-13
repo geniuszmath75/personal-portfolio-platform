@@ -46,7 +46,7 @@
             <NuxtLink
               v-for="(btn, j) in block.buttons"
               :key="'btn-' + i + '-' + j"
-              :to="btn === 'PROJECTS' ? '/projects' : '/about'"
+              :to="btn === 'PROJECTS' ? '/projects' : '/about-me'"
               :class="
                 'px-5 md:px-6 py-3 md:py-4 text-sm md:text-base font-semibold transition duration-500 rounded-lg ' +
                 (j === 0
@@ -231,10 +231,10 @@
 </template>
 
 <script setup lang="ts">
-import type { ISection as Section } from "~~/shared/types";
+import type { ValidatedSection } from "~~/app/utils/validateSection";
 import { checkItemColSpan } from "~/utils/checkItemColSpan";
 
 const { section } = defineProps<{
-  section: Section;
+  section: ValidatedSection;
 }>();
 </script>

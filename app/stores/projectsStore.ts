@@ -199,7 +199,6 @@ export const useProjectsStore = defineStore("projects", {
      * Update pagination state
      * @param pagination updated pagination metadata
      */
-
     setPagination(pagination: PaginationProperties): void {
       this.pagination = pagination;
     },
@@ -242,6 +241,7 @@ export const useProjectsStore = defineStore("projects", {
      * Fetches project details and sets the response to `projectDetails`
      * state
      * @param projectId - id of searched project
+     * @async
      */
     async fetchProject(projectId: string): Promise<void> {
       const { baseApiPath } = useRuntimeConfig().public;
