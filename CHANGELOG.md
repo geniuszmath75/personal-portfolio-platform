@@ -1,5 +1,30 @@
 ## Changelog
 
+### [v0.4.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.3.0...v0.4.0) - 13 November 2025
+
+#### New Features
+
+-  add dynamic About Me page and update sectionDetails store [`584f247`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/584f2475a70fd9dec97667d5d9b2a06e49a577f4)
+-  add validateSection util and update Section model [`fc91333`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/fc91333139342d3b2d18270eadf0e496a34c08ae)
+-  add /sections/:slug returning single section. Add new ISectionType element for ABOUT_ME section. Refactor /sectionsendpoint to return only home page sections. [`a15580c`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/a15580c5bacf782ea6d2bab40365c7538c38ec1d)
+
+#### Chores And Housekeeping
+
+-  add CHANGELOG.md to .prettierignore [`2fd71aa`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/2fd71aa1c12002edb0f053df1dc19e0f4f4fe0e1)
+
+#### Refactoring and Updates
+
+-  fix typo, update function desc and props types [`de05887`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/de0588762439ec85390fb372d061f98a7168f169)
+-  change method used to finding single section and improve error message visibility. [`b3caea6`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/b3caea6dfbc03df4dcd035f548a1628248b94b37)
+
+#### Changes to Test Assests
+
+-  add unit tests for validateSection util [`69d5dfa`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/69d5dfa70335d8f04bad297efbccabaa80fd6ebc)
+-  add or update unit tests with Nuxt environment for /sections/[slug].get, /sections endpoints and controllers [`54443c4`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/54443c433abb026a35a09614fbcf45a495816d86)
+-  add new unit tests with Nuxt environment for SectionStore and update exisiting tests in AppNavbar, SectionContent components [`d4344dd`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/d4344dd6bd01107f75bc42b8f7f8ff7ebcf7b483)
+-  update unit tests for Section model and SectionContent component [`4f74f32`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/4f74f32bb9f7d2d5bc9cc3b6c55c6974f9d39c34)
+-  update types for project and section store tests [`92bc289`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/92bc289573f47551e531feb9c47bd6010fbfc5df)
+
 ### [v0.3.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.2.0...v0.3.0) - 30 October 2025
 
 #### New Features
