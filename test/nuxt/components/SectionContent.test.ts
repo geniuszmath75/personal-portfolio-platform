@@ -31,7 +31,7 @@ describe("SectionContent", () => {
 
     // Buttons
     expect(screen.getByText("PROJECTS").getAttribute("href")).toBe("/projects");
-    expect(screen.getByText("ABOUT").getAttribute("href")).toBe("/about");
+    expect(screen.getByText("ABOUT").getAttribute("href")).toBe("/about-me");
 
     // Image
     expect(screen.getByAltText("hero image").getAttribute("src")).toBe(

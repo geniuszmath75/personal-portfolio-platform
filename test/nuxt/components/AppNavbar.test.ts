@@ -13,7 +13,7 @@ describe("AppNavbar", () => {
     expect(githubIcon).toBeTruthy();
     expect(screen.getByText("HOME")).toBeTruthy();
     expect(screen.getByText("PROJECTS")).toBeTruthy();
-    expect(screen.getByText("ABOUT")).toBeTruthy();
+    expect(screen.getByText("ABOUT ME")).toBeTruthy();
   });
 
   it("opens and closes account panel on click", async () => {
@@ -77,7 +77,7 @@ describe("AppNavbar", () => {
     await fireEvent.click(openButton);
 
     // Ensure that links are visible
-    const aboutLink = screen.getAllByText("ABOUT")[1]; // 1 - mobile
+    const aboutLink = screen.getAllByText("ABOUT ME")[1]; // 1 - mobile
     expect(aboutLink).toBeTruthy();
 
     // Click ABOUT link in mobile menu
@@ -96,7 +96,7 @@ describe("AppNavbar", () => {
       },
     });
 
-    const aboutLinks = screen.getAllByText("ABOUT");
+    const aboutLinks = screen.getAllByText("ABOUT ME");
 
     // Desktop (0) ABOUT link should have active class
     expect(aboutLinks[0].className).toContain("after:w-full");

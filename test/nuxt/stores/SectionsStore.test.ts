@@ -45,6 +45,15 @@ describe("sectionsStore", () => {
     },
   ];
 
+  const mockAboutSection: ValidatedSection = {
+    _id: "4",
+    slug: "about",
+    title: "About me",
+    blocks: [],
+    type: ISectionType.ABOUT_ME,
+    order: 4,
+  };
+
   beforeEach(() => {
     setActivePinia(createTestPinia());
   });
@@ -52,6 +61,7 @@ describe("sectionsStore", () => {
   it("should have default state", () => {
     const store = useSectionsStore();
     expect(store.sections).toEqual([]);
+    expect(store.sectionDetails).toBeNull();
   });
 
   it("should 'setSections' updates state", () => {
@@ -59,6 +69,13 @@ describe("sectionsStore", () => {
 
     store.setSections(mockSections);
     expect(store.sections).toEqual(mockSections);
+  });
+
+  it("should 'setSectionDetails' updates state", () => {
+    const store = useSectionsStore();
+
+    store.setSectionDetails(mockAboutSection);
+    expect(store.sectionDetails).toEqual(mockAboutSection);
   });
 
   it("should 'orderedSections' sorts sections by order", () => {
@@ -106,5 +123,71 @@ describe("sectionsStore", () => {
     expect(store.sections).toEqual([]);
 
     consoleErrorSpy.mockRestore();
+  });
+
+  it("should 'fetchSection' set sectionDetails from API response", async () => {
+    const store = useSectionsStore();
+
+    // Mock $fetch
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn().mockResolvedValue({ section: mockAboutSection }),
+    );
+
+    await store.fetchSection("about-me");
+
+    expect($fetch).toHaveBeenCalledWith("/api/v1/sections/about-me");
+    expect(store.sectionDetails).toEqual(mockAboutSection);
+  });
+
+  it("should 'fetchSection' handles errors gracefully", async () => {
+    const store = useSectionsStore();
+
+    // Mock $fetch
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn().mockRejectedValue(new Error("Network error")),
+    );
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    await store.fetchSection("about-me");
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Failed to fetch section details:",
+      expect.any(Error),
+    );
+    expect(store.sectionDetails).toBeNull();
+
+    consoleErrorSpy.mockRestore();
+  });
+
+  describe("getBlockElementsByKind", () => {
+    it("should return undefined when sectionDetails is null", () => {
+      const store = useSectionsStore();
+      store.sectionDetails = null;
+
+      const result = store.getBlockElementsByKind("IMAGE");
+      expect(result).toBeUndefined();
+    });
+
+    it("should return block element matching the specified kind", () => {
+      const store = useSectionsStore();
+      const mockBlock = { kind: "PARAGRAPH", paragraphs: ["Hello"] };
+      store.sectionDetails = { blocks: [mockBlock] };
+
+      const result = store.getBlockElementsByKind("PARAGRAPH");
+      expect(result).toEqual(mockBlock);
+    });
+
+    it("should return undefined when kind does not match any block", () => {
+      const store = useSectionsStore();
+      const mockBlock = { kind: "PARAGRAPH", paragraphs: ["Hello"] };
+      store.sectionDetails = { blocks: [mockBlock] };
+
+      const result = store.getBlockElementsByKind("IMAGE");
+      expect(result).toBeUndefined();
+    });
   });
 });
