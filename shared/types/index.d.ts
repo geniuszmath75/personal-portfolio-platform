@@ -148,6 +148,13 @@ export interface SectionsResponse {
   sections: ISection[];
 }
 
+/**
+ * Response format for Section details object from the API
+ */
+export interface SectionResponse {
+  section: ISection;
+}
+
 /********
  * PROJECT
  *
