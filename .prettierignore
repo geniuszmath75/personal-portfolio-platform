@@ -24,3 +24,6 @@ static
 
 # Code coverage
 /test/coverage
+
+# CHANGELELOG.md
+CHANGELOG.md
