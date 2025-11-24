@@ -8,7 +8,7 @@ vi.mock("../../../../server/models/User");
 
 useH3TestUtils();
 
-describe("Auth controller", async () => {
+describe("loginUser controller", async () => {
   const mockUser = {
     email: "test@example.com",
     role: UserSchemaRole.ADMIN,

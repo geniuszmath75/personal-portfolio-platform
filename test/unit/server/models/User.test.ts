@@ -1,8 +1,9 @@
 import { beforeEach, describe, vi, it, expect } from "vitest";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { User } from "../../../../server/models/User";
+import { User, userSchemaPreSave } from "../../../../server/models/User";
 import mongoose from "mongoose";
+import type { IUser } from "../../../../server/types";
 
 // Type for mocking jwt.sign
 type SignType = (
@@ -18,6 +19,8 @@ type CompareType = (password: string, hash: string) => Promise<boolean>;
 vi.mock("bcryptjs", () => ({
   default: {
     compare: vi.fn(),
+    genSalt: vi.fn(),
+    hash: vi.fn(),
   },
 }));
 
@@ -85,7 +88,7 @@ describe("User model", () => {
     it("should reject too short password", () => {
       const user = new User({
         email: "test@example.com",
-        password: "short",
+        password: "Sh0r!",
         username: "testuser",
       });
 
@@ -93,6 +96,62 @@ describe("User model", () => {
       expect(validationError?.errors.password).toBeDefined();
       expect(validationError?.errors.password?.message).toBe(
         "Password must be at least 8 characters long",
+      );
+    });
+
+    it("should reject password without at least 1 uppercase letter", () => {
+      const user = new User({
+        email: "test@example.com",
+        password: "pass123!",
+        username: "testuser",
+      });
+
+      const validationError = user.validateSync();
+      expect(validationError?.errors.password).toBeDefined();
+      expect(validationError?.errors.password?.message).toBe(
+        "Password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character",
+      );
+    });
+
+    it("should reject password without at least 1 lowercase letter", () => {
+      const user = new User({
+        email: "test@example.com",
+        password: "PASS123!",
+        username: "testuser",
+      });
+
+      const validationError = user.validateSync();
+      expect(validationError?.errors.password).toBeDefined();
+      expect(validationError?.errors.password?.message).toBe(
+        "Password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character",
+      );
+    });
+
+    it("should reject password without at least 1 digit", () => {
+      const user = new User({
+        email: "test@example.com",
+        password: "Password!",
+        username: "testuser",
+      });
+
+      const validationError = user.validateSync();
+      expect(validationError?.errors.password).toBeDefined();
+      expect(validationError?.errors.password?.message).toBe(
+        "Password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character",
+      );
+    });
+
+    it("should reject password without at least 1 special character", () => {
+      const user = new User({
+        email: "test@example.com",
+        password: "Pass1234",
+        username: "testuser",
+      });
+
+      const validationError = user.validateSync();
+      expect(validationError?.errors.password).toBeDefined();
+      expect(validationError?.errors.password?.message).toBe(
+        "Password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character",
       );
     });
   });
@@ -148,14 +207,14 @@ describe("User model", () => {
    * ROLE
    */
   describe("role", () => {
-    it("should set default role to ADMIN", () => {
+    it("should set default role to GUEST", () => {
       const user = new User({
         email: "test@example.com",
         password: "password123",
         username: "testuser",
       });
 
-      expect(user.role).toBe("ADMIN");
+      expect(user.role).toBe("GUEST");
     });
 
     it("should reject invalid role", () => {
@@ -175,22 +234,22 @@ describe("User model", () => {
    * AVATAR
    */
   describe("avatar", () => {
-    it("should allow empty value", () => {
+    it("should set default value to null", () => {
       const user = new User({
         email: "test@example.com",
-        password: "password123",
+        password: "Password123!",
         username: "testuser",
       });
 
       const validationError = user.validateSync();
       expect(validationError).toBeUndefined();
-      expect(user.avatar).toBeUndefined();
+      expect(user.avatar).toBeNull();
     });
 
     it("should accept String value", () => {
       const user = new User({
         email: "test@example.com",
-        password: "password123",
+        password: "Password123!",
         username: "testuser",
         avatar: "https://example.com/avatar.png",
       });
@@ -251,6 +310,95 @@ describe("User model", () => {
         "plain-password",
         "hashed-password",
       );
+    });
+  });
+
+  /**
+   * PRE SAVE HOOK
+   */
+  describe("pre save hook", () => {
+    it("should hash password before saving", async () => {
+      // Arrange
+      const plainPassword = "Pass123!";
+      const mockSalt = "mockedSalt123";
+      const mockHashedPassword = "hashedPassword123";
+
+      vi.mocked(bcrypt.genSalt).mockResolvedValue(mockSalt as never);
+      vi.mocked(bcrypt.hash).mockResolvedValue(mockHashedPassword as never);
+
+      const mockUser = {
+        password: plainPassword,
+      } as IUser;
+
+      // Act
+      await userSchemaPreSave.call(mockUser);
+
+      // Assert
+      expect(bcrypt.genSalt).toHaveBeenCalledWith(12);
+      expect(bcrypt.hash).toHaveBeenCalledWith(plainPassword, mockSalt);
+      expect(mockUser.password).toBe(mockHashedPassword);
+      expect(mockUser.password).not.toBe(plainPassword);
+    });
+
+    it("should generate salt with correct rounds (12)", async () => {
+      // Arrange
+      const mockSalt = "mockedSalt";
+      const mockHashedPassword = "hashedPassword";
+
+      vi.mocked(bcrypt.genSalt).mockResolvedValue(mockSalt as never);
+      vi.mocked(bcrypt.hash).mockResolvedValue(mockHashedPassword as never);
+
+      const mockUser = {
+        password: "password123",
+      } as IUser;
+
+      // Act
+      await userSchemaPreSave.call(mockUser);
+
+      // Assert
+      expect(bcrypt.genSalt).toHaveBeenCalledTimes(1);
+      expect(bcrypt.genSalt).toHaveBeenCalledWith(12);
+    });
+
+    it("should throw error if bcrypt.genSalt fails", async () => {
+      // Arrange
+      const error = new Error("Salt generation failed");
+      vi.mocked(bcrypt.genSalt).mockRejectedValue(error);
+
+      const mockUser = {
+        username: "testuser",
+        email: "test@example.com",
+        password: "password123",
+      } as IUser;
+
+      // Act & Assert
+      await expect(userSchemaPreSave.call(mockUser)).rejects.toThrow(
+        "Salt generation failed",
+      );
+      expect(bcrypt.genSalt).toHaveBeenCalledWith(12);
+      expect(bcrypt.hash).not.toHaveBeenCalled();
+    });
+
+    it("should throw error if bcrypt.hash fails", async () => {
+      // Arrange
+      const mockSalt = "salt";
+      const error = new Error("Hash generation failed");
+
+      vi.mocked(bcrypt.genSalt).mockResolvedValue(mockSalt as never);
+      vi.mocked(bcrypt.hash).mockRejectedValue(error);
+
+      const mockUser = {
+        username: "testuser",
+        email: "test@example.com",
+        password: "password123",
+      } as IUser;
+
+      // Act & Assert
+      await expect(userSchemaPreSave.call(mockUser)).rejects.toThrow(
+        "Hash generation failed",
+      );
+      expect(bcrypt.genSalt).toHaveBeenCalledWith(12);
+      expect(bcrypt.hash).toHaveBeenCalledWith("password123", mockSalt);
     });
   });
 });

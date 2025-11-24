@@ -3,7 +3,7 @@ import { createMockH3Event } from "../../../../mock/h3-event";
 import { UserSchemaRole } from "../../../../../server/types/enums";
 import { useH3TestUtils } from "../../../../setup";
 
-vi.mock("../../../../../server/controllers/auth");
+vi.mock("../../../../../server/controllers/loginUser");
 
 useH3TestUtils();
 
@@ -12,7 +12,9 @@ describe("POST /api/v1/auth/login", async () => {
     vi.clearAllMocks();
   });
 
-  const authHandler = await import("../../../../../server/controllers/auth");
+  const authHandler = await import(
+    "../../../../../server/controllers/loginUser"
+  );
   const loginHandler = await import(
     "../../../../../server/api/v1/auth/login.post"
   );
