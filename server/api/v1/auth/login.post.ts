@@ -1,5 +1,5 @@
-import auth from "~~/server/controllers/auth";
+import loginUser from "~~/server/controllers/loginUser";
 
 export default defineEventHandler(async (event) => {
-  return await auth(event);
+  return await loginUser(event);
 });

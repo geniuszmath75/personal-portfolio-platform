@@ -3,4 +3,5 @@
  */
 export enum UserSchemaRole {
   ADMIN = "ADMIN",
+  GUEST = "GUEST",
 }

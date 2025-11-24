@@ -18,6 +18,10 @@ const UserSchema = new mongoose.Schema<IUser, UserModel, IUserMethods>({
     type: String,
     required: [true, "Password is required"],
     minLength: [8, "Password must be at least 8 characters long"],
+    match: [
+      /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/,
+      "Password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character",
+    ],
   },
   username: {
     type: String,
@@ -28,12 +32,22 @@ const UserSchema = new mongoose.Schema<IUser, UserModel, IUserMethods>({
   role: {
     type: String,
     enum: UserSchemaRole,
-    default: UserSchemaRole.ADMIN,
+    default: UserSchemaRole.GUEST,
   },
   avatar: {
     type: String,
+    default: null,
   },
 });
+
+// Hash password before saving to database
+export async function userSchemaPreSave(this: IUser) {
+  const salt = await bcrypt.genSalt(12);
+  this.password = await bcrypt.hash(this.password, salt);
+}
+
+// Pre-save hook to do some operations before saving a user
+UserSchema.pre("save", userSchemaPreSave);
 
 // Create a JWT token for the logged-in user
 UserSchema.methods.createJWT = function (): string {
