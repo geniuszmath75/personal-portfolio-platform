@@ -4,6 +4,7 @@ import type {
   ProjectSourceType,
   ProjectStatusType,
 } from "./enums";
+import type { UserSchemaRole } from "../../server/types/enums";
 
 /**
  * Represents the image properties
@@ -320,3 +321,14 @@ export type PaginationQuery = Pick<PaginationProperties, "page" | "limit"> & {
    */
   skip: number;
 };
+
+/****************
+ * LOGIN RESPONSE
+ ***************/
+export interface LoginResponse {
+  user: {
+    email: string;
+    role: UserSchemaRole;
+  };
+  token: string;
+}

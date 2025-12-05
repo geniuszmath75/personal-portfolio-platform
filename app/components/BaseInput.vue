@@ -1,7 +1,7 @@
 <template>
   <input
     :id="id"
-    v-model="modelValue"
+    v-model="inputValue"
     :type="type"
     :name="name"
     :disabled="isDisabled"
@@ -22,7 +22,7 @@ const props = withDefaults(defineProps<BaseInputProps>(), {
   isDisabled: false,
 });
 
-const modelValue = defineModel({ default: "", type: String });
+const inputValue = defineModel<string>({ default: "" });
 
 /**
  * Computed classes for invalid input state
