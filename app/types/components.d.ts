@@ -1,3 +1,5 @@
+import type { ButtonHTMLAttributes, InputTypeHTMLAttribute } from "vue";
+
 /**
  * Utility type to make certain properties required while keeping others optional
  */
@@ -159,4 +161,73 @@ export interface ProjectPanelProps {
    * Type of the panel component (affect styling)
    */
   type?: "primary" | "secondary";
+}
+
+/**
+ * BASE INPUT
+ *
+ * Props for the BaseInput component
+ */
+export interface BaseInputProps {
+  /**
+   * Type of the input element
+   */
+  type?: InputTypeHTMLAttribute;
+
+  /**
+   * ID of the input element
+   */
+  id: string;
+
+  /**
+   * Name of the input element
+   */
+  name: string;
+
+  /**
+   * Placeholder text for the input element
+   */
+  placeholder?: string;
+
+  /**
+   * Whether the input has valid data
+   */
+  isValid?: boolean;
+
+  /**
+   * Whether the input is disabled
+   */
+  isDisabled?: boolean;
+}
+
+/**
+ * BASE BUTTON
+ *
+ * Props for the BaseBtn component
+ */
+export interface BaseBtnProps {
+  /**
+   * Type of the button element
+   */
+  type?: ButtonHTMLAttributes["type"];
+
+  /**
+   * Whether the button is disabled
+   */
+  isDisabled?: boolean;
+
+  /**
+   * Label text for the button
+   */
+  label: string;
+
+  /**
+   * Style variant of the button
+   */
+  btnStyle?: "additional" | "secondary" | "tab--active" | "tab--inactive";
+
+  /**
+   * Size variant of the button
+   */
+  btnSize?: "default" | "tab";
 }

@@ -63,7 +63,7 @@
             <div
               class="flex flex-col justify-center items-center space-y-2 py-6"
             >
-              <NuxtLink to="/login" class="w-48">
+              <NuxtLink to="/auth/login" class="w-48">
                 <div
                   class="relative flex items-center justify-center bg-additional-500 h-12 rounded-3xl shadow-primary hover:bg-additional-600"
                 >
@@ -131,7 +131,7 @@
             <!-- Log In -->
             <div class="w-full flex justify-center">
               <NuxtLink
-                to="/login"
+                to="/auth/login"
                 class="h-16 w-full flex items-center justify-center space-x-2 bg-additional-500 font-semibold text-xl"
                 @click="toggleMobileMenu"
               >

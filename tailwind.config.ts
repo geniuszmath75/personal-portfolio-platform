@@ -70,6 +70,7 @@ export default <Partial<Config>>{
       error: {
         100: "#FCF4ED",
         300: "#F0C5B1",
+        400: "#E6917E",
         500: "#D9534F",
         800: "#82201D",
       },
