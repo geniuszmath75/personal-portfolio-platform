@@ -26,16 +26,16 @@
         <label for="email" class="text-sm font-bold text-secondary-500 mb-2"
           >Email:</label
         >
-        <FormError :errors="v$.email.$errors">
+        <FormError :errors="emailErrors">
           <BaseInput
             id="email"
             ref="emailInput"
-            v-model="credentials.email"
+            v-model="formCredentials.email"
             :is-disabled="loading"
             name="email"
             placeholder="example@gmail.com"
-            :is-valid="!v$.email.$error"
-            @input="v$.email.$touch"
+            :is-valid="!isEmailInvalid"
+            @input="touchFields('email')"
           />
         </FormError>
       </div>
@@ -45,17 +45,17 @@
         <label for="password" class="text-sm font-bold text-secondary-500 mb-2"
           >Password:</label
         >
-        <FormError :errors="v$.password.$errors">
+        <FormError :errors="passwordErrors">
           <div class="relative">
             <BaseInput
               id="password"
-              v-model="credentials.password"
+              v-model="formCredentials.password"
               :is-disabled="loading"
               :type="isPasswordVisible ? 'text' : 'password'"
               name="password"
               placeholder="********"
-              :is-valid="!v$.password.$error"
-              @input="v$.password.$touch"
+              :is-valid="!isPasswordInvalid"
+              @input="touchFields('password')"
             />
 
             <!-- Show / Hide password icon -->
@@ -81,57 +81,29 @@
 </template>
 <script setup lang="ts">
 import BaseInput from "~/components/BaseInput.vue";
-import { useVuelidate } from "@vuelidate/core";
-import type { LoginResponse } from "~~/shared/types";
+import { useLoginForm } from "~/composables/useLoginForm";
 
 definePageMeta({
   layout: "auth",
 });
 
 const { isPasswordVisible, toggleVisibility } = usePasswordVisibility();
+const {
+  formCredentials,
+  loading,
+  login,
+  touchFields,
+  emailErrors,
+  passwordErrors,
+  isEmailInvalid,
+  isPasswordInvalid,
+} = useLoginForm({ email: "", password: "" });
 
 // BaseInput instance type
 type BaseInputInstance = InstanceType<typeof BaseInput>;
 
 // Email input reference
 const emailRef = useTemplateRef<BaseInputInstance>("emailInput");
-
-const loading = ref(false);
-
-// Login credentials
-const credentials = ref({
-  email: "",
-  password: "",
-});
-
-// Vuelidate instance
-const v$ = useVuelidate(loginValidationRules, credentials);
-
-const login = async () => {
-  const { baseApiPath } = useRuntimeConfig().public;
-  const isValid = await v$.value.$validate();
-
-  if (!isValid) return;
-
-  try {
-    loading.value = true;
-    const res = await $fetch<LoginResponse>(`${baseApiPath}/auth/login`, {
-      method: "POST",
-      body: JSON.stringify(credentials.value),
-    });
-
-    // Validate response schema
-    const validatedLoginResponse = loginResponseSchema.parse(res);
-    console.log("Logged in user: ", validatedLoginResponse.user);
-
-    showSuccessToast("Login successful");
-    await navigateTo("/admin/dashboard");
-  } catch (error) {
-    handleError(error, "Login failed");
-  } finally {
-    loading.value = false;
-  }
-};
 
 // Focus on email input on component mount/
 onMounted(() => {
