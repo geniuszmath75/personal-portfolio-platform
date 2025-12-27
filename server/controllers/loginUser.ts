@@ -4,6 +4,13 @@ export default defineEventHandler(async (event) => {
   // Read the request body
   const { email, password } = await readBody(event);
 
+  // Get runtime config
+  const runtimeConfig = useRuntimeConfig();
+
+  // Get environment and token lifetime variables
+  const environment = runtimeConfig.public.environment;
+  const jwtLifetime = runtimeConfig.jwtLifetime;
+
   // Check if email and password are provided
   if (!email || !password) {
     throw createError({
@@ -35,9 +42,18 @@ export default defineEventHandler(async (event) => {
   // Create a JWT token for the user
   const token = user.createJWT();
 
+  // Set token cookie
+  setCookie(event, "auth_token", token, {
+    httpOnly: true,
+    secure: environment === "production",
+    sameSite: "lax",
+    maxAge: parseInt(jwtLifetime),
+    path: "/",
+  });
+
   // Prepare the response
   const response = {
-    user: { email: user.email, role: user.role },
+    user: { user_id: user.id, email: user.email, role: user.role },
     token,
   };
 

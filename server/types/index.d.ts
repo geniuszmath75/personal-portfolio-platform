@@ -1,5 +1,4 @@
 import type { Model } from "mongoose";
-import type { StringValue } from "ms";
 import type { UserSchemaRole } from "./enums";
 import type { IProject } from "~~/shared/types";
 
@@ -74,6 +73,15 @@ export type UserModel = Model<IUser, object, IUserMethods>;
  */
 export type ProjectModel = Model<IProject, object>;
 
+/**
+ * Represents information about the authenticated user
+ */
+export interface AuthUser {
+  user_id: string;
+  email: string;
+  role: UserSchemaRole;
+}
+
 /***********
  * CONFIGURATION
  *
@@ -82,6 +90,16 @@ export type ProjectModel = Model<IProject, object>;
 declare module "@nuxt/schema" {
   export interface RuntimeConfig {
     jwtSecret: string;
-    jwtLifetime: number | StringValue;
+    jwtLifetime: string;
+  }
+}
+
+/**
+ * Overrides the h3 event.context object with custom types
+ */
+declare module "h3" {
+  interface H3EventContext {
+    user: AuthUser | null;
+    isAuthenticated: boolean;
   }
 }

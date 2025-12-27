@@ -52,11 +52,12 @@ UserSchema.pre("save", userSchemaPreSave);
 // Create a JWT token for the logged-in user
 UserSchema.methods.createJWT = function (): string {
   const { jwtSecret, jwtLifetime } = useRuntimeConfig();
+
   return jwt.sign(
     { userId: this._id, email: this.email, role: this.role },
     jwtSecret,
     {
-      expiresIn: jwtLifetime,
+      expiresIn: parseInt(jwtLifetime),
     },
   );
 };
