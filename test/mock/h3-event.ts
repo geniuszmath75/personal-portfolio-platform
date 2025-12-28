@@ -1,4 +1,5 @@
 import type { H3Event } from "h3";
+import type { AuthUser } from "../../server/types";
 import { merge } from "lodash";
 
 export const createMockH3Event = (
@@ -6,6 +7,8 @@ export const createMockH3Event = (
     body?: Record<string, unknown>;
     params?: Record<string, unknown>;
     query?: Record<string, unknown>;
+    user?: AuthUser;
+    isAuthenticated?: boolean;
   },
 ): H3Event => {
   const event = {
@@ -18,6 +21,8 @@ export const createMockH3Event = (
     context: {
       params: partialEvent.params || {},
       query: partialEvent.query || {},
+      user: partialEvent.user || null,
+      isAuthenticated: partialEvent.isAuthenticated || false,
     },
 
     _requestBody: partialEvent.body,

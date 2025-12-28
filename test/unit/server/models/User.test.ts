@@ -32,7 +32,7 @@ vi.mock("jsonwebtoken", () => ({
 
 vi.stubGlobal("useRuntimeConfig", () => ({
   jwtSecret: "testsecret",
-  jwtLifetime: "10m",
+  jwtLifetime: "10",
 }));
 
 describe("User model", () => {
@@ -284,7 +284,7 @@ describe("User model", () => {
       expect(signSpy).toHaveBeenCalledWith(
         { userId: fakeId, email: "test@example.com", role: "ADMIN" },
         "testsecret",
-        { expiresIn: "10m" },
+        { expiresIn: 10 },
       );
     });
   });

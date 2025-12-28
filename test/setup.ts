@@ -21,6 +21,9 @@ export function useH3TestUtils() {
     }),
     getRouterParams: vi.fn((event: H3Event) => event.context?.params || {}),
     getQuery: vi.fn((event: H3Event) => event.context?.query || {}),
+    setCookie: vi.fn(),
+    deleteCookie: vi.fn(),
+    getCookie: vi.fn(),
   }));
 
   // Stub the global functions to support auto-imports in tests
@@ -29,6 +32,9 @@ export function useH3TestUtils() {
   vi.stubGlobal("readBody", h3.readBody);
   vi.stubGlobal("getRouterParams", h3.getRouterParams);
   vi.stubGlobal("getQuery", h3.getQuery);
+  vi.stubGlobal("setCookie", h3.setCookie);
+  vi.stubGlobal("deleteCookie", h3.deleteCookie);
+  vi.stubGlobal("getCookie", h3.getCookie);
 
   return h3;
 }

@@ -10,6 +10,7 @@ useH3TestUtils();
 
 describe("loginUser controller", async () => {
   const mockUser = {
+    id: 1,
     email: "test@example.com",
     role: UserSchemaRole.ADMIN,
     comparePassword: vi.fn(),
@@ -65,6 +66,39 @@ describe("loginUser controller", async () => {
     });
   });
 
+  it("should set auth_token cookie with correct options", async () => {
+    // Arrange: mock DB to return a user
+    vi.mocked(User.findOne).mockResolvedValue(mockUser);
+    // Simulate correct password
+    mockUser.comparePassword.mockResolvedValue(true);
+    // And mock JWT generation
+    mockUser.createJWT.mockReturnValue("jwt-token");
+
+    // Get setCookie mock from h3 utils
+    const { setCookie } = useH3TestUtils();
+
+    const event = createMockH3Event({
+      body: { email: "test@example.com", password: "correctpass" },
+    });
+
+    // Act: call handler
+    await handler.default(event);
+
+    // Assert: verify setCookie was called with correct parameters
+    expect(setCookie).toHaveBeenCalledWith(
+      event,
+      "auth_token",
+      "jwt-token",
+      expect.objectContaining({
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        maxAge: expect.any(Number),
+        path: "/",
+      }),
+    );
+  });
+
   it("should return token and user on success", async () => {
     // Arrange: mock DB to return a user
     vi.mocked(User.findOne).mockResolvedValue(mockUser);
@@ -85,7 +119,11 @@ describe("loginUser controller", async () => {
     expect(mockUser.comparePassword).toHaveBeenCalledWith("correctpass");
     expect(mockUser.createJWT).toHaveBeenCalled();
     expect(result).toEqual({
-      user: { email: "test@example.com", role: UserSchemaRole.ADMIN },
+      user: {
+        user_id: 1,
+        email: "test@example.com",
+        role: UserSchemaRole.ADMIN,
+      },
       token: "jwt-token",
     });
   });
