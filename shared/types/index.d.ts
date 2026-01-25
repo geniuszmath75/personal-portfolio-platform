@@ -326,9 +326,35 @@ export type PaginationQuery = Pick<PaginationProperties, "page" | "limit"> & {
  * LOGIN RESPONSE
  ***************/
 export interface LoginResponse {
+  /**
+   * Logged in user information
+   */
   user: {
     email: string;
     role: UserSchemaRole;
   };
+  /**
+   * JWT token for authenticated requests
+   */
   token: string;
+}
+
+/**
+ * AUTH USER
+ *
+ * Represents information about the authenticated user
+ */
+export interface AuthUser {
+  /**
+   * The unique identifier for the user.
+   */
+  user_id: string;
+  /**
+   * The email of the user.
+   */
+  email: string;
+  /**
+   * The role of the user in the application.
+   */
+  role: UserSchemaRole;
 }

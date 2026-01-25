@@ -1,6 +1,6 @@
 import type { Model } from "mongoose";
 import type { UserSchemaRole } from "./enums";
-import type { IProject } from "~~/shared/types";
+import type { IProject, AuthUser } from "~~/shared/types";
 
 /********
  * USER
@@ -72,15 +72,6 @@ export type UserModel = Model<IUser, object, IUserMethods>;
  * Represents a Mongoose model for the IProject schema
  */
 export type ProjectModel = Model<IProject, object>;
-
-/**
- * Represents information about the authenticated user
- */
-export interface AuthUser {
-  user_id: string;
-  email: string;
-  role: UserSchemaRole;
-}
 
 /***********
  * CONFIGURATION

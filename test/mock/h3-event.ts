@@ -1,5 +1,5 @@
 import type { H3Event } from "h3";
-import type { AuthUser } from "../../server/types";
+import type { AuthUser } from "../../shared/types";
 import { merge } from "lodash";
 
 export const createMockH3Event = (
