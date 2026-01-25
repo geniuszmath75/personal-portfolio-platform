@@ -20,7 +20,7 @@
     </div>
 
     <!-- Login form -->
-    <form class="space-y-6" @submit.prevent="login">
+    <form class="space-y-6" @submit.prevent="submitLogin">
       <!-- Email field -->
       <div>
         <label for="email" class="text-sm font-bold text-secondary-500 mb-2"
@@ -85,13 +85,15 @@ import { useLoginForm } from "~/composables/useLoginForm";
 
 definePageMeta({
   layout: "auth",
+  middleware: ["03-guest"],
 });
 
+const authStore = useAuthStore();
+const { loading } = storeToRefs(authStore);
 const { isPasswordVisible, toggleVisibility } = usePasswordVisibility();
 const {
+  submitLogin,
   formCredentials,
-  loading,
-  login,
   touchFields,
   emailErrors,
   passwordErrors,

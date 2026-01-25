@@ -1,17 +1,14 @@
 import useVuelidate from "@vuelidate/core";
+import { UserSchemaRole } from "~~/server/types/enums";
 
 export function useLoginForm(credentials: { email: string; password: string }) {
-  const { baseApiPath } = useRuntimeConfig().public;
+  const authStore = useAuthStore();
+  const { user } = storeToRefs(authStore);
 
   /**
    * Login form credentials
    */
   const formCredentials = ref({ ...credentials });
-
-  /**
-   * Indicates if the login request is in progress
-   */
-  const loading = ref(false);
 
   /**
    * Vuelidate validation setup
@@ -58,37 +55,33 @@ export function useLoginForm(credentials: { email: string; password: string }) {
    *
    * @async
    */
-  const login = async (): Promise<void> => {
+  const submitLogin = async (): Promise<void> => {
     // Validate the form before proceeding
     const isValid = await validate();
     if (!isValid) return;
 
     try {
-      loading.value = true;
+      // Attempt to log in with the provided credentials
+      const status = await authStore.login(formCredentials.value);
 
-      // Send login request to the API
-      const res = await $fetch<LoginResponse>(`${baseApiPath}/auth/login`, {
-        method: "POST",
-        body: JSON.stringify(formCredentials.value),
-      });
-
-      // Validate the response schema
-      const validatedLoginResponse = loginResponseSchema.parse(res);
-      console.log("Login successful:", validatedLoginResponse.user);
-
-      showSuccessToast("Login successful!");
-      await navigateTo("/admin/dashboard");
+      //
+      if (status) {
+        showSuccessToast("Login successful!");
+        if (user.value?.role === UserSchemaRole.GUEST) {
+          await navigateTo("/");
+        }
+        if (user.value?.role === UserSchemaRole.ADMIN) {
+          await navigateTo("/admin/dashboard");
+        }
+      }
     } catch (error) {
       handleError(error, "Login failed");
-    } finally {
-      loading.value = false;
     }
   };
 
   return {
     formCredentials,
-    loading,
-    login,
+    submitLogin,
 
     // Validation API
     validate,

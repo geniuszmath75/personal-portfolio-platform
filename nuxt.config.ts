@@ -22,4 +22,7 @@ export default defineNuxtConfig({
     jwtSecret: process.env.JWT_SECRET,
     jwtLifetime: process.env.JWT_LIFETIME,
   },
+  routeRules: {
+    "/admin/**": { ssr: false },
+  },
 });

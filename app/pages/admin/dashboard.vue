@@ -1,15 +1,22 @@
 <template>
-  <div class="flex justify-center inset-0 text-secondary-500">
-    <h1 v-show="user.email" class="">Hello, {{ user.email }}!</h1>
-    <h1 v-show="!user.email">Cannot read 'user' cookie!</h1>
-    <div class="absolute left-4 top-4">
-      <NuxtLink to="/"> HOME </NuxtLink>
-    </div>
+  <div
+    class="absolute inset-0 flex items-center justify-center bg-primary-500 text-center"
+  >
+    <h1 v-show="data?.message" class="text-2xl text-secondary-500">
+      {{ `${data?.message}!` }}
+    </h1>
   </div>
 </template>
 <script setup lang="ts">
 definePageMeta({
   layout: "dashboard",
+  middleware: ["02-admin"],
 });
-const user = useCookie("user", { default: () => ({ email: "", role: "" }) });
+
+const { data } = await useFetch<{ message: string }>(
+  "/api/v1/admin/dashboard",
+  {
+    credentials: "include",
+  },
+);
 </script>

@@ -46,7 +46,7 @@
           </div>
         </div>
 
-        <!-- LogIn panel-->
+        <!-- LogIn/LogOut and Dashboard panel-->
         <Transition
           enter-active-class="transition duration-150 ease-out"
           enter-from-class="opacity-0 -translate-y-2"
@@ -63,19 +63,52 @@
             <div
               class="flex flex-col justify-center items-center space-y-2 py-6"
             >
-              <NuxtLink to="/auth/login" class="w-48">
-                <div
-                  class="relative flex items-center justify-center bg-additional-500 h-12 rounded-3xl shadow-primary hover:bg-additional-600"
+              <NuxtLink v-if="!loggedIn" to="/auth/login" class="w-48">
+                <BaseBtn
+                  label="LOG IN"
+                  btn-size="large"
+                  btn-style="login--logout"
+                  icon-name="mdi:login"
+                  @click="toggleAccountPanel"
                 >
-                  <Icon
-                    name="mdi:login"
-                    class="absolute left-4 text-secondary-500"
-                    size="1.5em"
-                  />
-
-                  <span class="text-primary-500 font-semibold">LOG IN</span>
-                </div>
+                  <template #icon>
+                    <Icon
+                      name="mdi:login"
+                      class="absolute left-2 text-secondary-500 text-2xl"
+                    />
+                  </template>
+                </BaseBtn>
               </NuxtLink>
+              <NuxtLink v-if="isAdmin" to="/admin/dashboard" class="w-48">
+                <BaseBtn
+                  label="DASHBOARD"
+                  btn-size="large"
+                  btn-style="secondary"
+                  icon-name="material-symbols:dashboard"
+                  @click="toggleAccountPanel"
+                >
+                  <template #icon>
+                    <Icon
+                      name="material-symbols:dashboard"
+                      class="absolute left-2 text-additional-500 text-2xl"
+                    />
+                  </template>
+                </BaseBtn>
+              </NuxtLink>
+              <BaseBtn
+                v-if="loggedIn"
+                label="LOG OUT"
+                btn-size="large"
+                btn-style="login--logout"
+                @click="handleLogout"
+              >
+                <template #icon>
+                  <Icon
+                    name="mdi:logout"
+                    class="absolute left-2 text-secondary-500 text-2xl"
+                  />
+                </template>
+              </BaseBtn>
             </div>
           </div>
         </Transition>
@@ -128,16 +161,52 @@
               >{{ link.label }}</NuxtLink
             >
 
-            <!-- Log In -->
+            <!-- Log In, Log Out and Dashboard -->
             <div class="w-full flex justify-center">
-              <NuxtLink
-                to="/auth/login"
-                class="h-16 w-full flex items-center justify-center space-x-2 bg-additional-500 font-semibold text-xl"
-                @click="toggleMobileMenu"
+              <NuxtLink v-if="!loggedIn" to="/auth/login" class="w-full">
+                <BaseBtn
+                  label="LOG IN"
+                  btn-style="mobile--login--logout"
+                  btn-size="mobile--menu"
+                  @click="toggleMobileMenu"
+                >
+                  <template #icon>
+                    <Icon
+                      name="mdi:login"
+                      class="absolute left-2 text-secondary-500 text-2xl"
+                    />
+                  </template>
+                </BaseBtn>
+              </NuxtLink>
+              <NuxtLink v-if="isAdmin" to="/admin/dashboard" class="w-full">
+                <BaseBtn
+                  label="DASHBOARD"
+                  btn-style="mobile--secondary"
+                  btn-size="mobile--menu"
+                  @click="toggleMobileMenu"
+                >
+                  <template #icon>
+                    <Icon
+                      name="material-symbols:dashboard"
+                      class="absolute left-2 text-additional-500 text-2xl"
+                    />
+                  </template>
+                </BaseBtn>
+              </NuxtLink>
+              <BaseBtn
+                v-if="loggedIn"
+                label="LOG OUT"
+                btn-style="mobile--login--logout"
+                btn-size="mobile--menu"
+                @click="handleLogout"
               >
-                <Icon name="mdi:login" class="text-primary-500" size="1.5em" />
-                <span class="text-secondary-500">LOG IN</span></NuxtLink
-              >
+                <template #icon>
+                  <Icon
+                    name="mdi:logout"
+                    class="absolute left-2 text-secondary-500 text-2xl"
+                  />
+                </template>
+              </BaseBtn>
             </div>
           </div>
         </Transition>
@@ -148,6 +217,8 @@
 
 <script setup lang="ts">
 const route = useRoute();
+const authStore = useAuthStore();
+const { loggedIn, isAdmin } = storeToRefs(authStore);
 
 /**
  * Check if account panel is open
@@ -185,6 +256,15 @@ const toggleAccountPanel = () => {
  */
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
+};
+
+/**
+ * Handle logout button click
+ */
+const handleLogout = async () => {
+  isAccountPanelOpen.value = false;
+  isMobileMenuOpen.value = false;
+  await authStore.logout();
 };
 
 /**
