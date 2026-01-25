@@ -224,10 +224,22 @@ export interface BaseBtnProps {
   /**
    * Style variant of the button
    */
-  btnStyle?: "additional" | "secondary" | "tab--active" | "tab--inactive";
+  btnStyle?:
+    | "additional"
+    | "secondary"
+    | "tab--active"
+    | "tab--inactive"
+    | "login--logout"
+    | "mobile--login--logout"
+    | "mobile--secondary";
 
   /**
    * Size variant of the button
    */
-  btnSize?: "default" | "tab";
+  btnSize?: "default" | "tab" | "large" | "mobile--menu";
+
+  /**
+   * Name of the icon to display in the button
+   */
+  iconName?: string | null;
 }

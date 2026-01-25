@@ -1,7 +1,9 @@
 <template>
-  <div class="flex min-h-screen font-default bg-primary-500">
-    <main class="m-auto w-full max-w-md">
+  <div class="flex bg-primary-500 min-h-screen font-default">
+    <AppNavbar />
+    <main class="flex-1">
       <slot />
     </main>
+    <AppFooter />
   </div>
 </template>
