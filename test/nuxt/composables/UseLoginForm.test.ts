@@ -5,6 +5,10 @@ import { mockNuxtImport } from "@nuxt/test-utils/runtime";
 import { UserSchemaRole } from "../../../server/types/enums";
 import { showSuccessToast } from "../../../app/utils/toastNotification";
 import { handleError } from "../../../app/utils/handleError";
+import type { AuthUser } from "../../../shared/types";
+import { createTestPinia } from "../../setup";
+import { setActivePinia } from "pinia";
+import { useAuthStore } from "../../../app/stores/authStore";
 
 const { navigateToMock } = vi.hoisted(() => ({ navigateToMock: vi.fn() }));
 
@@ -36,7 +40,11 @@ vi.mock("~/utils/handleError", () => ({
 }));
 
 describe("useLoginForm composable", () => {
+  let authStore: ReturnType<typeof useAuthStore>;
+
   beforeEach(() => {
+    setActivePinia(createTestPinia());
+    authStore = useAuthStore();
     vi.clearAllMocks();
   });
 
@@ -50,8 +58,7 @@ describe("useLoginForm composable", () => {
 
     // Assert
     expect(result).toHaveProperty("formCredentials");
-    expect(result).toHaveProperty("loading");
-    expect(result).toHaveProperty("login");
+    expect(result).toHaveProperty("submitLogin");
 
     expect(result).toHaveProperty("validate");
     expect(result).toHaveProperty("touchFields");
@@ -91,34 +98,35 @@ describe("useLoginForm composable", () => {
 
   it("should 'login' method stop execution when form is invalid", async () => {
     // Arrange
-    vi.stubGlobal("$fetch", vi.fn());
     const { result } = mount(() => useLoginForm({ email: "", password: "" }));
 
     // Force validate() to return false
     vi.spyOn(result, "validate").mockResolvedValue(false);
+    // Spy on authStore.login
+    vi.spyOn(authStore, "login");
 
     // Act
-    await result.login();
+    await result.submitLogin();
 
     // Assert
-    expect(result.loading.value).toBe(false);
-    expect(handleError).not.toHaveBeenCalled();
+    expect(authStore.login).not.toHaveBeenCalled();
     expect(showSuccessToast).not.toHaveBeenCalled();
     expect(navigateToMock).not.toHaveBeenCalled();
+    expect(handleError).not.toHaveBeenCalled();
   });
 
-  it("should 'login' performs successful flow", async () => {
+  it("should 'login' performs successfully and redirect ADMIN to dashboard", async () => {
     // Arrange
-    const validResponse = {
-      user: { email: "john@mail.com", role: UserSchemaRole.ADMIN },
-      token: "XYZ",
-    };
+    authStore.user = {
+      email: "admin@gmail.com",
+      role: UserSchemaRole.ADMIN,
+    } as AuthUser;
 
-    vi.stubGlobal("$fetch", vi.fn().mockResolvedValue(validResponse));
+    vi.spyOn(authStore, "login").mockResolvedValue(true);
 
     const { result } = mount(() =>
       useLoginForm({
-        email: "john@email.com",
+        email: "admin@gmail.com",
         password: "123456",
       }),
     );
@@ -126,17 +134,49 @@ describe("useLoginForm composable", () => {
     vi.spyOn(result, "validate").mockResolvedValue(true);
 
     // Act
-    await result.login();
+    await result.submitLogin();
 
     // Assert
-    expect(handleError).not.toHaveBeenCalled();
+    expect(authStore.login).toHaveBeenCalledWith({
+      email: "admin@gmail.com",
+      password: "123456",
+    });
     expect(showSuccessToast).toHaveBeenCalledWith("Login successful!");
     expect(navigateToMock).toHaveBeenCalledWith("/admin/dashboard");
+    expect(handleError).not.toHaveBeenCalled();
+  });
+
+  it("should login successfully and redirect GUEST to home", async () => {
+    // Arrange
+    authStore.user = {
+      email: "guest@gmail.com",
+      role: UserSchemaRole.GUEST,
+    };
+
+    vi.spyOn(authStore, "login").mockResolvedValue(true);
+
+    const { result } = mount(() =>
+      useLoginForm({
+        email: "guest@gmail.com",
+        password: "123456",
+      }),
+    );
+
+    vi.spyOn(result, "validate").mockResolvedValue(true);
+
+    // Act
+    await result.submitLogin();
+
+    // Assert
+    expect(showSuccessToast).toHaveBeenCalledWith("Login successful!");
+    expect(navigateToMock).toHaveBeenCalledWith("/");
+    expect(handleError).not.toHaveBeenCalled();
   });
 
   it("should 'login' handles API errors", async () => {
     // Arrange
-    vi.stubGlobal("$fetch", vi.fn().mockRejectedValue(new Error("error")));
+    vi.spyOn(authStore, "login").mockRejectedValue(new Error("Login failed"));
+
     const { result } = mount(() =>
       useLoginForm({ email: "a@a.com", password: "123" }),
     );
@@ -144,11 +184,11 @@ describe("useLoginForm composable", () => {
     vi.spyOn(result, "validate").mockResolvedValue(true);
 
     // Act
-    await result.login();
+    await result.submitLogin();
 
     // Assert
-    expect(handleError).toHaveBeenCalled();
     expect(showSuccessToast).not.toHaveBeenCalled();
     expect(navigateToMock).not.toHaveBeenCalled();
+    expect(handleError).toHaveBeenCalled();
   });
 });

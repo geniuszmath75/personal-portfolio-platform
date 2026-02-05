@@ -6,7 +6,7 @@ describe("Auth layout", () => {
   const pinia = createTestPinia();
 
   it("should render layout structure", () => {
-    const { container } = renderWithNuxt(AuthLayout, {
+    const { container, getByText } = renderWithNuxt(AuthLayout, {
       global: {
         plugins: [pinia],
       },
@@ -23,9 +23,10 @@ describe("Auth layout", () => {
       "bg-primary-500",
     );
 
-    // slot
+    // slot and HOME link
     expect(container.querySelector("main")?.textContent).toContain(
       "Authentication content",
     );
+    expect(getByText("HOME")).toBeTruthy();
   });
 });

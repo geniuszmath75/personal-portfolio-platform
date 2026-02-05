@@ -1,93 +1,108 @@
 import { describe, it, expect } from "vitest";
-import { loginResponseSchema } from "../../../app/utils/validateLoginResponse";
+import {
+  loginResponseSchema,
+  authUserSchema,
+} from "../../../app/utils/validateLoginResponse";
 import { UserSchemaRole } from "../../../server/types/enums";
 
 describe("validateLoginResponse util", () => {
   // Valid test data
-  const validLoginResponse = {
+  const validAuthUser = {
     user: {
+      user_id: "68a9d098b70e48772cd5ceaa",
       email: "user@example.com",
       role: UserSchemaRole.GUEST,
     },
+  };
+
+  const validLoginResponse = {
+    user: { ...validAuthUser.user },
     token:
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
   };
+
+  describe("Valid auth user", () => {
+    it("should validate correct auth user", () => {
+      const result = authUserSchema.parse(validAuthUser);
+      expect(result).toEqual(validAuthUser);
+    });
+
+    it("should validate with admin role", () => {
+      const response = {
+        ...validAuthUser,
+        user: {
+          ...validAuthUser.user,
+          role: UserSchemaRole.ADMIN,
+        },
+      };
+      const result = authUserSchema.parse(response);
+      expect(result.user.role).toBe(UserSchemaRole.ADMIN);
+    });
+  });
 
   describe("Valid login response", () => {
     it("should validate correct login response", () => {
       const result = loginResponseSchema.parse(validLoginResponse);
       expect(result).toEqual(validLoginResponse);
     });
-
-    it("should validate with admin role", () => {
-      const response = {
-        ...validLoginResponse,
-        user: {
-          ...validLoginResponse.user,
-          role: UserSchemaRole.ADMIN,
-        },
-      };
-      const result = loginResponseSchema.parse(response);
-      expect(result.user.role).toBe(UserSchemaRole.ADMIN);
-    });
   });
 
   describe("Email validation", () => {
     it("should reject invalid email format", () => {
       const response = {
-        ...validLoginResponse,
+        ...validAuthUser,
         user: {
-          ...validLoginResponse.user,
+          ...validAuthUser.user,
           email: "invalid-email",
         },
       };
-      expect(() => loginResponseSchema.parse(response)).toThrow();
+      expect(() => authUserSchema.parse(response)).toThrow();
     });
 
     it("should reject email with null value", () => {
       const response = {
-        ...validLoginResponse,
+        ...validAuthUser,
         user: {
-          ...validLoginResponse.user,
+          ...validAuthUser.user,
           email: null,
         },
       };
-      expect(() => loginResponseSchema.parse(response)).toThrow();
+      expect(() => authUserSchema.parse(response)).toThrow();
     });
 
     it("should reject email with undefined value", () => {
       const response = {
-        ...validLoginResponse,
+        ...validAuthUser,
         user: {
-          ...validLoginResponse.user,
+          ...validAuthUser.user,
           email: undefined,
         },
       };
-      expect(() => loginResponseSchema.parse(response)).toThrow();
+      expect(() => authUserSchema.parse(response)).toThrow();
     });
 
     it("should reject empty string email", () => {
       const response = {
-        ...validLoginResponse,
+        ...validAuthUser,
         user: {
-          ...validLoginResponse.user,
+          ...validAuthUser.user,
           email: "",
         },
       };
-      expect(() => loginResponseSchema.parse(response)).toThrow();
+      expect(() => authUserSchema.parse(response)).toThrow();
     });
   });
 
   describe("Role validation", () => {
     it("should reject invalid role", () => {
       const response = {
-        ...validLoginResponse,
+        ...validAuthUser,
         user: {
-          ...validLoginResponse.user,
+          ...validAuthUser.user,
           role: "INVALID_ROLE",
         },
       };
-      expect(() => loginResponseSchema.parse(response)).toThrow();
+      expect(() => authUserSchema.parse(response)).toThrow();
     });
   });
 

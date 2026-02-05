@@ -1,10 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { fireEvent, screen } from "@testing-library/vue";
-import { renderWithNuxt } from "../../setup";
+import { createTestPinia, renderWithNuxt } from "../../setup";
 import AppNavbar from "../../../app/components/AppNavbar.vue";
+import { useAuthStore } from "../../../app/stores/authStore";
 
 describe("AppNavbar", () => {
-  it("renders static elements", () => {
+  it("should render static elements", () => {
     renderWithNuxt(AppNavbar);
 
     const githubIcon = document.body.querySelector(".i-mdi\\:github");
@@ -16,7 +17,7 @@ describe("AppNavbar", () => {
     expect(screen.getByText("ABOUT ME")).toBeTruthy();
   });
 
-  it("opens and closes account panel on click", async () => {
+  it("should open and close account panel on click", async () => {
     renderWithNuxt(AppNavbar);
 
     const accountIcon = document.body.querySelector(
@@ -36,7 +37,7 @@ describe("AppNavbar", () => {
     expect(screen.queryByText("LOG IN")).toBeNull();
   });
 
-  it("open and closes mobile menu with dedicated icons", async () => {
+  it("should open and close mobile menu with dedicated icons", async () => {
     renderWithNuxt(AppNavbar);
 
     // Initially closed
@@ -65,7 +66,7 @@ describe("AppNavbar", () => {
     expect(screen.queryByText("LOG IN")).toBeNull();
   });
 
-  it("closes mobile menu when a link is clicked", async () => {
+  it("should close mobile menu when a link is clicked", async () => {
     renderWithNuxt(AppNavbar);
 
     // Open menu
@@ -100,5 +101,120 @@ describe("AppNavbar", () => {
 
     // Desktop (0) ABOUT link should have active class
     expect(aboutLinks[0].className).toContain("after:w-full");
+  });
+
+  it("should show LOG IN when user is not logged in (desktop)", async () => {
+    // Arrange
+    renderWithNuxt(AppNavbar);
+
+    const accountIcon = document.querySelector(".i-mdi\\:user")!;
+
+    // Act
+    await fireEvent.click(accountIcon);
+
+    // Assert: only LOG IN is visible
+    expect(screen.getByText("LOG IN")).toBeTruthy();
+    expect(screen.queryByText("LOG OUT")).toBeNull();
+    expect(screen.queryByText("DASHBOARD")).toBeNull();
+  });
+
+  it("should show LOG OUT when user is logged in (desktop)", async () => {
+    // Arrange: set logged in user
+    const pinia = createTestPinia();
+    const authStore = useAuthStore(pinia);
+    authStore.loggedIn = true;
+
+    renderWithNuxt(AppNavbar);
+
+    const accountIcon = document.querySelector(".i-mdi\\:user")!;
+
+    // Act
+    await fireEvent.click(accountIcon);
+
+    // Assert: only LOG OUT is visible
+    expect(screen.getByText("LOG OUT")).toBeTruthy();
+    expect(screen.queryByText("LOG IN")).toBeNull();
+    expect(screen.queryByText("DASHBOARD")).toBeNull();
+  });
+
+  it("should show DASHBOARD for admin user (desktop)", async () => {
+    // Arrange: set logged in admin user
+    const pinia = createTestPinia();
+    const authStore = useAuthStore(pinia);
+    authStore.loggedIn = true;
+    authStore.isAdmin = true;
+
+    renderWithNuxt(AppNavbar);
+
+    const accountIcon = document.querySelector(".i-mdi\\:user")!;
+
+    // Act
+    await fireEvent.click(accountIcon);
+
+    // Assert: DASHBOARD and LOG OUT are visible
+    expect(screen.getByText("DASHBOARD")).toBeTruthy();
+    expect(screen.getByText("LOG OUT")).toBeTruthy();
+  });
+
+  it("should call logout and close panels on LOG OUT click", async () => {
+    // Arrange: set logged in user
+    const pinia = createTestPinia();
+    const authStore = useAuthStore(pinia);
+    authStore.loggedIn = true;
+    authStore.logout = vi.fn();
+
+    // Spy on logout method
+    vi.spyOn(authStore, "logout");
+
+    renderWithNuxt(AppNavbar);
+
+    // Act: open account panel and click LOG OUT
+    const accountIcon = document.querySelector(".i-mdi\\:user")!;
+    await fireEvent.click(accountIcon);
+
+    const logoutBtn = screen.getByText("LOG OUT");
+    await fireEvent.click(logoutBtn);
+
+    // Assert: logout called and LOG OUT button no longer visible
+    expect(authStore.logout).toHaveBeenCalledOnce();
+    expect(screen.queryByText("LOG OUT")).toBeNull();
+  });
+
+  it("should show DASHBOARD in mobile menu for admin", async () => {
+    // Arrange: set logged in admin user
+    const pinia = createTestPinia();
+    const authStore = useAuthStore(pinia);
+    authStore.loggedIn = true;
+    authStore.isAdmin = true;
+
+    renderWithNuxt(AppNavbar);
+
+    // Act: open mobile menu
+    const openBtn = document.querySelector(".i-mdi\\:menu")!;
+    await fireEvent.click(openBtn);
+
+    // Assert: DASHBOARD link is visible
+    expect(screen.getByText("DASHBOARD")).toBeTruthy();
+  });
+
+  it("should log out and close mobile menu", async () => {
+    // Arrange: set logged in user
+    const pinia = createTestPinia();
+    const authStore = useAuthStore(pinia);
+    authStore.loggedIn = true;
+    authStore.logout = vi.fn();
+
+    // Spy on logout method
+    vi.spyOn(authStore, "logout");
+
+    renderWithNuxt(AppNavbar);
+
+    // Act: open mobile menu and click LOG OUT
+    await fireEvent.click(document.querySelector(".i-mdi\\:menu")!);
+    await fireEvent.click(screen.getByText("LOG OUT"));
+
+    // Assert: logout called and LOG OUT button no longer visible
+    expect(authStore.logout).toHaveBeenCalledOnce();
+    expect(screen.queryByText("LOG OUT")).toBeNull();
   });
 });

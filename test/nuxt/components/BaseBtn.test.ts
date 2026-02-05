@@ -121,6 +121,33 @@ describe("BaseBtn.vue", () => {
         btnStyle: "tab--inactive",
         expectedClasses: ["text-secondary-500", "border-secondary-500"],
       },
+      {
+        btnStyle: "login--logout",
+        expectedClasses: [
+          "bg-additional-500",
+          "text-primary-500",
+          "hover:bg-additional-600",
+          "rounded-3xl",
+          "shadow-primary",
+        ],
+      },
+      {
+        btnStyle: "mobile--login--logout",
+        expectedClasses: [
+          "bg-additional-500",
+          "text-primary-500",
+          "hover:bg-additional-600",
+        ],
+      },
+      {
+        btnStyle: "mobile--secondary",
+        expectedClasses: [
+          "bg-secondary-500",
+          "text-primary-500",
+          "hover:bg-secondary-600",
+          "disabled:hover:bg-secondary-500",
+        ],
+      },
     ])(
       "should apply correct style classes for btnStyle: $btnStyle",
       ({ btnStyle, expectedClasses }) => {
@@ -161,6 +188,14 @@ describe("BaseBtn.vue", () => {
           "border-b-2",
         ],
       },
+      {
+        btnSize: "large",
+        expectedClasses: ["w-48", "h-12", "font-semibold"],
+      },
+      {
+        btnSize: "mobile--menu",
+        expectedClasses: ["w-full", "h-16", "font-semibold", "text-lg"],
+      },
     ])(
       "should apply correct size classes for btnSize: $btnSize",
       ({ btnSize, expectedClasses }) => {
@@ -183,6 +218,28 @@ describe("BaseBtn.vue", () => {
       const button = container.querySelector("button") as HTMLButtonElement;
       expect(button.className).toContain("w-full");
       expect(button.className).toContain("py-3");
+    });
+  });
+
+  describe("Icon slot", () => {
+    it("should render icon slot content", () => {
+      const { container } = renderWithNuxt(BaseBtn, {
+        props: { label: "Test" },
+        slots: {
+          icon: "<Icon name='mdi:check' />",
+        },
+      });
+
+      const icon = container.querySelector("[data-icon='mdi:check']");
+      expect(icon).toBeTruthy();
+    });
+
+    it("should render button without icon slot", () => {
+      const { container } = renderWithNuxt(BaseBtn, {
+        props: { label: "Test" },
+      });
+      const button = container.querySelector("button");
+      expect(button?.textContent).toContain("Test");
     });
   });
 

@@ -9,6 +9,14 @@ describe("Dashboard layout", () => {
     const { container } = renderWithNuxt(DashboardLayout, {
       global: {
         plugins: [pinia],
+        stubs: {
+          AppNavbar: {
+            template: "<nav>MockNavbar</nav>",
+          },
+          AppFooter: {
+            template: "<footer>MockFooter</footer>",
+          },
+        },
       },
       slots: {
         default: "<p>Dashboard content</p>",
@@ -27,5 +35,25 @@ describe("Dashboard layout", () => {
     expect(container.querySelector("main")?.textContent).toContain(
       "Dashboard content",
     );
+
+    // stubs
+    expect(container.querySelector("nav")?.textContent).toBe("MockNavbar");
+    expect(container.querySelector("footer")?.textContent).toBe("MockFooter");
+  });
+
+  it("should render slot content correctly", () => {
+    const { getByText } = renderWithNuxt(DashboardLayout, {
+      global: {
+        stubs: {
+          AppNavbar: true,
+          AppFooter: true,
+        },
+      },
+      slots: {
+        default: "<span>Page body</span>",
+      },
+    });
+
+    expect(getByText("Page body")).toBeVisible();
   });
 });
