@@ -31,6 +31,27 @@ export const useAuthStore = defineStore("auth", {
   },
   actions: {
     /**
+     * Update the authenticated user
+     * @param user - updated user information
+     */
+    setAuthUser(user: AuthUser | null) {
+      this.user = user;
+    },
+    /**
+     * Update the loggedIn status
+     * @param loggedIn - updated loggedIn status
+     */
+    setLoggedIn(loggedIn: boolean) {
+      this.loggedIn = loggedIn;
+    },
+    /**
+     * Clears the authentication state
+     */
+    clearAuth() {
+      this.user = null;
+      this.loggedIn = false;
+    },
+    /**
      * Logs in the user with provided credentials
      *
      * @param credentials - user login credentials
@@ -50,11 +71,12 @@ export const useAuthStore = defineStore("auth", {
 
         const validatedLoginResponse = loginResponseSchema.parse(res);
 
-        this.user = validatedLoginResponse.user;
-        this.loggedIn = true;
+        this.setAuthUser(validatedLoginResponse.user);
+        this.setLoggedIn(true);
         return true;
       } catch (error) {
         handleError(error);
+        return false;
       } finally {
         this.loading = false;
       }
@@ -75,8 +97,7 @@ export const useAuthStore = defineStore("auth", {
       } catch (error) {
         handleError(error);
       } finally {
-        this.user = null;
-        this.loggedIn = false;
+        this.clearAuth();
         this.loading = false;
         await navigateTo("/");
         showSuccessToast("Successfully logged out");
@@ -98,12 +119,11 @@ export const useAuthStore = defineStore("auth", {
 
         const validatedAuthUser = authUserSchema.parse(res);
 
-        this.user = validatedAuthUser.user;
-        this.loggedIn = true;
+        this.setAuthUser(validatedAuthUser.user);
+        this.setLoggedIn(true);
       } catch {
         // Not logged in user or session expired
-        this.user = null;
-        this.loggedIn = false;
+        this.clearAuth();
       } finally {
         this.loading = false;
       }

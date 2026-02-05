@@ -1,4 +1,5 @@
 import type { AuthUser } from "~~/shared/types";
+import { requireAuth } from "~~/server/utils/auth";
 
 export default defineEventHandler(async (event) => {
   requireAuth(event);

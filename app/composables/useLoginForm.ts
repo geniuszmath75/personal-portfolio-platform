@@ -64,7 +64,7 @@ export function useLoginForm(credentials: { email: string; password: string }) {
       // Attempt to log in with the provided credentials
       const status = await authStore.login(formCredentials.value);
 
-      //
+      // Handle successful login
       if (status) {
         showSuccessToast("Login successful!");
         if (user.value?.role === UserSchemaRole.GUEST) {
