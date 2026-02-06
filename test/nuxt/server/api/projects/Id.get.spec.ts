@@ -12,13 +12,11 @@ describe("GET /api/v1/projects/:id (id.get)", async () => {
   });
 
   // Arrange: import handlers
-  const getSingleProjectHandler = await import(
-    "../../../../../server/controllers/getSingleProject"
-  );
+  const getSingleProjectHandler =
+    await import("../../../../../server/controllers/getSingleProject");
 
-  const projectsIdGetHandler = await import(
-    "../../../../../server/api/v1/projects/[id].get"
-  );
+  const projectsIdGetHandler =
+    await import("../../../../../server/api/v1/projects/[id].get");
 
   it("should call getSingleProject controller with event and returns result", async () => {
     const fakeResponse = {

@@ -12,13 +12,11 @@ describe("GET /api/v1/sections (index.get)", async () => {
   });
 
   // Arrange: import handlers
-  const getAllSectionsHandler = await import(
-    "../../../../../server/controllers/getAllSections"
-  );
+  const getAllSectionsHandler =
+    await import("../../../../../server/controllers/getAllSections");
 
-  const sectionsIndexGetHandler = await import(
-    "../../../../../server/api/v1/sections/index.get"
-  );
+  const sectionsIndexGetHandler =
+    await import("../../../../../server/api/v1/sections/index.get");
 
   it("should call getAllSections controller with event and returns result", async () => {
     const fakeResponse = {

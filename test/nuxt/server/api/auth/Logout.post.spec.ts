@@ -11,12 +11,10 @@ describe("POST /api/v1/auth/logout", async () => {
     vi.clearAllMocks();
   });
 
-  const controllerHandler = await import(
-    "../../../../../server/controllers/logoutUser"
-  );
-  const logoutHandler = await import(
-    "../../../../../server/api/v1/auth/logout.post"
-  );
+  const controllerHandler =
+    await import("../../../../../server/controllers/logoutUser");
+  const logoutHandler =
+    await import("../../../../../server/api/v1/auth/logout.post");
 
   it("should call logout controller with event and returns result", async () => {
     // Arrange: create mock event

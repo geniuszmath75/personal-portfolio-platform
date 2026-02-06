@@ -12,9 +12,8 @@ describe("GET /api/v1/auth/me", async () => {
     vi.clearAllMocks();
   });
 
-  const controllerHandler = await import(
-    "../../../../../server/controllers/getMeUser"
-  );
+  const controllerHandler =
+    await import("../../../../../server/controllers/getMeUser");
   const getMeHandler = await import("../../../../../server/api/v1/auth/me.get");
 
   it("should call getMeUser controller with event and returns result", async () => {

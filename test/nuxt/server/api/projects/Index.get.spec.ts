@@ -12,13 +12,11 @@ describe("GET /api/v1/projects (index.get)", async () => {
   });
 
   // Arrange: import handlers
-  const getAllProjectsHandler = await import(
-    "../../../../../server/controllers/getAllProjects"
-  );
+  const getAllProjectsHandler =
+    await import("../../../../../server/controllers/getAllProjects");
 
-  const projectsIndexGetHandler = await import(
-    "../../../../../server/api/v1/projects/index.get"
-  );
+  const projectsIndexGetHandler =
+    await import("../../../../../server/api/v1/projects/index.get");
 
   it("should call getAllProjects controller with event and returns result", async () => {
     const fakeResponse = {

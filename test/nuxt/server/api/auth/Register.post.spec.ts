@@ -11,12 +11,10 @@ describe("POST /api/v1/auth/registerUser", async () => {
     vi.clearAllMocks();
   });
 
-  const controllerHandler = await import(
-    "../../../../../server/controllers/registerUser"
-  );
-  const registerHandler = await import(
-    "../../../../../server/api/v1/auth/register.post"
-  );
+  const controllerHandler =
+    await import("../../../../../server/controllers/registerUser");
+  const registerHandler =
+    await import("../../../../../server/api/v1/auth/register.post");
 
   it("should call register controller with event and returns result", async () => {
     // Arrange: create mock event with body
