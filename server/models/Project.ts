@@ -32,7 +32,7 @@ const ProjectSchema = new mongoose.Schema<IProject, ProjectModel>({
   endDate: {
     type: Date,
     validate: {
-      validator: function (value: Date) {
+      validator: function (this: IProject, value: Date) {
         // endDate undefined
         if (!value) return true;
 

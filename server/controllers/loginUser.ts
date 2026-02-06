@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
 
   // Prepare the response
   const response = {
-    user: { user_id: user.id, email: user.email, role: user.role },
+    user: { user_id: user._id, email: user.email, role: user.role },
     token,
   };
 

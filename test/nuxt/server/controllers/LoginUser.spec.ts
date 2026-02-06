@@ -10,7 +10,7 @@ useH3TestUtils();
 
 describe("loginUser controller", async () => {
   const mockUser = {
-    id: 1,
+    _id: 1,
     email: "test@example.com",
     role: UserSchemaRole.ADMIN,
     comparePassword: vi.fn(),
