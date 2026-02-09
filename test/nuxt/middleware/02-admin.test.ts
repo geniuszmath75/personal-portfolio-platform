@@ -5,6 +5,10 @@ import { createTestPinia } from "../../setup";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
 import middleware from "../../../app/middleware/02-admin";
 import { UserSchemaRole } from "../../../server/types/enums";
+import type {
+  RouteLocationNormalized,
+  RouteLocationNormalizedGeneric,
+} from "vue-router";
 
 const { navigateToMock } = vi.hoisted(() => ({ navigateToMock: vi.fn() }));
 
@@ -23,10 +27,17 @@ describe("02-admin middleware", () => {
     // Arrange: Set authStore to not logged in
     authStore.loggedIn = false;
     authStore.user = null;
-    const to = { path: "/admin/dashboard" };
+
+    const to: Partial<RouteLocationNormalizedGeneric> = {
+      path: "/admin/dashboard",
+    };
+    const from: Partial<RouteLocationNormalized> = { path: "/" };
 
     // Act
-    await middleware(to);
+    await middleware(
+      to as RouteLocationNormalizedGeneric,
+      from as RouteLocationNormalized,
+    );
 
     // Assert: redirect to /auth/login
     expect(navigateToMock).toHaveBeenCalledOnce();
@@ -37,12 +48,20 @@ describe("02-admin middleware", () => {
     // Arrange: Set authStore to logged in but not admin
     authStore.loggedIn = true;
     authStore.user = {
+      user_id: "68a9d098b70e48772cd5ceaa",
+      email: "guest@gmail.com",
       role: UserSchemaRole.GUEST,
     };
-    const to = { path: "/admin/dashboard" };
+    const to: Partial<RouteLocationNormalizedGeneric> = {
+      path: "/admin/dashboard",
+    };
+    const from: Partial<RouteLocationNormalized> = { path: "/" };
 
     // Act
-    await middleware(to);
+    await middleware(
+      to as RouteLocationNormalizedGeneric,
+      from as RouteLocationNormalized,
+    );
 
     // Assert: redirect to /auth/login
     expect(navigateToMock).toHaveBeenCalledOnce();
@@ -53,12 +72,20 @@ describe("02-admin middleware", () => {
     // Arrange: Set authStore to logged in as admin
     authStore.loggedIn = true;
     authStore.user = {
+      user_id: "68a9d098b70e48772cd5ceaa",
+      email: "admin@gmail.com",
       role: UserSchemaRole.ADMIN,
     };
-    const to = { path: "/admin/dashboard" };
+    const to: Partial<RouteLocationNormalizedGeneric> = {
+      path: "/admin/dashboard",
+    };
+    const from: Partial<RouteLocationNormalized> = { path: "/" };
 
     // Act
-    await middleware(to);
+    await middleware(
+      to as RouteLocationNormalizedGeneric,
+      from as RouteLocationNormalized,
+    );
 
     // Assert: no redirect
     expect(navigateToMock).not.toHaveBeenCalled();
@@ -68,10 +95,16 @@ describe("02-admin middleware", () => {
     // Arrange: Set authStore to not logged in
     authStore.loggedIn = false;
     authStore.user = null;
-    const to = { path: "/admin/login" };
+    const to: Partial<RouteLocationNormalizedGeneric> = {
+      path: "/admin/login",
+    };
+    const from: Partial<RouteLocationNormalized> = { path: "/" };
 
     // Act
-    await middleware(to);
+    await middleware(
+      to as RouteLocationNormalizedGeneric,
+      from as RouteLocationNormalized,
+    );
 
     // Assert: no redirect
     expect(navigateToMock).not.toHaveBeenCalled();

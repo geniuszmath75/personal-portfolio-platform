@@ -15,6 +15,10 @@ describe("GET /api/v1/projects (index.get)", async () => {
   const getAllProjectsHandler =
     await import("../../../../../server/controllers/getAllProjects");
 
+  type GetAllProjectsHandlerType = Awaited<
+    ReturnType<typeof getAllProjectsHandler.default>
+  >;
+
   const projectsIndexGetHandler =
     await import("../../../../../server/api/v1/projects/index.get");
 
@@ -24,7 +28,7 @@ describe("GET /api/v1/projects (index.get)", async () => {
         { _id: "1", title: "Project 1", technologies: ["Vue", "Nuxt"] },
       ],
       count: 1,
-    };
+    } as unknown as GetAllProjectsHandlerType;
     vi.mocked(getAllProjectsHandler.default).mockResolvedValue(fakeResponse);
 
     const event = createMockH3Event({});

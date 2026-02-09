@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { renderWithNuxt } from "../../setup.ts";
+import { renderWithNuxt } from "../../setup";
 import BaseFilterBar from "../../../app/components/BaseFilterBar.vue";
 import { fireEvent } from "@testing-library/vue";
 

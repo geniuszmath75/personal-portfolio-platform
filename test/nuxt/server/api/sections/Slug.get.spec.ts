@@ -15,13 +15,17 @@ describe("GET /api/v1/sections/:slug (slug.get)", async () => {
   const getSingleSectionHandler =
     await import("../../../../../server/controllers/getSingleSection");
 
+  type GetSingleSectionHandlerType = Awaited<
+    ReturnType<typeof getSingleSectionHandler.default>
+  >;
+
   const sectionsSlugGetHandler =
     await import("../../../../../server/api/v1/sections/[slug].get");
 
   it("should call getSingleSection controller with event and returns result", async () => {
     const fakeResponse = {
       section: [{ _id: "1", title: "Section 1" }],
-    };
+    } as unknown as GetSingleSectionHandlerType;
     vi.mocked(getSingleSectionHandler.default).mockResolvedValue(fakeResponse);
 
     const event = createMockH3Event({});

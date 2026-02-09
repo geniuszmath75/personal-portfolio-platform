@@ -4,6 +4,10 @@ import { setActivePinia } from "pinia";
 import { createTestPinia } from "../../setup";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
 import middleware from "../../../app/middleware/03-guest";
+import type {
+  RouteLocationNormalized,
+  RouteLocationNormalizedGeneric,
+} from "vue-router";
 
 const { navigateToMock } = vi.hoisted(() => ({ navigateToMock: vi.fn() }));
 
@@ -21,11 +25,14 @@ describe("03-guest middleware", () => {
   it("should redirect to '/' when user is logged in and route is not '/'", async () => {
     // Arrange: logged in user
     authStore.loggedIn = true;
-    const to = { path: "/auth/login" };
+    const to: Partial<RouteLocationNormalizedGeneric> = { path: "/auth/login" };
+    const from: Partial<RouteLocationNormalized> = { path: "/" };
 
     // Act
-    await middleware(to);
-
+    await middleware(
+      to as RouteLocationNormalizedGeneric,
+      from as RouteLocationNormalized,
+    );
     // Assert
     expect(navigateToMock).toHaveBeenCalledOnce();
     expect(navigateToMock).toHaveBeenCalledWith("/");
@@ -34,10 +41,14 @@ describe("03-guest middleware", () => {
   it("should not redirect when user is logged in and route is '/'", async () => {
     // Arrange: logged in user
     authStore.loggedIn = true;
-    const to = { path: "/" };
+    const to: Partial<RouteLocationNormalizedGeneric> = { path: "/" };
+    const from: Partial<RouteLocationNormalized> = { path: "/" };
 
     // Act
-    await middleware(to);
+    await middleware(
+      to as RouteLocationNormalizedGeneric,
+      from as RouteLocationNormalized,
+    );
 
     // Assert: no redirect
     expect(navigateToMock).not.toHaveBeenCalled();
@@ -46,10 +57,14 @@ describe("03-guest middleware", () => {
   it("should not redirect when user is not logged in", async () => {
     // Arrange: not logged in user
     authStore.loggedIn = false;
-    const to = { path: "/auth/login" };
+    const to: Partial<RouteLocationNormalizedGeneric> = { path: "/auth/login" };
+    const from: Partial<RouteLocationNormalized> = { path: "/" };
 
     // Act
-    await middleware(to);
+    await middleware(
+      to as RouteLocationNormalizedGeneric,
+      from as RouteLocationNormalized,
+    );
 
     // Assert: no redirect
     expect(navigateToMock).not.toHaveBeenCalled();

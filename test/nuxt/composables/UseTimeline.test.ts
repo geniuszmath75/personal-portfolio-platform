@@ -16,7 +16,7 @@ describe("useTimeline", () => {
   it.each([
     { size: "medium", expectedClass: "text-md gap-8" },
     { size: "large", expectedClass: "text-lg gap-16" },
-  ])(
+  ] as const)(
     "should 'getTimelineSizeClasses' return correct classes for $size size",
     ({ size, expectedClass }) => {
       // Arrange
@@ -33,7 +33,7 @@ describe("useTimeline", () => {
   it.each([
     { horizontal: true, expectedClass: "flex-row" },
     { horizontal: false, expectedClass: "flex-col" },
-  ])(
+  ] as const)(
     "should 'getTimelineDirectionClasses' return correct classes for horizontal=$horizontal",
     ({ horizontal, expectedClass }) => {
       // Arrange

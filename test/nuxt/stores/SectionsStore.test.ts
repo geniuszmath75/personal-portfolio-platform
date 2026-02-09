@@ -3,8 +3,9 @@ import { setActivePinia } from "pinia";
 import { createTestPinia } from "../../setup";
 import { useSectionsStore } from "../../../app/stores/sectionsStore";
 import type { ValidatedSection } from "../../../app/utils/validateSection";
-import { ISectionType } from "../../../shared/types/enums";
+import { BlockKind, ISectionType } from "../../../shared/types/enums";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
+import type { ParagraphBlock } from "~~/shared/types";
 
 // Mock 'useRuntimeConfig'
 mockNuxtImport("useRuntimeConfig", () => {
@@ -168,25 +169,43 @@ describe("sectionsStore", () => {
       const store = useSectionsStore();
       store.sectionDetails = null;
 
-      const result = store.getBlockElementsByKind("IMAGE");
+      const result = store.getBlockElementsByKind(BlockKind.IMAGE);
       expect(result).toBeUndefined();
     });
 
     it("should return block element matching the specified kind", () => {
       const store = useSectionsStore();
-      const mockBlock = { kind: "PARAGRAPH", paragraphs: ["Hello"] };
-      store.sectionDetails = { blocks: [mockBlock] };
+      const mockBlock: ParagraphBlock = {
+        kind: BlockKind.PARAGRAPH,
+        paragraphs: ["Hello"],
+      };
+      store.sectionDetails = {
+        _id: "4",
+        order: 1,
+        slug: "about-me",
+        type: ISectionType.ABOUT_ME,
+        blocks: [mockBlock],
+      };
 
-      const result = store.getBlockElementsByKind("PARAGRAPH");
+      const result = store.getBlockElementsByKind(BlockKind.PARAGRAPH);
       expect(result).toEqual(mockBlock);
     });
 
     it("should return undefined when kind does not match any block", () => {
       const store = useSectionsStore();
-      const mockBlock = { kind: "PARAGRAPH", paragraphs: ["Hello"] };
-      store.sectionDetails = { blocks: [mockBlock] };
+      const mockBlock: ParagraphBlock = {
+        kind: BlockKind.PARAGRAPH,
+        paragraphs: ["Hello"],
+      };
+      store.sectionDetails = {
+        _id: "4",
+        order: 1,
+        slug: "about-me",
+        type: ISectionType.ABOUT_ME,
+        blocks: [mockBlock],
+      };
 
-      const result = store.getBlockElementsByKind("IMAGE");
+      const result = store.getBlockElementsByKind(BlockKind.IMAGE);
       expect(result).toBeUndefined();
     });
   });

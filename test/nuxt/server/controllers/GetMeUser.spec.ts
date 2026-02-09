@@ -27,7 +27,7 @@ describe("GetMeUser controller", async () => {
     const { requireAuth } = await import("../../../../server/utils/auth");
 
     const event = createMockH3Event({
-      context: { user: mockAuthUser },
+      context: { user: mockAuthUser, isAuthenticated: true },
     });
 
     await handler.default(event);

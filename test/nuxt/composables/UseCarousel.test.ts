@@ -49,7 +49,7 @@ describe("useCarousel", () => {
         placement: "right",
         expected: "right-4 top-1/2 transform -translate-y-1/2 flex-col",
       },
-    ])(
+    ] as const)(
       "should return correct dotPlacementClasses for $placement placement",
       ({ placement, expected }) => {
         const { result } = mount(() =>
@@ -79,7 +79,7 @@ describe("useCarousel", () => {
         placement: "right",
         expected: "right-4 bottom-4",
       },
-    ])(
+    ] as const)(
       "should return correct arrowPlacementClasses for $placement placement",
       ({ placement, expected }) => {
         const { result } = mount(() =>

@@ -51,9 +51,10 @@ describe("BaseCarousel", () => {
 
     // Second arrow
     const nextArrow = getAllByRole("button")[1];
+    expect(nextArrow).toBeDefined();
 
     // Act: click next arrow
-    await fireEvent.click(nextArrow);
+    await fireEvent.click(nextArrow!);
 
     // Assert: first container style changed to translateX(-100%)
     const transformContainer = container.querySelector(
@@ -78,9 +79,10 @@ describe("BaseCarousel", () => {
 
     // Prev arrow
     const prevArrow = getAllByRole("button")[0];
+    expect(prevArrow).toBeDefined();
 
     // Act: click prev arrow
-    await fireEvent.click(prevArrow);
+    await fireEvent.click(prevArrow!);
 
     // Assert: first container style changed to translateX(-100%)
     const transformContainer = container.querySelector(
@@ -101,12 +103,13 @@ describe("BaseCarousel", () => {
     });
 
     const dots = getAllByRole("button");
+    expect(dots[2]).toBeDefined();
 
     // Act: click the last dot
-    await fireEvent.click(dots[2]);
+    await fireEvent.click(dots[2]!);
 
     // Assert: change bg-color for selected dot
-    expect(dots[2].classList.contains("bg-secondary-500")).toBe(true);
+    expect(dots[2]!.classList.contains("bg-secondary-500")).toBe(true);
   });
 
   it("should automatically advance slides when autoplay=true", async () => {

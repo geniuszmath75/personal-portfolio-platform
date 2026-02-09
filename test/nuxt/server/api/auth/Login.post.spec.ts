@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockH3Event } from "../../../../mock/h3-event";
 import { UserSchemaRole } from "../../../../../server/types/enums";
 import { useH3TestUtils } from "../../../../setup";
-
+import { Types } from "mongoose";
 vi.mock("../../../../../server/controllers/loginUser");
 
 useH3TestUtils();
@@ -22,7 +22,11 @@ describe("POST /api/v1/auth/login", async () => {
     const event = createMockH3Event({ body: { email: "a", password: "b" } });
     // Mock controller response
     const fakeResponse = {
-      user: { email: "a", role: UserSchemaRole.ADMIN },
+      user: {
+        user_id: new Types.ObjectId(),
+        email: "a",
+        role: UserSchemaRole.ADMIN,
+      },
       token: "jwt",
     };
 

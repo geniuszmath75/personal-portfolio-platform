@@ -14,6 +14,7 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
 import { useH3TestUtils } from "../../../setup";
 import { connectDB } from "../../../../server/db/connect";
+import type { NitroApp } from "nitropack";
 
 useH3TestUtils();
 
@@ -62,7 +63,10 @@ describe("mongodb plugin", async () => {
 
   it("should connect successfully", async () => {
     // Call the plugin
-    await mongodbPlugin.default();
+    mongodbPlugin.default({} as NitroApp);
+
+    // Wait for the next tick to allow async operations to complete
+    await new Promise(process.nextTick);
 
     expect(consoleLogSpy).toHaveBeenCalledWith(
       "MongoDB connected successfully!",
@@ -76,7 +80,10 @@ describe("mongodb plugin", async () => {
     vi.mocked(connectDB).mockRejectedValue(error);
 
     // Call the plugin
-    await mongodbPlugin.default();
+    mongodbPlugin.default({} as NitroApp);
+
+    // Wait for the next tick to allow async operations to complete
+    await new Promise(process.nextTick);
 
     expect(consoleLogSpy).not.toHaveBeenCalled();
     expect(consoleErrorSpy).toHaveBeenCalledWith(

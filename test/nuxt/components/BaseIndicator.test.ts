@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { useLoadingStore } from "../../../app/stores/loadingStore.ts";
+import { useLoadingStore } from "../../../app/stores/loadingStore";
 import BaseIndicator from "../../../app/components/BaseIndicator.vue";
 import { createTestPinia, renderWithNuxt } from "../../setup";
 

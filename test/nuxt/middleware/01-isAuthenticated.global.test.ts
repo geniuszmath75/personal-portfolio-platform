@@ -3,6 +3,10 @@ import { setActivePinia } from "pinia";
 import middleware from "../../../app/middleware/01-isAuthenticated.global";
 import { createTestPinia } from "../../setup";
 import { useAuthStore } from "../../../app/stores/authStore";
+import type {
+  RouteLocationNormalized,
+  RouteLocationNormalizedGeneric,
+} from "vue-router";
 
 describe("01-isAuthenticated.global middleware", () => {
   let authStore: ReturnType<typeof useAuthStore>;
@@ -14,11 +18,22 @@ describe("01-isAuthenticated.global middleware", () => {
   });
 
   it("should call checkAuth on client side", async () => {
-    // Arrange: Spy on the checkAuth method
+    // Arrange: Spy on the checkAuth method and create minimal mock route objects
     vi.spyOn(authStore, "checkAuth");
 
+    const to: Partial<RouteLocationNormalizedGeneric> = {
+      path: "/",
+    };
+
+    const from: Partial<RouteLocationNormalized> = {
+      path: "/admin/dashboard",
+    };
+
     // Act
-    await middleware();
+    await middleware(
+      to as RouteLocationNormalizedGeneric,
+      from as RouteLocationNormalized,
+    );
 
     // Assert: checkAuth should be called
     expect(authStore.checkAuth).toHaveBeenCalledTimes(1);

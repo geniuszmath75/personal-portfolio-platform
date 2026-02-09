@@ -15,15 +15,21 @@ describe("GET /api/v1/projects/:id (id.get)", async () => {
   const getSingleProjectHandler =
     await import("../../../../../server/controllers/getSingleProject");
 
+  type GetSingleProjectHandlerType = Awaited<
+    ReturnType<typeof getSingleProjectHandler.default>
+  >;
+
   const projectsIdGetHandler =
     await import("../../../../../server/api/v1/projects/[id].get");
 
   it("should call getSingleProject controller with event and returns result", async () => {
     const fakeResponse = {
-      project: [
-        { _id: "1", title: "Project 1", technologies: ["Vue", "Nuxt"] },
-      ],
-    };
+      project: {
+        _id: "1",
+        title: "Project 1",
+        technologies: ["Vue", "Nuxt"],
+      },
+    } as unknown as GetSingleProjectHandlerType;
     vi.mocked(getSingleProjectHandler.default).mockResolvedValue(fakeResponse);
 
     const event = createMockH3Event({});

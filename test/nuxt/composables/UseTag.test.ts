@@ -12,7 +12,7 @@ describe("useTag", () => {
       { size: "medium", expected: "h-10 px-3 py-1 text-sm" },
       { size: "large", expected: "h-12 px-4 py-2 text-base" },
       { size: undefined, expected: "h-10 px-3 py-1 text-sm" },
-    ])(
+    ] as const)(
       "should return correct classes for size='$size'",
       ({ size, expected }) => {
         // Arrange
@@ -69,7 +69,7 @@ describe("useTag", () => {
         dashed: false,
         expected: "border-none border-error-500 border-solid",
       },
-    ])(
+    ] as const)(
       "should return correct border classes for type='$type', bordered=$bordered, dashed=$dashed",
       ({ type, bordered, dashed, expected }) => {
         // Arrange
@@ -93,7 +93,7 @@ describe("useTag", () => {
       { rounded: true, expected: "rounded-2xl" },
       { rounded: false, expected: "rounded-none" },
       { rounded: undefined, expected: "rounded-none" },
-    ])(
+    ] as const)(
       "should return correct rounded class when rounded=$rounded",
       ({ rounded, expected }) => {
         // Arrange
@@ -142,7 +142,7 @@ describe("useTag", () => {
         type: undefined,
         expected: "bg-secondary-500 text-primary-500",
       },
-    ])(
+    ] as const)(
       "should return correct classes for type='$type'",
       ({ type, expected }) => {
         // Arrange

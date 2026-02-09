@@ -106,7 +106,7 @@ describe("projectsStore", () => {
   it("should 'basicProjectInformation' return mapped projects with max 3 technologies", () => {
     // Arrange: create store and set mocked projects
     const store = useProjectsStore();
-    store.setProjects(mockProjects);
+    store.setProjects(mockProjects, 2);
 
     // Act: get the basicProjectInformation getter result
     const basicInfo = store.basicProjectInformation;
@@ -127,8 +127,8 @@ describe("projectsStore", () => {
     });
 
     // max 3 technologies
-    expect(basicInfo[0].technologies.length).toBe(3);
-    expect(basicInfo[1].technologies.length).toBe(2);
+    expect(basicInfo[0]!.technologies.length).toBe(3);
+    expect(basicInfo[1]!.technologies.length).toBe(2);
   });
 
   it("should 'fetchProjects' set projects, count and pagination from API response", async () => {
@@ -211,7 +211,7 @@ describe("projectsStore", () => {
     const project = mockProjects[0];
 
     // Act: call setPagination with mocked data
-    store.setProjectDetails(project);
+    store.setProjectDetails(project!);
 
     // Assert: projectDetails state should be updated
     expect(store.projectDetails).toEqual(project);
@@ -276,7 +276,7 @@ describe("projectsStore", () => {
 
     // Act: update projectDetails state and call getter
     store.setProjectDetails({
-      ...mockProjects[0],
+      ...mockProjects[0]!,
       mainImage,
       otherImages,
     });
@@ -302,7 +302,7 @@ describe("projectsStore", () => {
 
     // Act: update projectDetails state and call getter
     store.setProjectDetails({
-      ...mockProjects[0],
+      ...mockProjects[0]!,
       githubLink: "https://github.com/test",
       websiteLink: "https://example.com",
     });
@@ -336,7 +336,7 @@ describe("projectsStore", () => {
 
     // Act: update projectDetails state
     store.setProjectDetails({
-      ...mockProjects[0],
+      ...mockProjects[0]!,
       githubLink: null,
       websiteLink: null,
     });
@@ -349,7 +349,7 @@ describe("projectsStore", () => {
     // Arrange: create store and project with both dates
     const store = useProjectsStore();
     const project = {
-      ...mockProjects[0],
+      ...mockProjects[0]!,
       startDate: new Date("2024-03-15"),
       endDate: new Date("2024-05-10"),
     };
@@ -390,7 +390,7 @@ describe("projectsStore", () => {
 
       // Act: update projectDetails state with $status variable
       store.setProjectDetails({
-        ...mockProjects[0],
+        ...mockProjects[0]!,
         status,
       });
 
@@ -430,7 +430,7 @@ describe("projectsStore", () => {
 
       // Act: update projectDetails state with $source variable
       store.setProjectDetails({
-        ...mockProjects[0],
+        ...mockProjects[0]!,
         projectSource: source,
       });
 

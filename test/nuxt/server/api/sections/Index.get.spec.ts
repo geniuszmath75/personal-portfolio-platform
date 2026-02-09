@@ -15,6 +15,10 @@ describe("GET /api/v1/sections (index.get)", async () => {
   const getAllSectionsHandler =
     await import("../../../../../server/controllers/getAllSections");
 
+  type GetAllSectionsHandlerType = Awaited<
+    ReturnType<typeof getAllSectionsHandler.default>
+  >;
+
   const sectionsIndexGetHandler =
     await import("../../../../../server/api/v1/sections/index.get");
 
@@ -22,7 +26,7 @@ describe("GET /api/v1/sections (index.get)", async () => {
     const fakeResponse = {
       sections: [{ _id: "1", title: "Section 1" }],
       count: 1,
-    };
+    } as unknown as GetAllSectionsHandlerType;
     vi.mocked(getAllSectionsHandler.default).mockResolvedValue(fakeResponse);
 
     const event = createMockH3Event({});

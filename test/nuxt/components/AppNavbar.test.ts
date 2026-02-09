@@ -3,6 +3,7 @@ import { fireEvent, screen } from "@testing-library/vue";
 import { createTestPinia, renderWithNuxt } from "../../setup";
 import AppNavbar from "../../../app/components/AppNavbar.vue";
 import { useAuthStore } from "../../../app/stores/authStore";
+import { UserSchemaRole } from "~~/server/types/enums";
 
 describe("AppNavbar", () => {
   it("should render static elements", () => {
@@ -79,10 +80,10 @@ describe("AppNavbar", () => {
 
     // Ensure that links are visible
     const aboutLink = screen.getAllByText("ABOUT ME")[1]; // 1 - mobile
-    expect(aboutLink).toBeTruthy();
+    expect(aboutLink).toBeDefined();
 
     // Click ABOUT link in mobile menu
-    await fireEvent.click(aboutLink);
+    await fireEvent.click(aboutLink!);
 
     // Menu should be closed
     expect(screen.queryByText("LOG IN")).toBeNull();
@@ -98,9 +99,10 @@ describe("AppNavbar", () => {
     });
 
     const aboutLinks = screen.getAllByText("ABOUT ME");
+    expect(aboutLinks.length).toBeGreaterThan(0);
 
     // Desktop (0) ABOUT link should have active class
-    expect(aboutLinks[0].className).toContain("after:w-full");
+    expect(aboutLinks[0]!.className).toContain("after:w-full");
   });
 
   it("should show LOG IN when user is not logged in (desktop)", async () => {
@@ -142,7 +144,11 @@ describe("AppNavbar", () => {
     const pinia = createTestPinia();
     const authStore = useAuthStore(pinia);
     authStore.loggedIn = true;
-    authStore.isAdmin = true;
+    authStore.user = {
+      user_id: "68a9d098b70e48772cd5ceaa",
+      email: "admin@gmail.com",
+      role: UserSchemaRole.ADMIN,
+    }; // Set user with admin role
 
     renderWithNuxt(AppNavbar);
 
@@ -185,7 +191,11 @@ describe("AppNavbar", () => {
     const pinia = createTestPinia();
     const authStore = useAuthStore(pinia);
     authStore.loggedIn = true;
-    authStore.isAdmin = true;
+    authStore.user = {
+      user_id: "68a9d098b70e48772cd5ceaa",
+      email: "admin@gmail.com",
+      role: UserSchemaRole.ADMIN,
+    }; // Set user with admin role
 
     renderWithNuxt(AppNavbar);
 

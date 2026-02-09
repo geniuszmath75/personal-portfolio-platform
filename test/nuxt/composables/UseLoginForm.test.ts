@@ -149,6 +149,7 @@ describe("useLoginForm composable", () => {
   it("should login successfully and redirect GUEST to home", async () => {
     // Arrange
     authStore.user = {
+      user_id: "123",
       email: "guest@gmail.com",
       role: UserSchemaRole.GUEST,
     };

@@ -4,21 +4,23 @@ import { createMockH3Event } from "../../../mock/h3-event";
 import { UserSchemaRole } from "../../../../server/types/enums";
 import { User } from "../../../../server/models/User";
 
-vi.mock("../../../../server/models/User");
-
 useH3TestUtils();
 
 describe("loginUser controller", async () => {
-  const mockUser = {
-    _id: 1,
+  const mockUser = new User({
     email: "test@example.com",
     role: UserSchemaRole.ADMIN,
-    comparePassword: vi.fn(),
-    createJWT: vi.fn(),
-  };
+    username: "User1",
+    password: "Pass123!",
+    // comparePassword: vi.fn(),
+    // createJWT: vi.fn(),
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(User, "findOne");
+    vi.spyOn(mockUser, "comparePassword");
+    vi.spyOn(mockUser, "createJWT");
   });
 
   const handler = await import("../../../../server/api/v1/auth/login.post");
@@ -53,7 +55,7 @@ describe("loginUser controller", async () => {
     // Arrange: mock DB to return a user
     vi.mocked(User.findOne).mockResolvedValue(mockUser);
     // And simulate wrong password
-    mockUser.comparePassword.mockResolvedValue(false);
+    vi.mocked(mockUser.comparePassword).mockResolvedValue(false);
 
     const event = createMockH3Event({
       body: { email: "test@example.com", password: "wrongpassword" },
@@ -70,9 +72,9 @@ describe("loginUser controller", async () => {
     // Arrange: mock DB to return a user
     vi.mocked(User.findOne).mockResolvedValue(mockUser);
     // Simulate correct password
-    mockUser.comparePassword.mockResolvedValue(true);
+    vi.mocked(mockUser.comparePassword).mockResolvedValue(true);
     // And mock JWT generation
-    mockUser.createJWT.mockReturnValue("jwt-token");
+    vi.mocked(mockUser.createJWT).mockReturnValue("jwt-token");
 
     // Get setCookie mock from h3 utils
     const { setCookie } = useH3TestUtils();
@@ -103,9 +105,9 @@ describe("loginUser controller", async () => {
     // Arrange: mock DB to return a user
     vi.mocked(User.findOne).mockResolvedValue(mockUser);
     // Simulate correct password
-    mockUser.comparePassword.mockResolvedValue(true);
+    vi.mocked(mockUser.comparePassword).mockResolvedValue(true);
     // And mock JWT generation
-    mockUser.createJWT.mockReturnValue("jwt-token");
+    vi.mocked(mockUser.createJWT).mockReturnValue("jwt-token");
 
     const event = createMockH3Event({
       body: { email: "test@example.com", password: "correctpass" },
@@ -120,7 +122,7 @@ describe("loginUser controller", async () => {
     expect(mockUser.createJWT).toHaveBeenCalled();
     expect(result).toEqual({
       user: {
-        user_id: 1,
+        user_id: mockUser._id,
         email: "test@example.com",
         role: UserSchemaRole.ADMIN,
       },

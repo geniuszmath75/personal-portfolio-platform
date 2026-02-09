@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type { PaginationProperties } from "../../../shared/types/index";
-import { renderWithNuxt } from "../../setup.ts";
+import { renderWithNuxt } from "../../setup";
 import BasePagination from "../../../app/components/BasePagination.vue";
 import { fireEvent } from "@testing-library/vue";
 import { ref } from "vue";
@@ -176,7 +176,9 @@ describe("BasePagination", () => {
       },
     });
     const prevButton = container.querySelectorAll("button")[0];
-    await fireEvent.click(prevButton);
+
+    expect(prevButton).toBeDefined();
+    await fireEvent.click(prevButton!);
 
     // Assert: currentPage updated
     expect(currentPage.value).toBe(1);
@@ -205,7 +207,9 @@ describe("BasePagination", () => {
       container.querySelectorAll("button")[
         container.querySelectorAll("button").length - 1
       ];
-    await fireEvent.click(nextButton);
+
+    expect(nextButton).toBeDefined();
+    await fireEvent.click(nextButton!);
 
     // Assert: currentPage updated
     expect(currentPage.value).toBe(2);

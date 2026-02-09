@@ -22,7 +22,7 @@ describe("useTimelineItem", () => {
         type: undefined,
         expectedClasses: "border-secondary-500 bg-secondary-300",
       },
-    ])(
+    ] as const)(
       "should return correct classes for type: $type",
       ({ type, expectedClasses }) => {
         // Arrange
@@ -43,7 +43,7 @@ describe("useTimelineItem", () => {
       { size: "large", expectedClasses: "w-10 h-10" },
       { size: "medium", expectedClasses: "w-8 h-8" },
       { size: undefined, expectedClasses: "w-8 h-8" },
-    ])(
+    ] as const)(
       "should return correct classes for size: $size",
       ({ size, expectedClasses }) => {
         // Arrange
@@ -64,7 +64,7 @@ describe("useTimelineItem", () => {
       { horizontal: true, expectedClasses: "text-center" },
       { horizontal: false, expectedClasses: "text-left" },
       { horizontal: undefined, expectedClasses: "text-left" },
-    ])(
+    ] as const)(
       "returns correct alignment when horizontal=$horizontal",
       ({ horizontal, expectedClasses }) => {
         // Arrange
@@ -84,7 +84,7 @@ describe("useTimelineItem", () => {
     it("should return empty string when isLast is true", () => {
       // Arrange
       const props = { isLast: true };
-      const config = { size: "medium", horizontal: false };
+      const config = { size: "medium", horizontal: false } as const;
 
       // Act
       const { getLineConnectorClasses } = useTimelineItem(props, config);
@@ -118,7 +118,7 @@ describe("useTimelineItem", () => {
         expectedClasses:
           "after:h-[180%] after:w-0.5 after:top-full after:left-1/2 after:-translate-x-1/2 after:bg-secondary-500",
       },
-    ])(
+    ] as const)(
       "should return correct connector classes for size=$size horizontal=$horizontal",
       ({ size, horizontal, expectedClasses }) => {
         // Arrange
@@ -156,7 +156,7 @@ describe("useTimelineItem", () => {
         itemPlacement: undefined,
         expectedClasses: "flex-row",
       },
-    ])(
+    ] as const)(
       "should return correct classes for horizontal=$horizontal and placement=$itemPlacement",
       ({ horizontal, itemPlacement, expectedClasses }) => {
         // Arrange
