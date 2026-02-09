@@ -25,5 +25,5 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  return { project };
+  return { project: project.toJSON() };
 });

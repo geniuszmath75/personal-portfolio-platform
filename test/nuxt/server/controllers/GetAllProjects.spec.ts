@@ -80,11 +80,16 @@ describe("GetAllProjects controller", async () => {
     // Act: call controller
     const result = await handler.default(event);
 
+    // Transform projects to match expected JSON output
+    const tranformedProjects = mockProjects.map((project) => {
+      return project.toJSON();
+    });
+
     // Assert: result contains projects, count=2 and pagination info
     expect(Project.find).toHaveBeenCalled();
     expect(Project.countDocuments).toHaveBeenCalled();
     expect(result).toEqual({
-      projects: mockProjects,
+      projects: tranformedProjects,
       count: 2,
       pagination: {
         page: 1,

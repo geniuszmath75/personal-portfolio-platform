@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Project } from "../../../../server/models/Project";
 import { useH3TestUtils } from "../../../setup";
 import { createMockH3Event } from "../../../mock/h3-event";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 vi.mock("../../../server/models/Project");
 
@@ -31,8 +31,7 @@ describe("GetSingleProject controller", async () => {
 
   it("should return project when id is valid and project exists", async () => {
     // Arrange: mock Project.findById, prepare event with valid id
-    const validId = new mongoose.Types.ObjectId().toString();
-    mockProject._id = validId;
+    const validId = new Types.ObjectId();
     vi.mocked(Project.findById).mockResolvedValue(mockProject);
 
     const event = createMockH3Event({ params: { id: validId } });
@@ -43,7 +42,7 @@ describe("GetSingleProject controller", async () => {
     // Assert: result contains project mock
     expect(Project.findById).toHaveBeenCalledWith(validId);
     expect(result).toEqual({
-      project: mockProject,
+      project: mockProject.toJSON(),
     });
   });
 

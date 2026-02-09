@@ -11,8 +11,13 @@ export default defineEventHandler(async (event) => {
   // Create pagination metadata
   const pagination = await getPaginationObject(Project, page, limit);
 
+  // Transform documents to JSON
+  const transformedProjects = projects.map((project) => {
+    return project.toJSON();
+  });
+
   return {
-    projects,
+    projects: transformedProjects,
     count: projects.length,
     pagination,
   };

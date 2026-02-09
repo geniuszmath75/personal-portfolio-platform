@@ -74,10 +74,15 @@ describe("GetAllSections controller", async () => {
     // Act: call controller
     const result = await handler.default(event);
 
+    // Transform sections to match expected JSON output
+    const transformedSections = mockSections.map((section) => {
+      return section.toJSON();
+    });
+
     // Assert: result should contain mockSections and count = 2
     expect(Section.find).toHaveBeenCalled();
     expect(result).toEqual({
-      sections: mockSections,
+      sections: transformedSections,
       count: 2,
     });
   });

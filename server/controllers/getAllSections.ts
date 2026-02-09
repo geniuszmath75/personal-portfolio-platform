@@ -10,5 +10,10 @@ export default defineEventHandler(async (event) => {
 
   const sections = await Section.find({ type: { $in: homeSections } });
 
-  return { sections: sections, count: sections.length };
+  // Transform documents to JSON
+  const transformedSections = sections.map((section) => {
+    return section.toJSON();
+  });
+
+  return { sections: transformedSections, count: sections.length };
 });

@@ -24,5 +24,5 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  return { section };
+  return { section: section.toJSON() };
 });

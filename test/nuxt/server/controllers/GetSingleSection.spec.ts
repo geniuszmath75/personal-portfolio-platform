@@ -3,7 +3,7 @@ import { Section } from "../../../../server/models/Section";
 import { useH3TestUtils } from "../../../setup";
 import { createMockH3Event } from "../../../mock/h3-event";
 
-vi.mock("../../../server/models/Section");
+vi.mock("../../../../server/models/Section");
 
 useH3TestUtils();
 
@@ -40,7 +40,6 @@ describe("GetSingleSection controller", async () => {
   it("should return section when slug is valid and section exists", async () => {
     // Arrange: mock Section.findById, prepare event with valid slug
     const validSlug = "about-me";
-    mockSection.slug = validSlug;
     vi.mocked(Section.findOne).mockResolvedValue(mockSection);
 
     const event = createMockH3Event({ params: { slug: validSlug } });
@@ -51,7 +50,7 @@ describe("GetSingleSection controller", async () => {
     // Assert: result contains section mock
     expect(Section.findOne).toHaveBeenCalledWith({ slug: validSlug });
     expect(result).toEqual({
-      section: mockSection,
+      section: mockSection.toJSON(),
     });
   });
 
