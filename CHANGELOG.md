@@ -1,5 +1,41 @@
 ## Changelog
 
+### [v0.5.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.4.0...v0.5.0) - 9 February 2026
+
+#### New Features
+
+-  create login page and simple admin dashboard [`6ec83e8`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/6ec83e8df6f198a8639f7dda6f5ac357fc42c7b6)
+-  introduce auth store, session restore and auth endpoints [`f248b63`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/f248b6396736d5f666c87ad589e30102a3a42456)
+-  wire auth flow into login, middleware and navigation [`9407a29`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/9407a29de48f78a96fc2a0db831424e5892270b7)
+-  add API protection utils [`c6481c5`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/c6481c59f9bc24c1568f68e31d31d2a01478173e)
+-  add BaseBtn, BaseInput components and corresponding types [`35dbc97`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/35dbc976b830606caeb5933146207b06b1e67331)
+-  add /auth/register endpoint and MongoDB errors handler [`14f5502`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/14f55029639616660d37ac231e3ea5f548476168)
+-  extend BaseBtn variants and unify application layouts [`d1abc69`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/d1abc6976911c6aaa2f6338d3ba14f89b1c58bf9)
+
+#### Chores And Housekeeping
+
+-  update Nuxt to 4.3.0 [`5b62860`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/5b628606a0771ae37eb9cd80c66555918c9175ae)
+-  update linting and formatting tools [`9edd97e`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/9edd97e364970bd2fa87620dc4c6ff5481c37e13)
+-  fix TypeScript issues in tests after upgrade [`bfe8a3a`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/bfe8a3ad01ccdf00f0701ef7b8470a01442ee7bb)
+-  update vitest and test environment [`3c888e6`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/3c888e6a7d056e0546bde9c5c953ebe3f57eb11e)
+-  update low-risk dependendencies [`51e262c`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/51e262ca935fa9764a81ddc9d54c1f6987127afd)
+-  upgrade mongoose and mongodb-memory-server [`6c9d129`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/6c9d1296a464a8b915725e621c73b9cc32402544)
+-  align server controllers with updated runtime types [`b1cd70c`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/b1cd70c0ac86213259fd2e70412738097f2882b3)
+-  update vue-router [`0f89137`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/0f89137a2f487017e9b9c487eeabc9436831bc1b)
+
+#### Refactoring and Updates
+
+-  move login form logic to useLoginForm composable [`ba8f6f0`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/ba8f6f0c3ebebe3a23497b92c8a67abf10832453)
+-  add setters in authStore; add missing comments and imports [`71d7c16`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/71d7c16128d1d4e827a72e2523d0c7f83f86ea92)
+
+#### Changes to Test Assests
+
+-  add unit tests form validation and error handling utils. Add unit tests with Nuxt environment for new layouts, BaseBtn, BaseInput, FormError components and usePasswordVisibility composable [`a517420`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/a517420a6a90e48f6ccf4348d0d69e4efb6751b8)
+-  add unit tests with Nuxt environment for auth controllers, route middlewares, updated components and layouts [`aee4bc5`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/aee4bc5f06ef692c7804706d8f72b0f0f19423a9)
+-  add unit tests with Nuxt environment for registerUser (controller,  endpoint) and handleDatabaseError util. Update tests for User model (password, pre-save hook) and loginUser (names refactoring) [`0c29e40`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/0c29e400b6c4db537be0387c3c7cb6ac70693849)
+-  add unit tests with Nuxt environment for logoutUser (endpoint, controller), API protection util and type guards. Modify test's setup (add methods for handling cookies) and H3 event mock (user and isAuthenticated event.context properties) [`575c1b2`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/575c1b2558926e525f8ef11d1cacda3a0e600264)
+-  add unit tests with Nuxt environment for useLoginForm composable [`fcc6f07`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/fcc6f07280a7e48a511c474fbc28326349dc34b4)
+
 ### [v0.4.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.3.0...v0.4.0) - 13 November 2025
 
 #### New Features
