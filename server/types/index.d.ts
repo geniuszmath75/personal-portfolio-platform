@@ -33,6 +33,16 @@ export interface IUser {
    * The user's avatar URL.
    */
   avatar?: string;
+
+  /**
+   * User creation timestamp
+   */
+  createdAt: Date;
+
+  /**
+   * User update timestamp
+   */
+  updatedAt: Date;
 }
 
 /**

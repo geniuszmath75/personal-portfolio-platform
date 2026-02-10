@@ -4,41 +4,44 @@ import bcrypt from "bcryptjs";
 import { UserSchemaRole } from "../types/enums";
 import type { UserModel, IUser, IUserMethods } from "../types/index.d.ts";
 
-const UserSchema = new mongoose.Schema<IUser, UserModel, IUserMethods>({
-  email: {
-    type: String,
-    required: [true, "Email is required"],
-    match: [
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-      "Email is not valid",
-    ],
-    unique: true,
+const UserSchema = new mongoose.Schema<IUser, UserModel, IUserMethods>(
+  {
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+      match: [
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+        "Email is not valid",
+      ],
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: [true, "Password is required"],
+      minLength: [8, "Password must be at least 8 characters long"],
+      match: [
+        /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/,
+        "Password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character",
+      ],
+    },
+    username: {
+      type: String,
+      required: [true, "Username is required"],
+      minLength: [3, "Username must be at least 3 characters long"],
+      maxLength: [50, "Username must be at most 50 characters long"],
+    },
+    role: {
+      type: String,
+      enum: UserSchemaRole,
+      default: UserSchemaRole.GUEST,
+    },
+    avatar: {
+      type: String,
+      default: null,
+    },
   },
-  password: {
-    type: String,
-    required: [true, "Password is required"],
-    minLength: [8, "Password must be at least 8 characters long"],
-    match: [
-      /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/,
-      "Password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character",
-    ],
-  },
-  username: {
-    type: String,
-    required: [true, "Username is required"],
-    minLength: [3, "Username must be at least 3 characters long"],
-    maxLength: [50, "Username must be at most 50 characters long"],
-  },
-  role: {
-    type: String,
-    enum: UserSchemaRole,
-    default: UserSchemaRole.GUEST,
-  },
-  avatar: {
-    type: String,
-    default: null,
-  },
-});
+  { timestamps: true },
+);
 
 // Hash password before saving to database
 export async function userSchemaPreSave(this: IUser) {
