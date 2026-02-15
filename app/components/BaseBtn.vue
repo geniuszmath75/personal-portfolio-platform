@@ -15,6 +15,7 @@
     />
     <slot name="icon" />
     {{ label }}
+    <slot />
   </button>
 </template>
 
@@ -46,6 +47,10 @@ const btnStyleClasses = computed(() => {
       return "bg-additional-500 text-primary-500 hover:bg-additional-600 focus:ring-additional-500 focus:ring-offset-primary-500 focus:ring-2 focus:ring-offset-2";
     case "mobile--secondary":
       return "bg-secondary-500 text-primary-500 hover:bg-secondary-600 focus:ring-secondary-500 focus:ring-offset-primary-500 disabled:hover:bg-secondary-500 focus:ring-2 focus:ring-offset-2";
+    case "sidebar--secondary":
+      return "bg-secondary-500 text-primary-500 rounded-lg hover:bg-additional-500 hover:text-primary-500";
+    case "sidebar--additional":
+      return "bg-additional-500 text-primary-500 rounded-lg";
     default:
       return "bg-additional-500 text-primary-500 rounded-lg hover:bg-additional-600 focus:ring-additional-500 focus:ring-offset-primary-500 disabled:hover:bg-additional-500 focus:ring-2 focus:ring-offset-2";
   }
@@ -62,6 +67,8 @@ const btnSizeClasses = computed(() => {
       return "w-48 h-12 font-semibold";
     case "mobile--menu":
       return "w-full h-16 font-semibold text-lg";
+    case "small":
+      return "w-full py-2 px-3 font-semibold text-sm";
     default:
       return "w-full py-3 px-4 font-bold text-md";
   }

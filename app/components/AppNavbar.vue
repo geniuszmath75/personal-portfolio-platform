@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed bg-primary-500 w-full h-16 md:h-20 z-40">
+  <div class="fixed bg-primary-500 w-full h-16 md:h-20 z-50">
     <div class="h-full flex justify-between">
       <!-- Home -->
       <div class="flex items-center">
@@ -115,7 +115,7 @@
       </div>
 
       <!-- Mobile trigger -->
-      <div class="flex items-center px-2 md:hidden">
+      <div class="flex items-center px-2 mr-6 md:hidden">
         <Icon
           v-if="!isMobileMenuOpen"
           name="mdi:menu"

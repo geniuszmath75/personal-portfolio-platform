@@ -201,6 +201,20 @@ export interface BaseInputProps {
 }
 
 /**
+ * Type for button style variants
+ */
+export type BaseBtnStyle =
+  | "additional"
+  | "secondary"
+  | "tab--active"
+  | "tab--inactive"
+  | "login--logout"
+  | "mobile--login--logout"
+  | "mobile--secondary"
+  | "sidebar--secondary"
+  | "sidebar--additional";
+
+/**
  * BASE BUTTON
  *
  * Props for the BaseBtn component
@@ -224,22 +238,109 @@ export interface BaseBtnProps {
   /**
    * Style variant of the button
    */
-  btnStyle?:
-    | "additional"
-    | "secondary"
-    | "tab--active"
-    | "tab--inactive"
-    | "login--logout"
-    | "mobile--login--logout"
-    | "mobile--secondary";
+  btnStyle?: BaseBtnStyle;
 
   /**
    * Size variant of the button
    */
-  btnSize?: "default" | "tab" | "large" | "mobile--menu";
+  btnSize?: "default" | "tab" | "large" | "small" | "mobile--menu";
 
   /**
    * Name of the icon to display in the button
    */
   iconName?: string | null;
+}
+
+/**
+ * SIDEBAR LINK
+ *
+ * Union type representing a single navigation item
+ * in the DashboardSideNavbar component.
+ */
+export type SidebarLink = SidebarSingleLink | SidebarDropdownLink;
+
+/**
+ * SIDEBAR BASE
+ *
+ * Shared properties for all sidebar navigation items
+ */
+interface SidebarBase {
+  /**
+   * Unique identifier of the sidebar item
+   */
+  id: number;
+
+  /**
+   * Display label of the sidebar item
+   */
+  label: string;
+
+  /**
+   * Optional icon name
+   */
+  icon?: string;
+}
+
+/**
+ * SIDEBAR SINGLE LINK
+ *
+ * Represents a direct navigation link
+ * without nested children
+ */
+interface SidebarSingleLink extends SidebarBase {
+  /**
+   * Discriminator defining link type
+   */
+  type: "link";
+
+  /**
+   * Target route path
+   */
+  to: string;
+}
+
+/**
+ * SIDEBAR DROPDOWN LINK
+ *
+ * Represents a navigation item that contains
+ * nested child links
+ */
+interface SidebarDropdownLink extends SidebarBase {
+  /**
+   * Discriminator defining dropdown type
+   */
+  type: "dropdown";
+
+  /**
+   * Array of nested dropdown navigation items
+   */
+  children: SidebarDropdownChild[];
+}
+
+/**
+ * SIDEBAR DROPDOWN CHILD
+ *
+ * Represents a nested navigation link
+ * inside a dropdown sidebar item
+ */
+export interface SidebarDropdownChild {
+  /**
+   * Unique identifier of the dropdown child item
+   */
+  id: number;
+
+  /**
+   * Display label of the dropdown child
+   */
+  label: string;
+
+  /**
+   * Target route path
+   */
+  to: string;
+
+  /**
+   * Optional icon name
+   */
+  icon?: string;
 }

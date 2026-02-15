@@ -1,5 +1,5 @@
 <template>
-  <div class="h-16 md:h-20 w-full bg-primary-500">
+  <div class="static bottom-0 h-16 md:h-20 w-full bg-primary-500">
     <div class="h-full flex justify-center">
       <div class="flex items-center justify-center space-x-2">
         <Icon name="mdi:copyright" class="text-secondary-500" />
