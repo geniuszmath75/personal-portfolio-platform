@@ -4,7 +4,7 @@ import { setActivePinia } from "pinia";
 import { createTestPinia } from "../../setup";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
 import middleware from "../../../app/middleware/02-admin";
-import { UserSchemaRole } from "../../../server/types/enums";
+import { UserSchemaRole } from "../../../shared/types/enums";
 import type {
   RouteLocationNormalized,
   RouteLocationNormalizedGeneric,

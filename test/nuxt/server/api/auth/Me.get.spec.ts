@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockH3Event } from "../../../../mock/h3-event";
 import { useH3TestUtils } from "../../../../setup";
-import { UserSchemaRole } from "../../../../../server/types/enums";
+import { UserSchemaRole } from "../../../../../shared/types/enums";
 
 vi.mock("../../../../../server/controllers/getMeUser");
 

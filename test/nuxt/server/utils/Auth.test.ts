@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
 import { createMockH3Event } from "../../../mock/h3-event";
 import { useH3TestUtils } from "../../../setup";
-import { UserSchemaRole } from "../../../../server/types/enums";
+import { UserSchemaRole } from "../../../../shared/types/enums";
 import jwt from "jsonwebtoken";
 import { requireAdmin, requireAuth } from "../../../../server/utils/auth";
 

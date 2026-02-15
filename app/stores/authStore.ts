@@ -1,4 +1,4 @@
-import { UserSchemaRole } from "~~/server/types/enums";
+import { UserSchemaRole } from "~~/shared/types/enums";
 import type { AuthUser } from "~~/shared/types";
 
 export const useAuthStore = defineStore("auth", {

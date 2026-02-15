@@ -1,4 +1,4 @@
-import { UserSchemaRole } from "~~/server/types/enums";
+import { UserSchemaRole } from "~~/shared/types/enums";
 
 export default defineNuxtRouteMiddleware(async (to) => {
   if (import.meta.server) return;

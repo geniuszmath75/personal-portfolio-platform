@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { useLoginForm } from "../../../app/composables/useLoginForm";
 import { mount } from "vue-composable-tester";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
-import { UserSchemaRole } from "../../../server/types/enums";
+import { UserSchemaRole } from "../../../shared/types/enums";
 import { showSuccessToast } from "../../../app/utils/toastNotification";
 import { handleError } from "../../../app/utils/handleError";
 import type { AuthUser } from "../../../shared/types";

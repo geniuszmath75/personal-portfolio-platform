@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useH3TestUtils } from "../../../setup";
 import { createMockH3Event } from "../../../mock/h3-event";
 import type { AuthUser } from "../../../../shared/types";
-import { UserSchemaRole } from "../../../../server/types/enums";
+import { UserSchemaRole } from "../../../../shared/types/enums";
 
 useH3TestUtils();
 

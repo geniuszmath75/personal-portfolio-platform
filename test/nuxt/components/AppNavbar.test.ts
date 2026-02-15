@@ -3,7 +3,7 @@ import { fireEvent, screen } from "@testing-library/vue";
 import { createTestPinia, renderWithNuxt } from "../../setup";
 import AppNavbar from "../../../app/components/AppNavbar.vue";
 import { useAuthStore } from "../../../app/stores/authStore";
-import { UserSchemaRole } from "~~/server/types/enums";
+import { UserSchemaRole } from "~~/shared/types/enums";
 
 describe("AppNavbar", () => {
   it("should render static elements", () => {

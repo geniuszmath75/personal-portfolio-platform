@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { UserSchemaRole } from "../types/enums";
-import type { UserModel, IUser, IUserMethods } from "../types/index.d.ts";
+import { UserSchemaRole } from "../../shared/types/enums";
+import type { UserModel } from "../types/index.d.ts";
+import type { IUser, IUserMethods } from "../../shared/types/index";
 
 const UserSchema = new mongoose.Schema<IUser, UserModel, IUserMethods>(
   {

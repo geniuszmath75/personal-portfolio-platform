@@ -3,6 +3,7 @@ import type {
   BlockKind,
   ProjectSourceType,
   ProjectStatusType,
+  UserSchemaRole,
 } from "./enums";
 import type { UserSchemaRole } from "../../server/types/enums";
 
@@ -20,6 +21,73 @@ export interface Image {
    * Alternative text describing the image
    */
   altText: string;
+}
+
+/********
+ * USER
+ *
+ * Represents the user schema in the system.
+ ********/
+
+export interface IUser {
+  /**
+   * The user's email address.
+   */
+  email: string;
+
+  /**
+   * The user's hashed password.
+   */
+  password: string;
+
+  /**
+   * The user's username.
+   */
+  username: string;
+
+  /**
+   * The user's role in the system.
+   */
+  role: UserSchemaRole;
+
+  /**
+   * The user's avatar URL.
+   */
+  avatar?: string | null;
+
+  /**
+   * User creation timestamp
+   */
+  createdAt: Date;
+
+  /**
+   * User update timestamp
+   */
+  updatedAt: Date;
+}
+
+/**
+ * Represents details about Admin profile
+ */
+export type AdminDetails = Pick<IUser, "email" | "username" | "avatar">;
+
+/**
+ * Methods available on the IUser schema.
+ */
+export interface IUserMethods {
+  /**
+   * Generates a JSON Web Token (JWT) for the user.
+   * @returns {string} The generated JWT.
+   */
+  createJWT(): string;
+
+  /**
+   * Compares a candidate password with the user's stored password.
+   *
+   * @param candidatePassword - The password to compare against the user's stored password.
+   * @return {Promise<boolean>} A promise that resolves to true if the passwords match, false otherwise.
+   */
+  comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
 /********

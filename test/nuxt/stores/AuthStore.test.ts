@@ -4,7 +4,7 @@ import { setActivePinia } from "pinia";
 import { createTestPinia } from "../../setup";
 import { useAuthStore } from "../../../app/stores/authStore";
 import type { AuthUser } from "../../../shared/types";
-import { UserSchemaRole } from "../../../server/types/enums";
+import { UserSchemaRole } from "../../../shared/types/enums";
 import { handleError } from "../../../app/utils/handleError";
 import { showSuccessToast } from "../../../app/utils/toastNotification";
 

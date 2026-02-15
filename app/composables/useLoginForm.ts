@@ -1,5 +1,5 @@
 import useVuelidate from "@vuelidate/core";
-import { UserSchemaRole } from "~~/server/types/enums";
+import { UserSchemaRole } from "~~/shared/types/enums";
 
 export function useLoginForm(credentials: { email: string; password: string }) {
   const authStore = useAuthStore();
