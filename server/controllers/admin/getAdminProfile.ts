@@ -1,5 +1,5 @@
-import { User } from "../models/User";
-import { UserSchemaRole } from "../../shared/types/enums";
+import { User } from "../../models/User";
+import { UserSchemaRole } from "../../../shared/types/enums";
 
 export default defineEventHandler(async (event) => {
   requireAdmin(event);

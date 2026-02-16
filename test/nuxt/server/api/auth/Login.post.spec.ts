@@ -23,7 +23,7 @@ describe("POST /api/v1/auth/login", async () => {
     // Mock controller response
     const fakeResponse = {
       user: {
-        user_id: new Types.ObjectId(),
+        user_id: "123",
         email: "a",
         role: UserSchemaRole.ADMIN,
       },

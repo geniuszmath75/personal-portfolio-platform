@@ -31,6 +31,11 @@ export interface Image {
 
 export interface IUser {
   /**
+   * The unique identifier for the section.
+   */
+  _id: string;
+
+  /**
    * The user's email address.
    */
   email: string;
