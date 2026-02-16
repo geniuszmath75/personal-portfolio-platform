@@ -46,7 +46,7 @@ export const useAdminStore = defineStore("adminStore", {
       try {
         this.loading = true;
 
-        const res = await $fetch("/admin/dashboard", {
+        const res = await $fetch("/admin/profile", {
           baseURL: baseApiPath,
           credentials: "include",
         });
