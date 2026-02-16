@@ -48,5 +48,11 @@ export const handleDatabaseError = (error: unknown): CustomError => {
     customError.code = 400;
   }
 
+  // Generic Error with message
+  else if (error instanceof Error) {
+    // Log the error for debugging (in production, use proper logging)
+    console.error("Unhandled database error:", error.message);
+  }
+
   return customError;
 };
