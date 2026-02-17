@@ -9,7 +9,7 @@
     ]"
   >
     <Icon
-      v-show="isDisabled"
+      v-show="isLoading"
       name="mdi:loading"
       class="absolute left-2 text-secondary-500 animate-spin text-2xl"
     />
@@ -25,6 +25,7 @@ import type { BaseBtnProps } from "~/types/components";
 const props = withDefaults(defineProps<BaseBtnProps>(), {
   type: "submit",
   isDisabled: false,
+  isLoading: false,
   btnStyle: "additional",
   btnSize: "default",
   iconName: null,
@@ -36,13 +37,13 @@ const props = withDefaults(defineProps<BaseBtnProps>(), {
 const btnStyleClasses = computed(() => {
   switch (props.btnStyle) {
     case "secondary":
-      return "bg-secondary-500 text-primary-500 rounded-3xl hover:bg-secondary-600 focus:ring-secondary-500 focus:ring-offset-primary-500 disabled:hover:bg-secondary-500 focus:ring-2 focus:ring-offset-2 shadow-primary";
+      return "bg-secondary-500 text-primary-500 rounded-lg hover:bg-secondary-600 focus:ring-secondary-500 focus:ring-offset-primary-500 disabled:hover:bg-secondary-500 focus:ring-2 focus:ring-offset-2 shadow-primary";
     case "tab--active":
       return "text-additional-500 border-additional-500";
     case "tab--inactive":
       return "text-secondary-500 border-secondary-500";
     case "login--logout":
-      return "bg-additional-500 text-primary-500 rounded-3xl hover:bg-additional-600 focus:ring-additional-500 focus:ring-offset-primary-500 focus:ring-2 focus:ring-offset-2 shadow-primary";
+      return "bg-additional-500 text-primary-500 rounded-lg hover:bg-additional-600 focus:ring-additional-500 focus:ring-offset-primary-500 focus:ring-2 focus:ring-offset-2 shadow-primary";
     case "mobile--login--logout":
       return "bg-additional-500 text-primary-500 hover:bg-additional-600 focus:ring-additional-500 focus:ring-offset-primary-500 focus:ring-2 focus:ring-offset-2";
     case "mobile--secondary":

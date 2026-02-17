@@ -249,6 +249,11 @@ export interface BaseBtnProps {
    * Name of the icon to display in the button
    */
   iconName?: string | null;
+
+  /**
+   * Whether the button is waitng to finish background process
+   */
+  isLoading?: boolean;
 }
 
 /**

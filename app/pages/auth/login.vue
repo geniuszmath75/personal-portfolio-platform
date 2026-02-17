@@ -75,7 +75,7 @@
       </div>
 
       <!-- Submit button -->
-      <BaseBtn label="Log In" :is-disabled="loading" />
+      <BaseBtn label="Log In" :is-disabled="loading" :is-loading="loading" />
     </form>
   </div>
 </template>
