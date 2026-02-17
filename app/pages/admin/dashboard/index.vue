@@ -12,22 +12,31 @@
         >
           <!-- Text Fields -->
           <div class="flex flex-col gap-4">
-            <DashboardFormField label="Username">
-              <BaseInput
-                id="username"
-                name="username"
-                :is-disabled="!isEditing"
-                :model-value="editedData.username"
-              />
-            </DashboardFormField>
-            <DashboardFormField label="Email">
-              <BaseInput
-                id="email"
-                name="email"
-                :is-disabled="!isEditing"
-                :model-value="editedData.email"
-              />
-            </DashboardFormField>
+            <FormError :errors="usernameErrors">
+              <DashboardFormField label="Username">
+                <BaseInput
+                  id="username"
+                  v-model="editedData.username"
+                  name="username"
+                  :is-disabled="!isEditing"
+                  :is-valid="!isUsernameInvalid"
+                  @input="touchFields('username')"
+                />
+              </DashboardFormField>
+            </FormError>
+
+            <FormError :errors="emailErrors">
+              <DashboardFormField label="Email">
+                <BaseInput
+                  id="email"
+                  v-model="editedData.email"
+                  name="email"
+                  :is-disabled="!isEditing"
+                  :is-valid="!isEmailInvalid"
+                  @input="touchFields('email')"
+                />
+              </DashboardFormField>
+            </FormError>
           </div>
 
           <!-- Avatar -->
@@ -38,7 +47,7 @@
                 v-if="editedData.avatar"
                 :src="editedData.avatar"
                 alt="User avatar"
-                class="h-32 w-32 object-cover rounded-full"
+                class="h-32 w-32 min-h-32 min-w-32 object-cover rounded-full"
               />
               <Icon v-else name="mdi:user" class="text-primary-500 text-8xl" />
             </div>
@@ -49,7 +58,24 @@
 
       <template #actions>
         <!-- Edit button -->
-        <BaseBtn v-if="!loading" label="EDIT" @click="handleEditBtn" />
+        <BaseBtn
+          v-if="!loading && !isEditing"
+          label="EDIT"
+          @click="startEditing"
+        />
+        <div v-else class="flex flex-col lg:flex-row w-full gap-2">
+          <BaseBtn
+            label="CANCEL"
+            btn-style="secondary"
+            :is-disabled="loading"
+            @click="cancelEditing"
+          />
+          <BaseBtn
+            label="SAVE"
+            :is-disabled="loading || !hasChanges"
+            @click="saveChanges"
+          />
+        </div>
       </template>
     </DashboardPanelSection>
   </DashboardPanel>
@@ -63,27 +89,53 @@ definePageMeta({
 const adminStore = useAdminStore();
 const { loading, basicAdminDetails } = storeToRefs(adminStore);
 
-const editedData = ref({
-  email: "",
-  username: "",
-  avatar: null as string | null,
-});
+const {
+  editedData,
+  validate,
+  touchFields,
+  usernameErrors,
+  emailErrors,
+  isEmailInvalid,
+  isUsernameInvalid,
+  hasChanges,
+  resetToOriginal,
+  initFormData,
+} = useAdminProfileForm();
 
-const originalData = ref({
-  email: "",
-  username: "",
-  avatar: null as string | null,
-});
 const isEditing = ref(false);
 
-const handleEditBtn = () => {
-  showWarningToast("EDIT btn clicked");
+const startEditing = () => {
+  isEditing.value = true;
+};
+
+const cancelEditing = () => {
+  resetToOriginal();
+  isEditing.value = false;
+};
+
+const saveChanges = async () => {
+  const isValid = await validate();
+  if (!isValid) {
+    showErrorToast("Please correct the form errors");
+    return;
+  }
+
+  const success = await adminStore.updateAdminProfile({
+    email: editedData.value.email,
+    username: editedData.value.username,
+  });
+
+  if (success) {
+    showSuccessToast("Profile updated successfully");
+    isEditing.value = false;
+  } else {
+    cancelEditing();
+  }
 };
 
 await callOnce("adminProfile", () => adminStore.fetchAdminProfile());
 
-onMounted(async () => {
-  editedData.value = { ...basicAdminDetails.value };
-  originalData.value = { ...basicAdminDetails.value };
+onMounted(() => {
+  initFormData(basicAdminDetails.value);
 });
 </script>

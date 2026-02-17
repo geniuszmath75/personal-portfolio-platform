@@ -1,3 +1,5 @@
+import type { ValidatedUpdateUserProfile } from "~~/shared/utils/validateUpdateUserProfile";
+
 export const useAdminStore = defineStore("adminStore", {
   state: () => {
     return {
@@ -55,7 +57,33 @@ export const useAdminStore = defineStore("adminStore", {
 
         this.setAdminDetails(validatedAdminDetails.admin);
       } catch (error) {
-        handleError(error, "Failed to fetch Admin details");
+        handleError(error, "Failed to fetch Admin profile");
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async updateAdminProfile(updatedProfile: ValidatedUpdateUserProfile) {
+      const { baseApiPath } = useRuntimeConfig().public;
+
+      try {
+        this.loading = true;
+
+        const res = await $fetch("/admin/profile", {
+          baseURL: baseApiPath,
+          method: "PATCH",
+          credentials: "include",
+          body: updatedProfile,
+        });
+
+        const validatedUpdatedAdminDetails =
+          adminDetailsResponseSchema.parse(res);
+
+        this.setAdminDetails(validatedUpdatedAdminDetails.admin);
+        return true;
+      } catch (error) {
+        handleError(error, "Failed to update Admin profile");
+        return false;
       } finally {
         this.loading = false;
       }
