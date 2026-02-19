@@ -28,22 +28,25 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const { email, username } = validatedBody.data;
+    const { email, username, avatar } = validatedBody.data;
 
     // Check if at least one field is provided
-    if (!username && !email) {
+    if (!username && !email && !avatar) {
       throw createError({
         statusCode: 400,
         statusMessage: "Bad Request",
-        message: "At least one field (username, email) must be provided",
+        message:
+          "At least one field (username, email, avatar) must be provided",
       });
     }
 
     // Build update object with only provided fields
-    const updateData: { username?: string; email?: string } = {};
+    const updateData: { username?: string; email?: string; avatar?: string } =
+      {};
     if (isDefinedAndNotNull(username)) updateData.username = username.trim();
     if (isDefinedAndNotNull(email))
       updateData.email = email.toLowerCase().trim();
+    if (isDefinedAndNotNull(avatar)) updateData.avatar = avatar.trim();
 
     // Update user profile
     const updatedUser = await User.findByIdAndUpdate(adminId, updateData, {
