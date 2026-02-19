@@ -431,3 +431,30 @@ export interface AuthUser {
    */
   role: UserSchemaRole;
 }
+
+/**
+ * UPLOAD IMAGE RESPONSE
+ *
+ * Represents response after uploading image
+ */
+export interface UploadImageResponse {
+  /**
+   * The URL of image location
+   */
+  url: string;
+
+  /**
+   * Image file name
+   */
+  filename: string;
+
+  /**
+   * Size of the image file
+   */
+  size: number;
+
+  /**
+   * MIME type of the image file
+   */
+  mimetype: string;
+}

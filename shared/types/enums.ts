@@ -53,3 +53,11 @@ export enum ProjectStatusType {
   IN_PROGRESS = "IN PROGRESS",
   COMPLETED = "COMPLETED",
 }
+
+/**
+ * Represents the upload categories for organizing files
+ */
+export enum UploadCategory {
+  AVATARS = "avatars",
+  PROJECTS = "projects",
+}
