@@ -20,6 +20,17 @@ export function useAdminProfileForm() {
   });
 
   /**
+   * Pending avatar file to upload (before SAVE)
+   */
+  const pendingAvatarFile = ref<File | null>(null);
+  
+  /**
+   * Indicates if avatar file is invalid
+   */
+  const isAvatarInvalid = ref(false);
+
+
+  /**
    * Vuelidate validation setup
    */
   const $v = useVuelidate(adminProfileValidationRules, editedData);
@@ -43,6 +54,7 @@ export function useAdminProfileForm() {
   const initFormData = (data: typeof editedData.value) => {
     editedData.value = { ...data };
     originalData.value = { ...data };
+    pendingAvatarFile.value = null;
   };
 
   /**
@@ -50,6 +62,7 @@ export function useAdminProfileForm() {
    */
   const resetToOriginal = () => {
     editedData.value = { ...originalData.value };
+    pendingAvatarFile.value = null;
   };
 
   /**
@@ -79,7 +92,8 @@ export function useAdminProfileForm() {
     return (
       editedData.value.username !== originalData.value.username ||
       editedData.value.email !== originalData.value.email ||
-      editedData.value.avatar !== originalData.value.avatar
+      editedData.value.avatar !== originalData.value.avatar ||
+      pendingAvatarFile.value !== null
     );
   });
 
@@ -94,5 +108,7 @@ export function useAdminProfileForm() {
     hasChanges,
     initFormData,
     resetToOriginal,
+    pendingAvatarFile,
+    isAvatarInvalid
   };
 }
