@@ -23,12 +23,11 @@ export function useAdminProfileForm() {
    * Pending avatar file to upload (before SAVE)
    */
   const pendingAvatarFile = ref<File | null>(null);
-  
+
   /**
    * Indicates if avatar file is invalid
    */
   const isAvatarInvalid = ref(false);
-
 
   /**
    * Vuelidate validation setup
@@ -109,6 +108,6 @@ export function useAdminProfileForm() {
     initFormData,
     resetToOriginal,
     pendingAvatarFile,
-    isAvatarInvalid
+    isAvatarInvalid,
   };
 }
