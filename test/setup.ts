@@ -1,4 +1,4 @@
-import type { H3Event, EventHandlerRequest } from "h3";
+import type { H3Event, EventHandlerRequest, MultiPartData } from "h3";
 import { merge } from "lodash";
 import type { NitroAppPlugin } from "nitropack";
 import { afterEach, vi } from "vitest";
@@ -8,6 +8,9 @@ import { createTestingPinia, type TestingOptions } from "@pinia/testing";
 import "@testing-library/jest-dom/vitest";
 
 type Handler = (event: H3Event<EventHandlerRequest>) => Promise<unknown>;
+type TestH3Event = H3Event & {
+  _multipartFormData?: MultiPartData[];
+};
 
 export function useH3TestUtils() {
   const h3 = vi.hoisted(() => ({
@@ -24,6 +27,9 @@ export function useH3TestUtils() {
     setCookie: vi.fn(),
     deleteCookie: vi.fn(),
     getCookie: vi.fn(),
+    readMultipartFormData: vi.fn(async (event: TestH3Event) => {
+      return event._multipartFormData || [];
+    }),
   }));
 
   // Stub the global functions to support auto-imports in tests
@@ -35,6 +41,7 @@ export function useH3TestUtils() {
   vi.stubGlobal("setCookie", h3.setCookie);
   vi.stubGlobal("deleteCookie", h3.deleteCookie);
   vi.stubGlobal("getCookie", h3.getCookie);
+  vi.stubGlobal("readMultipartFormData", h3.readMultipartFormData);
 
   return h3;
 }

@@ -1,4 +1,4 @@
-import type { H3Event } from "h3";
+import type { H3Event, MultiPartData } from "h3";
 import type { AuthUser } from "../../shared/types";
 import { merge } from "lodash";
 
@@ -9,6 +9,7 @@ export const createMockH3Event = (
     query?: Record<string, unknown>;
     user?: AuthUser;
     isAuthenticated?: boolean;
+    multiPartFormData?: MultiPartData[];
   },
 ): H3Event => {
   const event = {
@@ -26,6 +27,7 @@ export const createMockH3Event = (
     },
 
     _requestBody: partialEvent.body,
+    _multipartFormData: partialEvent.multiPartFormData,
   } as unknown as H3Event;
 
   return merge(event, partialEvent) as H3Event;

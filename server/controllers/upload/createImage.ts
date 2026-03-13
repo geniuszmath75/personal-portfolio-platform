@@ -1,6 +1,7 @@
 import { uploadCategorySchema } from "~~/server/utils/validateUploadImage";
 import { uploadImage } from "./uploadImage";
 import { UploadCategory } from "~~/shared/types/enums";
+import { requireAuth } from "~~/server/utils/auth";
 
 export default defineEventHandler(async (event) => {
   requireAuth(event);

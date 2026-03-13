@@ -1,5 +1,8 @@
 import { User } from "~~/server/models/User";
 import { updateUserProfileSchema } from "~~/shared/utils/validateUpdateUserProfile";
+import { requireAdmin } from "~~/server/utils/auth";
+import { H3Error } from "h3";
+import { handleDatabaseError } from "~~/server/utils/handleDatabaseError";
 
 export default defineEventHandler(async (event) => {
   try {

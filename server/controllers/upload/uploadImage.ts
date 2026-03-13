@@ -1,4 +1,5 @@
 import type { H3Event } from "h3";
+import { H3Error } from "h3";
 import type { UploadImageResponse } from "~~/shared/types";
 import { extname, join } from "path";
 import { randomUUID } from "crypto";
@@ -60,7 +61,6 @@ export async function uploadImage(
   try {
     // Parse multipart form data
     const form = await readMultipartFormData(event);
-
     if (!form || form.length === 0) {
       throw createError({
         statusCode: 400,

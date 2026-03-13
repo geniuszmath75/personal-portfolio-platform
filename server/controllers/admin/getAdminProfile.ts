@@ -1,5 +1,6 @@
 import { User } from "../../models/User";
 import { UserSchemaRole } from "../../../shared/types/enums";
+import { requireAdmin } from "../../utils/auth";
 
 export default defineEventHandler(async (event) => {
   requireAdmin(event);
