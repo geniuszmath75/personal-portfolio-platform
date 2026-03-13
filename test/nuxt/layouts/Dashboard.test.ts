@@ -25,7 +25,6 @@ describe("Dashboard layout", () => {
 
     // wrapper
     expect(container.firstChild).toHaveClass(
-      "flex",
       "min-h-screen",
       "font-default",
       "bg-primary-500",

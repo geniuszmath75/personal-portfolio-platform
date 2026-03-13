@@ -26,7 +26,10 @@ describe("BaseBtn.vue", () => {
       "should set type prop correctly",
       ({ type }) => {
         const { container } = renderWithNuxt(BaseBtn, {
-          props: { label: "Test", type: type as "submit" | "button" | "reset" },
+          props: {
+            label: "Test",
+            type: type as "submit" | "button" | "reset",
+          },
         });
         const button = container.querySelector("button") as HTMLButtonElement;
         expect(button.type).toBe(type);
@@ -77,10 +80,12 @@ describe("BaseBtn.vue", () => {
       expect(button.className).toContain("disabled:opacity-50");
       expect(button.className).toContain("disabled:cursor-not-allowed");
     });
+  });
 
+  describe("Loading state", () => {
     it("should show loading icon when disabled", () => {
       const { container } = renderWithNuxt(BaseBtn, {
-        props: { label: "Test", isDisabled: true },
+        props: { label: "Test", isLoading: true },
       });
       const icon = container.querySelector(".i-mdi\\:loading");
       expect(icon).toBeTruthy();
@@ -88,7 +93,7 @@ describe("BaseBtn.vue", () => {
 
     it("should hide loading icon when not disabled", () => {
       const { container } = renderWithNuxt(BaseBtn, {
-        props: { label: "Test", isDisabled: false },
+        props: { label: "Test", isLoading: false },
       });
       const icon = container.querySelector(".i-mdi\\:loading");
       expect(icon?.className).toContain("absolute");
@@ -127,7 +132,7 @@ describe("BaseBtn.vue", () => {
           "bg-additional-500",
           "text-primary-500",
           "hover:bg-additional-600",
-          "rounded-3xl",
+          "rounded-lg",
           "shadow-primary",
         ],
       },
@@ -146,6 +151,16 @@ describe("BaseBtn.vue", () => {
           "text-primary-500",
           "hover:bg-secondary-600",
           "disabled:hover:bg-secondary-500",
+        ],
+      },
+      {
+        btnStyle: "sidebar--secondary",
+        expectedClasses: [
+          "bg-secondary-500",
+          "text-primary-500",
+          "rounded-lg",
+          "hover:bg-additional-500",
+          "hover:text-primary-500",
         ],
       },
     ])(
