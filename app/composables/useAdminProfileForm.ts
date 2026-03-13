@@ -96,6 +96,26 @@ export function useAdminProfileForm() {
     );
   });
 
+  /**
+   * Get only the fields that have been changed
+   * @returns object containing only modified fields
+   */
+  const getChangedFields = () => {
+    const changed: Record<string, unknown> = {};
+
+    if (editedData.value.username !== originalData.value.username) {
+      changed.username = editedData.value.username;
+    }
+    if (editedData.value.email !== originalData.value.email) {
+      changed.email = editedData.value.email;
+    }
+    if (editedData.value.avatar !== originalData.value.avatar) {
+      changed.avatar = editedData.value.avatar ?? undefined;
+    }
+
+    return changed;
+  };
+
   return {
     editedData,
     validate,
@@ -109,5 +129,6 @@ export function useAdminProfileForm() {
     resetToOriginal,
     pendingAvatarFile,
     isAvatarInvalid,
+    getChangedFields,
   };
 }

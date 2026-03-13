@@ -144,6 +144,7 @@ const {
   initFormData,
   pendingAvatarFile,
   isAvatarInvalid,
+  getChangedFields,
 } = useAdminProfileForm();
 
 const isEditing = ref(false);
@@ -205,12 +206,9 @@ const saveChanges = async () => {
       editedData.value.avatar = uploadedUrl;
     }
 
-    // Update profile with all changes
-    const success = await adminStore.updateAdminProfile({
-      email: editedData.value.email,
-      username: editedData.value.username,
-      avatar: editedData.value.avatar ?? undefined,
-    });
+    // Update profile with only changed fields
+    const changedFields = getChangedFields();
+    const success = await adminStore.updateAdminProfile(changedFields);
 
     if (success) {
       showSuccessToast("Profile updated successfully");
