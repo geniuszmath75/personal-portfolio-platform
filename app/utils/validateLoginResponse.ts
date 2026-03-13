@@ -1,5 +1,5 @@
 import z from "zod";
-import { UserSchemaRole } from "~~/shared/types/enums";
+import { UserSchemaRole } from "../../shared/types/enums";
 
 /**
  * Schema for validating authenticated user data.

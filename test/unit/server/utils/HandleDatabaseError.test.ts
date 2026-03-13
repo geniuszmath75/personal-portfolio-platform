@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import mongoose from "mongoose";
 import { handleDatabaseError } from "../../../../server/utils/handleDatabaseError";
 
@@ -9,7 +9,12 @@ describe("handleDatabaseError util", () => {
   describe("default error handling", () => {
     it("should return default error for unknown error type", () => {
       // Arrange
-      const unknownError = new Error("Some random error");
+      const errorMessage = "Some random error";
+      const unknownError = new Error(errorMessage);
+
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
       // Act
       const result = handleDatabaseError(unknownError);
@@ -20,6 +25,13 @@ describe("handleDatabaseError util", () => {
         statusMessage: "Internal Server Error",
         message: "Something went wrong, please try again later.",
       });
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Unhandled database error:",
+        errorMessage,
+      );
+
+      consoleErrorSpy.mockRestore();
     });
 
     it("should return default error for null", () => {
@@ -195,10 +207,15 @@ describe("handleDatabaseError util", () => {
 
     it("should return default error for MongoServerError with different error code", () => {
       // Arrange
+      const errorMessage = "Some other MongoDB error";
       const serverError = new mongoose.mongo.MongoServerError({
-        message: "Some other MongoDB error",
+        message: errorMessage,
       });
       serverError.code = 12345; // Different error code
+
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
       // Act
       const result = handleDatabaseError(serverError);
@@ -209,6 +226,13 @@ describe("handleDatabaseError util", () => {
         statusMessage: "Internal Server Error",
         message: "Something went wrong, please try again later.",
       });
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Unhandled database error:",
+        errorMessage,
+      );
+
+      consoleErrorSpy.mockRestore();
     });
   });
 });

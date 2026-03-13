@@ -1,4 +1,5 @@
 import z from "zod";
+import { UserSchemaRole } from "../../shared/types/enums";
 
 export const adminUserSchema = z.object({
   admin: z.object({

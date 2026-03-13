@@ -1,4 +1,5 @@
 import z from "zod";
+import { UploadCategory } from "../../shared/types/enums";
 
 export const uploadCategorySchema = z.enum(UploadCategory);
 

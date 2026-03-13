@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { jwtPayloadSchema } from "../../../../server/utils/validateJwtPayload";
-import { UserSchemaRole } from "../../../../server/types/enums";
+import { UserSchemaRole } from "../../../../shared/types/enums";
 
 describe("validateJwtPayload util", () => {
   // Valid test data

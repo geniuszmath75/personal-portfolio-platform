@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { User, userSchemaPreSave } from "../../../../server/models/User";
 import mongoose from "mongoose";
-import type { IUser } from "../../../../server/types";
+import type { IUser } from "../../../../shared/types";
 
 // Type for mocking jwt.sign
 type SignType = (

@@ -3,7 +3,7 @@ import {
   loginResponseSchema,
   authUserSchema,
 } from "../../../app/utils/validateLoginResponse";
-import { UserSchemaRole } from "../../../server/types/enums";
+import { UserSchemaRole } from "../../../shared/types/enums";
 
 describe("validateLoginResponse util", () => {
   // Valid test data

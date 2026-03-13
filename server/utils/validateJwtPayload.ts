@@ -1,5 +1,5 @@
 import z from "zod";
-import { UserSchemaRole } from "~~/shared/types/enums";
+import { UserSchemaRole } from "../../shared/types/enums";
 
 export const jwtPayloadSchema = z.object({
   userId: z.string().regex(/^[0-9a-f]{24}$/),
