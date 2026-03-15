@@ -145,7 +145,7 @@ describe("UpdateAdminProfile controller", async () => {
       expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
         "user123",
         { username: "newAdmin" },
-        { new: true, runValidators: true },
+        { returnDocument: "after", runValidators: true },
       );
       expect(result).toHaveProperty("admin");
     });
@@ -163,7 +163,7 @@ describe("UpdateAdminProfile controller", async () => {
       expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
         "user123",
         { email: "new@example.com" },
-        { new: true, runValidators: true },
+        { returnDocument: "after", runValidators: true },
       );
     });
 
@@ -180,7 +180,7 @@ describe("UpdateAdminProfile controller", async () => {
       expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
         "user123",
         { avatar: "https://example.com/new-avatar.png" },
-        { new: true, runValidators: true },
+        { returnDocument: "after", runValidators: true },
       );
     });
 
@@ -205,7 +205,7 @@ describe("UpdateAdminProfile controller", async () => {
           email: "new@example.com",
           avatar: "https://example.com/avatar.png",
         },
-        { new: true, runValidators: true },
+        { returnDocument: "after", runValidators: true },
       );
     });
 
@@ -247,7 +247,7 @@ describe("UpdateAdminProfile controller", async () => {
       expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
         "user123",
         { username: "spacedName", avatar: "https://url.com" },
-        { new: true, runValidators: true },
+        { returnDocument: "after", runValidators: true },
       );
     });
 

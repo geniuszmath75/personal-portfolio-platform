@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
 
     // Update user profile
     const updatedUser = await User.findByIdAndUpdate(adminId, updateData, {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     });
 
