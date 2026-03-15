@@ -211,7 +211,7 @@ export function useFileUpload(
         onError: (message) => {
           const updated = {
             status: "error" as UploadFileStatus,
-            errorMessages: message ?? "Upload failed",
+            errorMessage: message ?? "Upload failed",
           };
           updateFile(fileInfo.id, updated);
           callbacks.onError({ ...fileInfo, ...updated });
@@ -251,7 +251,7 @@ export function useFileUpload(
       } else {
         const updated = {
           status: "error" as UploadFileStatus,
-          errorMessages: `Server error: ${xhr.status}`,
+          errorMessage: `Server error: ${xhr.status}`,
         };
         updateFile(fileInfo.id, updated);
         callbacks.onError({ ...fileInfo, ...updated });
