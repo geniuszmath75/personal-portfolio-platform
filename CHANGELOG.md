@@ -1,5 +1,48 @@
 ## Changelog
 
+### [v0.6.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.5.0...v0.6.0) - 19 March 2026
+
+#### New Features
+
+-  add avatar uploading to admin dashboard page [`7290e8a`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/7290e8a7d4c23182b5ccf92e62f2e6ef41403438)
+-  update dashboard layout and add dashboard side navbar [`9201f45`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/9201f45a4953517a223885090cf2621a62a95ac3)
+-  extract admin profile form logic into composable and implement save [`308b4ea`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/308b4ea7f64768f957110d048c8f03affe8e7071)
+-  add dashboard overview page [`9355bac`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/9355bac6de1ac73559fd8c81ada369a01eff7547)
+-  add /upload/image API endpoint [`e8d4704`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/e8d4704c65c4118c3de884d4195ef7a0211fc778)
+-  add /admin/dashboard returning admin details. Add createdAt, updatedAt fields to User model [`c7551c4`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/c7551c4adfe9d454cce2359c638f97c0e26dfd0e)
+-  add PATCH '/admin/profile' endpoint updating admin profile. Log unhandled errors in handleDatabaseError util [`f3d4653`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/f3d46539dba947b3687ed3d114ec3e4aaa7f5152)
+-  replace /admin/dashboard endpoint with /admin/profile [`36efad4`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/36efad4198d63ca1e155a75a20917dfe6af3d522)
+-  add in updateAdminProfile controller possibility of updating admin avatar [`2b47e85`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/2b47e85dc6f0d6a207314237546a75014e88dc23)
+-  add isLoading prop to BaseBtn component [`b68e5ef`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/b68e5ef1e69e7850f65cff2f40195cc3ae936718)
+
+#### Fixes
+
+-  replace deprecated mongoose option new with returnDocument [`6da4462`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/6da4462fdf2e04b21fc6a5080f3be4a9e21eb565)
+
+#### Chores And Housekeeping
+
+-  update nuxt ecosystem and eslint to latest minor [`79752de`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/79752de1fb0ccbbc48c9ed812364053fbd129a07)
+-  fix linter errors [`038971d`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/038971dab12e8d9a24de778928e36bda56888ac3)
+-  update package-lock deps [`c59cdfe`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/c59cdfe90f2754a40dec1a09f8786cfbc61b9e0d)
+-  add memfs dev dependency [`a6ad9e5`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/a6ad9e5a18e44a1b63408b3581c96d5a052e31ac)
+-  update icon sets, types and minor tooling patches [`71dc313`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/71dc3135c27c5d44828650fb748ba70951210dc3)
+-  move user-related types and enums to 'shared' folder [`878f5f1`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/878f5f186246d8cb5085e0de20ed3b598d6d2f1d)
+-  add deps optimization in Nuxt config [`6ca609a`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/6ca609a03b4769b524581cdac9737f92cc363c0b)
+
+#### Refactoring and Updates
+
+-  send only changed fields in profile update [`88299e0`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/88299e02fdc2b61944f23bab8eeae88a74a89cf4)
+-  add '_id' field to IUser interface. Create 'admin' directory for admin-related controllers [`cf3d067`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/cf3d06777ede3bfdb85fd0d7738eb8d15d6bbc9e)
+-  rename property that contains error message according to UploadFileInfo type [`de8fa5d`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/de8fa5d9e2850105c194a8344d5a41345add8edc)
+
+#### Changes to Test Assests
+
+-  add unit tests with Nuxt environment for FileUpload component and useAdminProfileForm, useFileUpload composables. Create XHR request mock [`5765a05`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/5765a05fc272820edf2b388eea6bad0683514c90)
+-  add unit tests with Nuxt environment for uploading image, updating admin profile ednpoints and controllers. Update test setup with readMultipartFormData auto-import mock [`251c2ea`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/251c2ea6cff96760aa6cb629d57dc639dc03a7f0)
+-  add unit tests with Nuxt environment for new components [`b345a47`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/b345a47c1eb4cb2251f9d1dfc4ac2cd7f5307379)
+-  add unit tests with Nuxt environment for adminStore and validateImageUpload [`a464d63`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/a464d63aea76753b8c4bdca5d1ebda86e2281b15)
+-  add or modify unit tests for validators, handleDatabaseError util and User model. [`274bd72`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/274bd72dbacf303b493eea93f07569a08288c78b)
+
 ### [v0.5.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.4.0...v0.5.0) - 9 February 2026
 
 #### New Features
