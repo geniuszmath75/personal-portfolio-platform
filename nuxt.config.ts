@@ -25,4 +25,17 @@ export default defineNuxtConfig({
   routeRules: {
     "/admin/**": { ssr: false },
   },
+  vite: {
+    optimizeDeps: {
+      include: [
+        "@vue/devtools-core",
+        "@vue/devtools-kit",
+        "zod",
+        "vue-toast-notification",
+        "lodash",
+        "@vuelidate/core",
+        "@vuelidate/validators",
+      ],
+    },
+  },
 });
