@@ -1,4 +1,4 @@
-import { Project } from "../models/Project";
+import { Project } from "../../models/Project";
 import { Types } from "mongoose";
 
 export default defineEventHandler(async (event) => {
