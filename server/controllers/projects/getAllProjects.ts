@@ -1,5 +1,8 @@
 import { Project } from "../../models/Project";
-import { getPaginationObject, getPaginationParams } from "../../utils/pagination";
+import {
+  getPaginationObject,
+  getPaginationParams,
+} from "../../utils/pagination";
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);

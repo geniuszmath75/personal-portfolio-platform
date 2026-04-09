@@ -259,7 +259,7 @@ export interface IProject {
   /**
    * The project finish date
    */
-  endDate?: Date;
+  endDate?: Date | null;
 
   /**
    * The short decription of the project
@@ -305,6 +305,16 @@ export interface IProject {
    * List of gained experience
    */
   gainedExperience: string[];
+
+  /**
+   * Project creation timestamp
+   */
+  createdAt: Date;
+
+  /**
+   * Project update timestamp
+   */
+  updatedAt: Date;
 }
 
 /**
