@@ -326,6 +326,29 @@ export type BasicProjectInformation = Pick<
 >;
 
 /**
+ * Represents the form data for creating a new project
+ */
+export type CreateProjectForm = Omit<
+  IProject,
+  | "_id"
+  | "startDate"
+  | "endDate"
+  | "mainImage"
+  | "otherImages"
+  | "githubLink"
+  | "websiteLink"
+  | "createdAt"
+  | "updatedAt"
+> & {
+  startDate: string;
+  endDate: string;
+  githubLink: string;
+  websiteLink: string;
+  mainImage: null;
+  otherImages: [];
+};
+
+/**
  * Response format for list of Projects objects from the API.
  */
 export interface ProjectsResponse {

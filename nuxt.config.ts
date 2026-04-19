@@ -24,6 +24,7 @@ export default defineNuxtConfig({
   },
   routeRules: {
     "/admin/**": { ssr: false },
+    "/projects/create": { ssr: false },
   },
   vite: {
     optimizeDeps: {
