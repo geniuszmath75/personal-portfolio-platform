@@ -107,6 +107,7 @@ export function useFileUpload(
       thumbnailUrl: isImage ? URL.createObjectURL(file) : null,
       type: file.type || null,
       errorMessage: null,
+      altText: "",
     };
   }
 

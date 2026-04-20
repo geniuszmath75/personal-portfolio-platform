@@ -47,86 +47,98 @@
       <div
         v-for="fileItem in files"
         :key="fileItem.id"
-        class="flex items-center gap-4 p-4 bg-primary-600 rounded-lg border border-secondary-500"
+        class="flex flex-col gap-4 p-4 bg-primary-600 rounded-lg border border-secondary-500"
       >
-        <!-- Preview -->
-        <div
-          class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-secondary-500"
-        >
-          <img
-            v-if="fileItem.thumbnailUrl"
-            :src="fileItem.thumbnailUrl"
-            :alt="fileItem.name"
-            class="w-full h-full object-cover"
-          />
+        <div class="flex items-center gap-4">
+          <!-- Preview -->
           <div
-            v-else
-            class="w-full h-full flex items-center justify-center text-primary-500"
+            class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-secondary-500"
           >
-            <Icon name="mdi:file" class="text-3xl" />
-          </div>
-        </div>
-
-        <!-- File info -->
-        <div class="flex-1 overflow-hidden">
-          <p
-            class="text-secondary-500 line-clamp-1 break-all text-sm font-medium"
-          >
-            {{ fileItem.name }}
-          </p>
-          <p class="text-secondary-600 text-xs">
-            {{ fileItem.file ? formatFileSize(fileItem.file.size) : "" }}
-          </p>
-
-          <!-- Progress bar -->
-          <div
-            v-if="fileItem.status === 'uploading'"
-            class="mt-2 w-full bg-primary-700 rounded-full h-2"
-          >
-            <div
-              class="bg-additional-500 h-2 rounded-full transition-all duration-300"
-              :style="{ width: `${fileItem.percentage}%` }"
+            <img
+              v-if="fileItem.thumbnailUrl"
+              :src="fileItem.thumbnailUrl"
+              :alt="fileItem.name"
+              class="w-full h-full object-cover"
             />
+            <div
+              v-else
+              class="w-full h-full flex items-center justify-center text-primary-500"
+            >
+              <Icon name="mdi:file" class="text-3xl" />
+            </div>
           </div>
 
-          <!-- Finished -->
-          <div
-            v-else-if="fileItem.status === 'finished'"
-            class="mt-2 flex items-center gap-1"
-          >
-            <Icon name="mdi:check-circle" class="text-success-800 text-sm" />
-            <span class="text-success-500 text-xs">Uploaded</span>
+          <!-- File info -->
+          <div class="flex-1 overflow-hidden">
+            <p
+              class="text-secondary-500 line-clamp-1 break-all text-sm font-medium"
+            >
+              {{ fileItem.name }}
+            </p>
+            <p class="text-secondary-600 text-xs">
+              {{ fileItem.file ? formatFileSize(fileItem.file.size) : "" }}
+            </p>
+
+            <!-- Progress bar -->
+            <div
+              v-if="fileItem.status === 'uploading'"
+              class="mt-2 w-full bg-primary-700 rounded-full h-2"
+            >
+              <div
+                class="bg-additional-500 h-2 rounded-full transition-all duration-300"
+                :style="{ width: `${fileItem.percentage}%` }"
+              />
+            </div>
+
+            <!-- Finished -->
+            <div
+              v-else-if="fileItem.status === 'finished'"
+              class="mt-2 flex items-center gap-1"
+            >
+              <Icon name="mdi:check-circle" class="text-success-800 text-sm" />
+              <span class="text-success-500 text-xs">Uploaded</span>
+            </div>
+
+            <!-- Error -->
+            <div
+              v-else-if="fileItem.status === 'error'"
+              class="mt-2 flex items-center gap-1"
+            >
+              <Icon name="mdi:alert-circle" class="text-error-500 text-sm" />
+              <span class="text-error-500 text-xs">{{
+                fileItem.errorMessage
+              }}</span>
+            </div>
+
+            <!-- Pending (no action/customRequest configured) -->
+            <div
+              v-else-if="fileItem.status === 'pending'"
+              class="mt-2 flex items-center gap-1"
+            >
+              <Icon
+                name="mdi:clock-outline"
+                class="text-secondary-500 text-sm"
+              />
+              <span class="text-secondary-500 text-xs">Ready</span>
+            </div>
           </div>
 
-          <!-- Error -->
-          <div
-            v-else-if="fileItem.status === 'error'"
-            class="mt-2 flex items-center gap-1"
+          <!-- Remove button -->
+          <button
+            v-if="!disabled && fileItem.status !== 'uploading'"
+            class="flex p-2 text-secondary-500 hover:text-additional-500 transition-colors"
+            @click="removeFile(fileItem.id)"
           >
-            <Icon name="mdi:alert-circle" class="text-error-500 text-sm" />
-            <span class="text-error-500 text-xs">{{
-              fileItem.errorMessage
-            }}</span>
-          </div>
-
-          <!-- Pending (no action/customRequest configured) -->
-          <div
-            v-else-if="fileItem.status === 'pending'"
-            class="mt-2 flex items-center gap-1"
-          >
-            <Icon name="mdi:clock-outline" class="text-secondary-500 text-sm" />
-            <span class="text-secondary-500 text-xs">Ready</span>
-          </div>
+            <Icon name="mdi:close" class="text-2xl" />
+          </button>
         </div>
-
-        <!-- Remove button -->
-        <button
-          v-if="!disabled && fileItem.status !== 'uploading'"
-          class="flex p-2 text-secondary-500 hover:text-additional-500 transition-colors"
-          @click="removeFile(fileItem.id)"
-        >
-          <Icon name="mdi:close" class="text-2xl" />
-        </button>
+        <input
+          v-if="withAltText && fileItem.file?.type.startsWith('image/')"
+          v-model="fileItem.altText"
+          type="text"
+          placeholder="Image description (alt text)"
+          class="mt-2 w-full px-2 py-3 bg-primary-700 border border-secondary-700 rounded text-secondary-500 text-xs placeholder-secondary-700 focus:outline-none focus:border-secondary-300"
+        />
       </div>
     </div>
   </div>

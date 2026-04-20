@@ -198,6 +198,16 @@ export interface BaseInputProps {
    * Whether the input is disabled
    */
   isDisabled?: boolean;
+
+  /**
+   * Minimum value for the input element
+   */
+  min?: string;
+
+  /**
+   * Maximum value for the input element
+   */
+  max?: string;
 }
 
 /**
@@ -417,6 +427,11 @@ export interface UploadFileInfo {
    * Error message when status === 'error'
    */
   errorMessage: string | null;
+
+  /**
+   * Alternative text used for image accessibility
+   */
+  altText: string;
 }
 
 /**
@@ -508,6 +523,11 @@ export interface FileUploadProps {
    * Whether to include cookies and auth headers in cross-origin requests
    */
   withCredentials?: boolean;
+
+  /**
+   * Whether to include alternative text for image accessibility
+   */
+  withAltText?: boolean;
 }
 
 /**
@@ -537,3 +557,84 @@ export type FileUploadComposableProps = WithDefaults<
   >,
   "maxFiles" | "maxSizeMB" | "accept" | "data" | "headers" | "withCredentials"
 >;
+
+/**
+ * BASE TEXTAREA
+ *
+ * Props for BaseTextarea component
+ */
+export interface BaseTextareaProps {
+  /**
+   * ID of the textarea element
+   */
+  id?: string;
+
+  /**
+   * Name of the textarea element
+   */
+  name?: string;
+
+  /**
+   * Placeholder of the textarea element
+   */
+  placeholder?: string;
+
+  /**
+   * Number of rows for the textarea element
+   */
+  rows?: number;
+
+  /**
+   * Whether the textarea is valid
+   */
+  isValid?: boolean;
+
+  /**
+   * Whether the textarea is disabled
+   */
+  isDisabled?: boolean;
+}
+
+/**
+ * BASE SELECT
+ *
+ * Props for BaseSelect component
+ */
+export interface BaseSelectProps {
+  /**
+   * ID of the select element
+   */
+  id?: string;
+
+  /**
+   * Name of the select element
+   */
+  name?: string;
+
+  /**
+   * Whether the select is valid
+   */
+  isValid?: boolean;
+
+  /**
+   * Whether the select is disabled
+   */
+  isDisabled?: boolean;
+}
+
+/**
+ * BASE OPTION
+ *
+ * Props for BaseOption component
+ */
+export interface BaseOptionProps<T = string> {
+  /**
+   * The value of the option
+   */
+  value: T;
+
+  /**
+   * The label of the option
+   */
+  label: string;
+}

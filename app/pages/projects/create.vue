@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-primary-500 min-h-screen py-20 px16">
+  <div class="bg-primary-500 min-h-screen py-20 px-8">
     <h2
       class="text-2xl md:text-4xl font-bold text-secondary-500 text-center my-12"
     >
@@ -69,19 +69,12 @@
             >
           </label>
           <FormError :errors="longDescriptionErrors">
-            <textarea
+            <BaseTextarea
               id="longDescription"
               v-model="form.longDescription"
               :disabled="isSubmitting"
-              :class="[
-                'w-full px-4 py-3 bg-primary-600 border-2 rounded-lg text-secondary-500',
-                'placeholder-secondary-700 focus:outline-none transition-all resize-none',
-                'disabled:opacity-50 disabled:cursor-not-allowed',
-                isLongDescriptionInvalid
-                  ? 'border-additional-500 focus:border-additional-500'
-                  : 'border-secondary-700 focus:border-secondary-300',
-              ]"
-              rows="6"
+              :is-valid="!isLongDescriptionInvalid"
+              name="longDescription"
               placeholder="Detailed description of the project, its goals, implementation details..."
               @input="touchField('longDescription')"
             />
@@ -98,20 +91,19 @@
             <label class="block text-sm font-bold text-secondary-500 mb-2">
               Status
             </label>
-            <select
+            <BaseSelect
               id="status"
               v-model="form.status"
+              name="status"
               :disabled="isSubmitting"
-              class="w-full px-4 py-3 bg-primary-600 border-2 border-secondary-700 rounded-lg text-secondary-500 focus:outline-none focus:border-secondary-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <option
-                v-for="status in ProjectStatusType"
-                :key="status"
-                :value="status"
-              >
-                {{ status }}
-              </option>
-            </select>
+              <BaseOption
+                v-for="option in statusOptions"
+                :key="String(option.value)"
+                :value="option.value"
+                :label="option.label"
+              />
+            </BaseSelect>
           </div>
 
           <!-- Project Source -->
@@ -119,20 +111,19 @@
             <label class="block text-sm font-bold text-secondary-500 mb-2">
               Project Source
             </label>
-            <select
+            <BaseSelect
               id="projectSource"
               v-model="form.projectSource"
+              name="projectSource"
               :disabled="isSubmitting"
-              class="w-full px-4 py-3 bg-primary-600 border-2 border-secondary-700 rounded-lg text-secondary-500 focus:outline-none focus:border-secondary-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <option
-                v-for="source in ProjectSourceType"
-                :key="source"
-                :value="source"
-              >
-                {{ source }}
-              </option>
-            </select>
+              <BaseOption
+                v-for="option in projectSourceOptions"
+                :key="String(option.value)"
+                :value="option.value"
+                :label="option.label"
+              />
+            </BaseSelect>
           </div>
         </div>
       </section>
@@ -206,6 +197,7 @@
           <BaseBtn
             label="Add"
             btn-size="small"
+            type="button"
             :is-disabled="isSubmitting || !techInput.trim()"
             class="!w-auto px-6 shrink-0"
             @click="addTechnology"
@@ -382,15 +374,8 @@
             :accept="['image/jpeg', 'image/png', 'image/webp']"
             :max-size-m-b="5"
             :disabled="isSubmitting"
+            with-alt-text
           />
-          <div class="mt-3">
-            <label class="block text-sm font-bold text-secondary-500 mb-2">
-              Alt text
-              <span class="text-secondary-700 font-normal ml-1">
-                (required, description for accessibility)
-              </span>
-            </label>
-          </div>
         </div>
 
         <!-- Other images -->
@@ -404,6 +389,7 @@
             :accept="['image/jpeg', 'image/png', 'image/webp']"
             :max-size-m-b="5"
             :disabled="isSubmitting"
+            with-alt-text
           />
         </div>
       </section>
@@ -451,4 +437,17 @@ const {
   isGithubLinkInvalid,
   isWebsiteLinkInvalid,
 } = useCreateProjectForm();
+
+/**
+ * Options derived from enums - keeps template clean
+ */
+const statusOptions = Object.values(ProjectStatusType).map((v) => ({
+  value: v,
+  label: v,
+}));
+
+const projectSourceOptions = Object.values(ProjectSourceType).map((v) => ({
+  value: v,
+  label: v,
+}));
 </script>
