@@ -1,4 +1,5 @@
 import { camelCase, startCase, unionBy } from "lodash";
+import type { CreateProjectForm } from "~~/shared/types";
 
 export const useProjectsStore = defineStore("projects", {
   state: () => {
@@ -260,6 +261,119 @@ export const useProjectsStore = defineStore("projects", {
       } catch (e) {
         this.loading = false;
         console.error("Failed to fetch project details:", e);
+      }
+    },
+
+    /**
+     * Uploads a single project image file to the server.
+     *
+     * @param file - image file to upload
+     * @returns URL of uploaded image or null on failure
+     * @async
+     */
+    async uploadProjectImage(
+      file: File,
+      category: UploadCategory = UploadCategory.PROJECTS,
+    ): Promise<string | null> {
+      const { baseApiPath } = useRuntimeConfig().public;
+
+      try {
+        const formData = new FormData();
+        formData.append("image", file);
+
+        const res = await $fetch("/upload/image", {
+          baseURL: baseApiPath,
+          method: "POST",
+          credentials: "include",
+          body: formData,
+          query: { category },
+        });
+
+        const validated = imageCreationResponseSchema.parse(res);
+        return validated.data.url;
+      } catch (error) {
+        handleError(error, "Failed to upload project image");
+        return null;
+      }
+    },
+
+    /**
+     * Creates a new project.
+     *
+     * Uploads mainImage and any otherImages in
+     * parallel first, then sends the full project
+     * payload to POST /projects.
+     *
+     * @param formData - validated form data
+     * @param mainImageFile - main image file with
+     * its alt text
+     * @param otherImageFiles - additional image
+     * files with their alt texts
+     * @returns true on success, false otherwise
+     * @async
+     */
+    async createProject(
+      formData: CreateProjectForm,
+      mainImageFile: { file: File; altText: string },
+      otherImageFiles: { file: File; altText: string }[],
+    ): Promise<boolean> {
+      const { baseApiPath } = useRuntimeConfig().public;
+      this.loading = true;
+
+      try {
+        // Upload mainImage and all otherImages in parallel
+        const uploadTasks: Promise<string | null>[] = [
+          this.uploadProjectImage(mainImageFile.file),
+          ...otherImageFiles.map((item) => this.uploadProjectImage(item.file)),
+        ];
+
+        const uploadedResults = await Promise.all(uploadTasks);
+
+        // First result is always mainImage
+        const mainImageUrl = uploadedResults[0];
+        if (!mainImageUrl) {
+          showErrorToast("Failed to upload main image");
+          return false;
+        }
+
+        // Check if any of the otherImages uploads failed
+        const otherImageUrls = uploadedResults.slice(1);
+        const hasFailedOtherUpload = otherImageUrls.some((url) => !url);
+        if (hasFailedOtherUpload) {
+          showErrorToast("One or more additional images failed to upload");
+          return false;
+        }
+
+        // Build the project payload
+        const payload = {
+          ...formData,
+          mainImage: {
+            srcPath: mainImageUrl,
+            altText: mainImageFile.altText,
+          },
+          otherImages: otherImageFiles.map((item, index) => ({
+            srcPath: otherImageUrls[index],
+            altText: item.altText,
+          })),
+          // Transform empty strings to null for optional fields
+          githubLink: formData.githubLink || null,
+          websiteLink: formData.websiteLink || null,
+          endDate: formData.endDate || null,
+        };
+
+        await $fetch("/projects", {
+          baseURL: baseApiPath,
+          method: "POST",
+          credentials: "include",
+          body: payload,
+        });
+
+        return true;
+      } catch (error) {
+        handleError(error, "Failed to create project");
+        return false;
+      } finally {
+        this.loading = false;
       }
     },
   },

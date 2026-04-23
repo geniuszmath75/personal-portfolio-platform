@@ -370,11 +370,13 @@
             ></label
           >
           <FileUpload
+            ref="mainImageUploadRef"
             :max-files="1"
             :accept="['image/jpeg', 'image/png', 'image/webp']"
             :max-size-m-b="5"
             :disabled="isSubmitting"
             with-alt-text
+            @change="handleMainImageChange"
           />
         </div>
 
@@ -385,11 +387,13 @@
             <span class="text-secondary-700 font-normal ml-1">(optional)</span>
           </label>
           <FileUpload
+            ref="otherImagesUploadRef"
             :max-files="10"
             :accept="['image/jpeg', 'image/png', 'image/webp']"
             :max-size-m-b="5"
             :disabled="isSubmitting"
             with-alt-text
+            @change="handleOtherImagesChange"
           />
         </div>
       </section>
@@ -413,13 +417,15 @@ definePageMeta({
 
 const {
   form,
+  submitCreateProject,
+  handleMainImageChange,
+  handleOtherImagesChange,
   techInput,
   experienceInput,
   addTechnology,
   removeTechnology,
   addExperience,
   removeExperience,
-  submitCreateProject,
   touchField,
   isSubmitting,
   titleErrors,

@@ -132,12 +132,16 @@
             <Icon name="mdi:close" class="text-2xl" />
           </button>
         </div>
+
         <input
           v-if="withAltText && fileItem.file?.type.startsWith('image/')"
           v-model="fileItem.altText"
           type="text"
           placeholder="Image description (alt text)"
           class="mt-2 w-full px-2 py-3 bg-primary-700 border border-secondary-700 rounded text-secondary-500 text-xs placeholder-secondary-700 focus:outline-none focus:border-secondary-300"
+          @input="emit('change', files)"
+          @click.stop
+          @keydown.stop
         />
       </div>
     </div>

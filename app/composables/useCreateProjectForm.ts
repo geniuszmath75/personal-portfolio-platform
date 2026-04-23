@@ -1,7 +1,11 @@
 import useVuelidate from "@vuelidate/core";
+import type FileUpload from "~/components/FileUpload.vue";
+import type { UploadFileInfo } from "~/types/components";
 import type { CreateProjectForm } from "~~/shared/types";
 
 export function useCreateProjectForm() {
+  const projectsStore = useProjectsStore();
+
   const form = ref<CreateProjectForm>({
     title: "",
     shortDescription: "",
@@ -17,6 +21,71 @@ export function useCreateProjectForm() {
     mainImage: null,
     otherImages: [],
   });
+
+  /**
+   * FileUpload refs
+   */
+
+  const mainImageUploadRef = ref<InstanceType<typeof FileUpload>>();
+
+  const otherImagesUploadRef = ref<InstanceType<typeof FileUpload>>();
+
+  /**
+   * Pending file state
+   */
+  const pendingMainImage = ref<{ file: File; altText: string } | null>(null);
+
+  const pendingOtherImages = ref<{ file: File; altText: string }[]>([]);
+
+  const isMainImageInvalid = ref(false);
+
+  /**
+   * File change handlers
+   */
+
+  /**
+   * Called by FileUpload @change for the main image slot.
+   *
+   * @param files - array of uploaded image files
+   */
+  const handleMainImageChange = (files: UploadFileInfo[]) => {
+    const file = files[0];
+
+    if (!file) {
+      pendingMainImage.value = null;
+      isMainImageInvalid.value = false;
+      return;
+    }
+
+    if (file.status === "error") {
+      pendingMainImage.value = null;
+      isMainImageInvalid.value = true;
+      return;
+    }
+
+    if (!file.file) return;
+
+    pendingMainImage.value = {
+      file: file.file,
+      altText: file.altText,
+    };
+    isMainImageInvalid.value = false;
+  };
+
+  /**
+   * Called by FileUpload @change for the additional images slot
+   * Collects all valid (non-error) files
+   *
+   * @param files - array of uploaded image files
+   */
+  const handleOtherImagesChange = (files: UploadFileInfo[]) => {
+    pendingOtherImages.value = files
+      .filter((f) => f.status !== "error" && f.file !== null)
+      .map((f) => ({
+        file: f.file as File,
+        altText: f.altText,
+      }));
+  };
 
   /**
    * Dynamic list helpers
@@ -111,10 +180,10 @@ export function useCreateProjectForm() {
   const isSubmitting = ref(false);
 
   const submitCreateProject = async () => {
-    // Validate vuelidate fields
+    // 1. Validate text fields via Vuelidate
     const isValid = await validate();
 
-    // Validate dynamic lists manually (not covered by vuelidate)
+    // 2. Validate dynamic lists
     let listsValid = true;
 
     if (form.value.technologies.length === 0) {
@@ -128,11 +197,46 @@ export function useCreateProjectForm() {
       listsValid = false;
     }
 
+    // 3. Validate main image - must be selected and have no upload error
+    if (isMainImageInvalid.value) {
+      showErrorToast("Please fix the main image before submitting");
+      return;
+    }
+
+    if (!pendingMainImage.value) {
+      showErrorToast("Main image is required");
+      return;
+    }
+
+    if (!pendingMainImage.value.altText.trim()) {
+      showErrorToast("Main image requires alt text");
+      return;
+    }
+
+    const missingAltText = pendingOtherImages.value.some(
+      (img) => !img.altText.trim(),
+    );
+
+    if (missingAltText) {
+      showErrorToast("All additional images require alt text");
+      return;
+    }
+
     if (!isValid || !listsValid) return;
 
+    // 4. Upload images + create project via store
     isSubmitting.value = true;
     try {
-      showSuccessToast("Project created successfully!");
+      const success = await projectsStore.createProject(
+        form.value,
+        pendingMainImage.value,
+        pendingOtherImages.value,
+      );
+
+      if (success) {
+        showSuccessToast("Project created successfully!");
+        await navigateTo("/projects");
+      }
     } catch (error) {
       handleError(error, "Failed to create project");
     } finally {
@@ -142,7 +246,15 @@ export function useCreateProjectForm() {
 
   return {
     form,
+
+    // Form submission and image handling
     submitCreateProject,
+    handleMainImageChange,
+    handleOtherImagesChange,
+
+    // FileUpload refs
+    mainImageUploadRef,
+    otherImagesUploadRef,
 
     // Dynamic list state
     techInput,
@@ -159,13 +271,15 @@ export function useCreateProjectForm() {
     touchField,
     isSubmitting,
 
-    // Per-field
+    // Per-field errors
     titleErrors,
     shortDescriptionErrors,
     longDescriptionErrors,
     startDateErrors,
     githubLinkErrors,
     websiteLinkErrors,
+
+    // Per-field invalid flags
     isTitleInvalid,
     isShortDescriptionInvalid,
     isLongDescriptionInvalid,
