@@ -1,5 +1,26 @@
 ## Changelog
 
+### [v0.7.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.6.0...v0.7.0) - 6 May 2026
+
+#### New Features
+
+-  add create project page with form validation [`182a55e`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/182a55e635eb663c4113cb20097cce08aadf30ad)
+-  add BaseTextarea, BaseSelect, BaseOption components and extend existing ones [`e9bd58c`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/e9bd58c431f7c015c2504bdb680811a4eff4e050)
+-  add project creation endpoint with validation [`b419f29`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/b419f29482338e478e1899e06ebf3e2d993d440a)
+-  wire up project creation with image upload [`a75c61a`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/a75c61a5b027e18753db1532882fd7ff86800490)
+
+#### Chores And Housekeeping
+
+-  update all dependencies to latest minor versions [`38d6d13`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/38d6d137b5d20230124b2ae3d573726dbfd60e7d)
+
+#### Refactoring and Updates
+
+-  move controllers related with projects to separate folder [`d97ab35`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/d97ab35ca7670e2a841c9e3c57e64ffe6230a97e)
+
+#### Changes to Test Assests
+
+-  add unit tests for project controllers and validation utilities [`f455552`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/f4555527695112f45a4ca26a5dd92320e56bd38f)
+
 ### [v0.6.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.5.0...v0.6.0) - 19 March 2026
 
 #### New Features
@@ -42,6 +63,10 @@
 -  add unit tests with Nuxt environment for new components [`b345a47`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/b345a47c1eb4cb2251f9d1dfc4ac2cd7f5307379)
 -  add unit tests with Nuxt environment for adminStore and validateImageUpload [`a464d63`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/a464d63aea76753b8c4bdca5d1ebda86e2281b15)
 -  add or modify unit tests for validators, handleDatabaseError util and User model. [`274bd72`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/274bd72dbacf303b493eea93f07569a08288c78b)
+
+#### General Changes
+
+- release 0.6.0 [`4df8507`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/4df850769308e746f96a2aab2fc299466c0cb2fd)
 
 ### [v0.5.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.4.0...v0.5.0) - 9 February 2026
 
