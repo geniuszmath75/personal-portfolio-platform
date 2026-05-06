@@ -408,6 +408,7 @@ describe("useFileUpload", () => {
         thumbnailUrl: null,
         type: "text/plain",
         errorMessage: null,
+        altText: "",
       };
       const pendingFile: UploadFileInfo = {
         id: "f-2",
@@ -419,6 +420,7 @@ describe("useFileUpload", () => {
         thumbnailUrl: null,
         type: "text/plain",
         errorMessage: null,
+        altText: "",
       };
 
       // Bypass processFiles by using controlled mode

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useH3TestUtils } from "../../../../setup";
 import { createMockH3Event } from "../../../../mock/h3-event";
 
-vi.mock("../../../../../server/controllers/getAllProjects");
+vi.mock("../../../../../server/controllers/projects/getAllProjects");
 
 useH3TestUtils();
 
@@ -13,7 +13,7 @@ describe("GET /api/v1/projects (index.get)", async () => {
 
   // Arrange: import handlers
   const getAllProjectsHandler =
-    await import("../../../../../server/controllers/getAllProjects");
+    await import("../../../../../server/controllers/projects/getAllProjects");
 
   type GetAllProjectsHandlerType = Awaited<
     ReturnType<typeof getAllProjectsHandler.default>

@@ -18,8 +18,6 @@ export function useCreateProjectForm() {
     websiteLink: "",
     technologies: [],
     gainedExperience: [],
-    mainImage: null,
-    otherImages: [],
   });
 
   /**
@@ -140,38 +138,37 @@ export function useCreateProjectForm() {
   /**
    * Vuelidate
    */
-  const $v = useVuelidate(createProjectValidationRules, form);
+  const v$ = useVuelidate(createProjectValidationRules, form);
 
-  const validate = () => $v.value.$validate();
+  const validate = () => v$.value.$validate();
 
   const touchField = (field: keyof typeof createProjectValidationRules) => {
-    $v.value[field].$touch();
+    v$.value[field].$touch();
   };
 
   /**
    * Per-field error/invalid helpers
    */
-  const titleErrors = computed(() => $v.value.title.$errors);
+  const titleErrors = computed(() => v$.value.title.$errors);
   const shortDescriptionErrors = computed(
-    () => $v.value.shortDescription.$errors,
+    () => v$.value.shortDescription.$errors,
   );
   const longDescriptionErrors = computed(
-    () => $v.value.longDescription.$errors,
+    () => v$.value.longDescription.$errors,
   );
-  const startDateErrors = computed(() => $v.value.startDate.$errors);
-  const githubLinkErrors = computed(() => $v.value.githubLink.$errors);
-  const websiteLinkErrors = computed(() => $v.value.websiteLink.$errors);
-
-  const isTitleInvalid = computed(() => $v.value.title.$error);
+  const startDateErrors = computed(() => v$.value.startDate.$errors);
+  const githubLinkErrors = computed(() => v$.value.githubLink.$errors);
+  const websiteLinkErrors = computed(() => v$.value.websiteLink.$errors);
+  const isTitleInvalid = computed(() => v$.value.title.$error);
   const isShortDescriptionInvalid = computed(
-    () => $v.value.shortDescription.$error,
+    () => v$.value.shortDescription.$error,
   );
   const isLongDescriptionInvalid = computed(
-    () => $v.value.longDescription.$error,
+    () => v$.value.longDescription.$error,
   );
-  const isStartDateInvalid = computed(() => $v.value.startDate.$error);
-  const isGithubLinkInvalid = computed(() => $v.value.githubLink.$error);
-  const isWebsiteLinkInvalid = computed(() => $v.value.websiteLink.$error);
+  const isStartDateInvalid = computed(() => v$.value.startDate.$error);
+  const isGithubLinkInvalid = computed(() => v$.value.githubLink.$error);
+  const isWebsiteLinkInvalid = computed(() => v$.value.websiteLink.$error);
 
   /**
    * Submit

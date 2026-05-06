@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useH3TestUtils } from "../../../../setup";
 import { createMockH3Event } from "../../../../mock/h3-event";
 
-vi.mock("../../../../../server/controllers/getSingleProject");
+vi.mock("../../../../../server/controllers/projects/getSingleProject");
 
 useH3TestUtils();
 
@@ -13,7 +13,7 @@ describe("GET /api/v1/projects/:id (id.get)", async () => {
 
   // Arrange: import handlers
   const getSingleProjectHandler =
-    await import("../../../../../server/controllers/getSingleProject");
+    await import("../../../../../server/controllers/projects/getSingleProject");
 
   type GetSingleProjectHandlerType = Awaited<
     ReturnType<typeof getSingleProjectHandler.default>

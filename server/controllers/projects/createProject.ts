@@ -1,6 +1,8 @@
-import { createProjectSchema } from "../../utils/validateCreateProject";
-import { Project } from "../../models/Project";
-import { handleDatabaseError } from "../../utils/handleDatabaseError";
+import { createProjectSchema } from "~~/server/utils/validateCreateProject";
+import { Project } from "~~/server/models/Project";
+import { requireAdmin } from "~~/server/utils/auth";
+import { H3Error } from "h3";
+import { handleDatabaseError } from "~~/server/utils/handleDatabaseError";
 
 export default defineEventHandler(async (event) => {
   try {

@@ -1,14 +1,11 @@
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { PaginationProperties } from "../../../shared/types";
-import type { ValidatedProject } from "../../../app/utils/validateProject";
-import {
-  ProjectSourceType,
-  ProjectStatusType,
-} from "../../../shared/types/enums";
+import type { PaginationProperties, CreateProjectForm } from "~~/shared/types";
+import type { ValidatedProject } from "~/utils/validateProject";
+import { ProjectSourceType, ProjectStatusType } from "~~/shared/types/enums";
 import { setActivePinia } from "pinia";
-import { createTestPinia } from "../../setup";
-import { useProjectsStore } from "../../../app/stores/projectsStore";
+import { createTestPinia } from "~~/test/setup";
+import { useProjectsStore } from "~/stores/projectsStore";
 
 mockNuxtImport("useRuntimeConfig", () => {
   return () => {
@@ -22,6 +19,12 @@ mockNuxtImport("useRuntimeConfig", () => {
 
 vi.mock("~/utils/validateProject", () => ({
   projectSchema: {
+    parse: vi.fn((p) => p),
+  },
+}));
+
+vi.mock("~/utils/validateImageUpload", () => ({
+  imageCreationResponseSchema: {
     parse: vi.fn((p) => p),
   },
 }));
@@ -73,6 +76,20 @@ describe("projectsStore", () => {
     prevPage: null,
     nextPage: null,
     totalDocuments: 3,
+  };
+
+  const mockFormData: CreateProjectForm = {
+    title: "New Project",
+    shortDescription: "A new project",
+    longDescription: "Long description of the project",
+    technologies: ["Vue", "Nuxt"],
+    projectSource: ProjectSourceType.HOBBY,
+    status: ProjectStatusType.IN_PROGRESS,
+    startDate: "2024-01-01",
+    endDate: "",
+    gainedExperience: ["Learning"],
+    githubLink: "https://github.com/test/project",
+    websiteLink: "",
   };
 
   beforeEach(() => {
@@ -451,5 +468,206 @@ describe("projectsStore", () => {
       source: ProjectSourceType.HOBBY,
       icon: "mdi:local-florist",
     });
+  });
+
+  it("should 'uploadProjectImage' upload file and return URL on success", async () => {
+    // Arrange: create store and mock file
+    const store = useProjectsStore();
+    const mockFile = new File(["image data"], "test.jpg", {
+      type: "image/jpeg",
+    });
+    const mockResponse = {
+      success: true,
+      data: { url: "/uploads/projects/test.jpg" },
+    };
+
+    vi.stubGlobal("$fetch", vi.fn().mockResolvedValue(mockResponse));
+
+    // Act: call uploadProjectImage action
+    const result = await store.uploadProjectImage(mockFile);
+
+    // Assert:
+    // - $fetch called with correct endpoint and FormData
+    // - returns uploaded image URL
+    expect($fetch).toHaveBeenCalledWith("/upload/image", {
+      baseURL: "/api/v1",
+      method: "POST",
+      credentials: "include",
+      body: expect.any(FormData),
+      query: { category: "projects" },
+    });
+    expect(result).toBe("/uploads/projects/test.jpg");
+  });
+
+  it("should 'uploadProjectImage' return null on failure", async () => {
+    // Arrange: create store and mock file
+    const store = useProjectsStore();
+    const mockFile = new File(["image data"], "test.jpg", {
+      type: "image/jpeg",
+    });
+
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn().mockRejectedValue(new Error("Upload failed")),
+    );
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    // Act: call uploadProjectImage action
+    const result = await store.uploadProjectImage(mockFile);
+
+    // Assert:
+    // - returns null on error
+    // - error is handled
+    expect(result).toBeNull();
+    expect(consoleErrorSpy).toHaveBeenCalled();
+
+    consoleErrorSpy.mockRestore();
+  });
+
+  it("should 'createProject' upload images and create project successfully", async () => {
+    // Arrange: create store and mock data
+    const store = useProjectsStore();
+    const mainImageFile = {
+      file: new File(["main"], "main.jpg", { type: "image/jpeg" }),
+      altText: "Main image",
+    };
+    const otherImageFiles = [
+      {
+        file: new File(["other"], "other.jpg", { type: "image/jpeg" }),
+        altText: "Other image",
+      },
+    ];
+
+    // Mock uploadProjectImage to return URLs
+    vi.spyOn(store, "uploadProjectImage")
+      .mockResolvedValueOnce("/uploads/projects/main.jpg")
+      .mockResolvedValueOnce("/uploads/projects/other.jpg");
+
+    vi.stubGlobal("$fetch", vi.fn().mockResolvedValue({}));
+
+    // Act: call createProject action
+    const result = await store.createProject(
+      mockFormData,
+      mainImageFile,
+      otherImageFiles,
+    );
+
+    // Assert:
+    // - returns true on success
+    // - loading state is false
+    // - $fetch called with correct endpoint and payload
+    expect(result).toBe(true);
+    expect(store.loading).toBe(false);
+    expect($fetch).toHaveBeenCalledWith(
+      "/projects",
+      expect.objectContaining({
+        baseURL: "/api/v1",
+        method: "POST",
+        credentials: "include",
+      }),
+    );
+  });
+
+  it("should 'createProject' fail if main image upload fails", async () => {
+    // Arrange: create store and mock data
+    const store = useProjectsStore();
+    const mainImageFile = {
+      file: new File(["main"], "main.jpg", { type: "image/jpeg" }),
+      altText: "Main image",
+    };
+    const otherImageFiles = [
+      {
+        file: new File(["other"], "other.jpg", { type: "image/jpeg" }),
+        altText: "Other image",
+      },
+    ];
+
+    // Mock uploadProjectImage to fail for main image
+    vi.spyOn(store, "uploadProjectImage").mockResolvedValueOnce(null);
+
+    // Act: call createProject action
+    const result = await store.createProject(
+      mockFormData,
+      mainImageFile,
+      otherImageFiles,
+    );
+
+    // Assert:
+    // - returns false on main image upload failure
+    // - loading state is false
+    expect(result).toBe(false);
+    expect(store.loading).toBe(false);
+  });
+
+  it("should 'createProject' fail if other image upload fails", async () => {
+    // Arrange: create store and mock data
+    const store = useProjectsStore();
+    const mainImageFile = {
+      file: new File(["main"], "main.jpg", { type: "image/jpeg" }),
+      altText: "Main image",
+    };
+    const otherImageFiles = [
+      {
+        file: new File(["other1"], "other1.jpg", { type: "image/jpeg" }),
+        altText: "Other image 1",
+      },
+      {
+        file: new File(["other2"], "other2.jpg", { type: "image/jpeg" }),
+        altText: "Other image 2",
+      },
+    ];
+
+    // Mock uploadProjectImage: main success, first other success, second other fails
+    vi.spyOn(store, "uploadProjectImage")
+      .mockResolvedValueOnce("/uploads/projects/main.jpg")
+      .mockResolvedValueOnce("/uploads/projects/other1.jpg")
+      .mockResolvedValueOnce(null); // second other image fails
+
+    // Act: call createProject action
+    const result = await store.createProject(
+      mockFormData,
+      mainImageFile,
+      otherImageFiles,
+    );
+
+    // Assert:
+    // - returns false if any other image upload fails
+    // - loading state is false
+    expect(result).toBe(false);
+    expect(store.loading).toBe(false);
+  });
+
+  it("should 'createProject' handle API errors gracefully", async () => {
+    // Arrange: create store and mock data
+    const store = useProjectsStore();
+    const mainImageFile = {
+      file: new File(["main"], "main.jpg", { type: "image/jpeg" }),
+      altText: "Main image",
+    };
+
+    // Mock successful image uploads but failed project creation
+    vi.spyOn(store, "uploadProjectImage").mockResolvedValue(
+      "/uploads/projects/main.jpg",
+    );
+
+    vi.stubGlobal("$fetch", vi.fn().mockRejectedValue(new Error("API error")));
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    // Act: call createProject action
+    const result = await store.createProject(mockFormData, mainImageFile, []);
+
+    // Assert:
+    // - returns false on API error
+    // - loading state is false
+    // - error is logged
+    expect(result).toBe(false);
+    expect(store.loading).toBe(false);
+    expect(consoleErrorSpy).toHaveBeenCalled();
+
+    consoleErrorSpy.mockRestore();
   });
 });

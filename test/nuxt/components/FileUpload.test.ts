@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { fireEvent, screen } from "@testing-library/vue";
-import { renderWithNuxt } from "../../setup";
+import { renderWithNuxt } from "~~/test/setup";
 import FileUpload from "~/components/FileUpload.vue";
 import type { UploadFileInfo } from "~/types/components";
 
@@ -33,6 +33,7 @@ function makeFileInfo(overrides: Partial<UploadFileInfo> = {}): UploadFileInfo {
     thumbnailUrl: null,
     type: "text/plain",
     errorMessage: null,
+    altText: "",
     ...overrides,
   };
 }
@@ -40,10 +41,6 @@ function makeFileInfo(overrides: Partial<UploadFileInfo> = {}): UploadFileInfo {
 const defaultProps = {
   accept: [] as string[],
 };
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 describe("FileUpload.vue", () => {
   // -------------------------------------------------------------------------
@@ -329,6 +326,49 @@ describe("FileUpload.vue", () => {
       await fireEvent.click(screen.getByRole("button"));
 
       expect(emitted().remove).toBeTruthy();
+      expect(emitted().change).toBeTruthy();
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Alt attribute input
+  // -------------------------------------------------------------------------
+  describe("alt attribute input", () => {
+    it("should show an input field when a file is an image and withAltText is true", () => {
+      const files = [
+        makeFileInfo({
+          name: "photo.jpg",
+          type: "image/jpeg",
+          file: makeFile("photo.jpg", "image/jpeg"),
+        }),
+      ];
+
+      renderWithNuxt(FileUpload, {
+        props: { ...defaultProps, fileList: files, withAltText: true },
+      });
+
+      expect(
+        screen.getByPlaceholderText("Image description (alt text)"),
+      ).toBeInTheDocument();
+    });
+
+    it("should emit 'change' when the alt text is updated", async () => {
+      const files = [
+        makeFileInfo({
+          name: "photo.jpg",
+          type: "image/jpeg",
+          file: makeFile("photo.jpg", "image/jpeg"),
+        }),
+      ];
+
+      const { emitted } = renderWithNuxt(FileUpload, {
+        props: { ...defaultProps, fileList: files, withAltText: true },
+      });
+
+      await fireEvent.input(
+        screen.getByPlaceholderText("Image description (alt text)"),
+      );
+
       expect(emitted().change).toBeTruthy();
     });
   });

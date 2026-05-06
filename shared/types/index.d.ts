@@ -344,8 +344,6 @@ export type CreateProjectForm = Omit<
   endDate: string;
   githubLink: string;
   websiteLink: string;
-  mainImage: null;
-  otherImages: [];
 };
 
 /**

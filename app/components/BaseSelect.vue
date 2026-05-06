@@ -1,7 +1,8 @@
 <template>
   <select
-    id="status"
+    :id="id"
     v-model="selected"
+    :name="name"
     :disabled="isDisabled"
     :class="[
       'w-full px-4 py-3 bg-primary-600 border-2 rounded-lg text-secondary-500',

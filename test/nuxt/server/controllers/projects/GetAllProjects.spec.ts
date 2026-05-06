@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Project } from "../../../../server/models/Project";
-import { useH3TestUtils } from "../../../setup";
-import { createMockH3Event } from "../../../mock/h3-event";
-import { createMockFindChain } from "../../../mock/mongoose-find";
+import { Project } from "~~/server/models/Project";
+import { useH3TestUtils } from "../../../../setup";
+import { createMockH3Event } from "../../../../mock/h3-event";
+import { createMockFindChain } from "../../../../mock/mongoose-find";
 
-vi.mock("../../../../server/models/Project");
+vi.mock("~~/server/models/Project");
 
 useH3TestUtils();
 
@@ -41,7 +41,7 @@ describe("GetAllProjects controller", async () => {
     vi.clearAllMocks();
   });
 
-  const handler = await import("../../../../server/api/v1/projects/index.get");
+  const handler = await import("~~/server/api/v1/projects/index.get");
 
   it("should return empty array, count 0 and correct pagination when no projects found", async () => {
     // Arrange: mock DB to return empty list

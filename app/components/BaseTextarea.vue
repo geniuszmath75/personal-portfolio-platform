@@ -2,8 +2,9 @@
   <textarea
     :id="id"
     v-model="inputValue"
+    :name="name"
     :disabled="isDisabled"
-    rows="6"
+    :rows="rows"
     :placeholder="placeholder"
     :class="[
       'w-full px-4 py-3 bg-primary-600 border-2 rounded-lg text-secondary-500',

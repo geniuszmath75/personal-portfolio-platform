@@ -75,6 +75,70 @@ describe("BaseInput.vue", () => {
       const input = container.querySelector("input") as HTMLInputElement;
       expect(input.placeholder).toBe(placeholder);
     });
+
+    it("should set min prop correctly for non-date types", () => {
+      const { container } = renderWithNuxt(BaseInput, {
+        props: { id: "test-id", name: "test-name", type: "number", min: "5" },
+      });
+      const input = container.querySelector("input") as HTMLInputElement;
+      expect(input.min).toBe("5");
+    });
+
+    it("should set max prop correctly for non-date types", () => {
+      const { container } = renderWithNuxt(BaseInput, {
+        props: { id: "test-id", name: "test-name", type: "number", max: "100" },
+      });
+      const input = container.querySelector("input") as HTMLInputElement;
+      expect(input.max).toBe("100");
+    });
+
+    it("should apply default min for date type when min prop is not provided", () => {
+      const { container } = renderWithNuxt(BaseInput, {
+        props: { id: "test-id", name: "test-name", type: "date" },
+      });
+      const input = container.querySelector("input") as HTMLInputElement;
+      const minDate = new Date();
+      minDate.setFullYear(minDate.getFullYear() - 10);
+      const expectedMin = minDate.toISOString().slice(0, 10);
+      expect(input.min).toBe(expectedMin);
+    });
+
+    it("should apply default max for date type when max prop is not provided", () => {
+      const { container } = renderWithNuxt(BaseInput, {
+        props: { id: "test-id", name: "test-name", type: "date" },
+      });
+      const input = container.querySelector("input") as HTMLInputElement;
+      const maxDate = new Date();
+      maxDate.setFullYear(maxDate.getFullYear() + 10);
+      const expectedMax = maxDate.toISOString().slice(0, 10);
+      expect(input.max).toBe(expectedMax);
+    });
+
+    it("should use custom min prop for date type when provided", () => {
+      const { container } = renderWithNuxt(BaseInput, {
+        props: {
+          id: "test-id",
+          name: "test-name",
+          type: "date",
+          min: "2020-01-01",
+        },
+      });
+      const input = container.querySelector("input") as HTMLInputElement;
+      expect(input.min).toBe("2020-01-01");
+    });
+
+    it("should use custom max prop for date type when provided", () => {
+      const { container } = renderWithNuxt(BaseInput, {
+        props: {
+          id: "test-id",
+          name: "test-name",
+          type: "date",
+          max: "2030-12-31",
+        },
+      });
+      const input = container.querySelector("input") as HTMLInputElement;
+      expect(input.max).toBe("2030-12-31");
+    });
   });
 
   describe("v-model", () => {
@@ -176,6 +240,24 @@ describe("BaseInput.vue", () => {
       requiredClasses.forEach((cls) => {
         expect(input.className).toContain(cls);
       });
+    });
+  });
+
+  describe("Date input", () => {
+    it("should apply date-input class when type is date", () => {
+      const { container } = renderWithNuxt(BaseInput, {
+        props: { id: "test-id", name: "test-name", type: "date" },
+      });
+      const input = container.querySelector("input") as HTMLInputElement;
+      expect(input.className).toContain("date-input");
+    });
+
+    it("should not apply date-input class for non-date types", () => {
+      const { container } = renderWithNuxt(BaseInput, {
+        props: { id: "test-id", name: "test-name", type: "email" },
+      });
+      const input = container.querySelector("input") as HTMLInputElement;
+      expect(input.className).not.toContain("date-input");
     });
   });
 

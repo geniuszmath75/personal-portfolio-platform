@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Project } from "../../../../server/models/Project";
-import { useH3TestUtils } from "../../../setup";
-import { createMockH3Event } from "../../../mock/h3-event";
+import { Project } from "~~/server/models/Project";
+import { useH3TestUtils } from "../../../../setup";
+import { createMockH3Event } from "../../../../mock/h3-event";
 import mongoose, { Types } from "mongoose";
 
-vi.mock("../../../server/models/Project");
+vi.mock("~~/server/models/Project");
 
 useH3TestUtils();
 
@@ -27,7 +27,7 @@ describe("GetSingleProject controller", async () => {
     vi.spyOn(Project, "findById");
   });
 
-  const handler = await import("../../../../server/api/v1/projects/[id].get");
+  const handler = await import("~~/server/api/v1/projects/[id].get");
 
   it("should return project when id is valid and project exists", async () => {
     // Arrange: mock Project.findById, prepare event with valid id
