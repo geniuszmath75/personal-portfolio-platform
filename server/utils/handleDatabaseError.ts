@@ -48,10 +48,17 @@ export const handleDatabaseError = (error: unknown): CustomError => {
     customError.code = 400;
   }
 
+  // MongoDB Cast Error
+  else if (error instanceof mongoose.Error.CastError) {
+    customError.message = `Invalid value for field '${error.path}'`;
+    customError.statusMessage = "Bad Request";
+    customError.code = 400;
+  }
+
   // Generic Error with message
   else if (error instanceof Error) {
     // Log the error for debugging (in production, use proper logging)
-    console.error("Unhandled database error:", error.message);
+    console.error("Unhandled database error:", error.message, error.stack);
   }
 
   return customError;
