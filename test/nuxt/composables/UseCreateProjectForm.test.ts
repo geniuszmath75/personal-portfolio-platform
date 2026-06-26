@@ -89,8 +89,6 @@ describe("useCreateProjectForm composable", () => {
       const { result } = mount(() => useCreateProjectForm());
 
       // Assert
-      expect(result.techInput.value).toBe("");
-      expect(result.experienceInput.value).toBe("");
       expect(result.technologiesErrors.value).toBe("");
       expect(result.gainedExperienceErrors.value).toBe("");
     });
@@ -192,23 +190,20 @@ describe("useCreateProjectForm composable", () => {
     it("should add technology to the list", () => {
       // Arrange
       const { result } = mount(() => useCreateProjectForm());
-      result.techInput.value = "React";
 
       // Act
-      result.addTechnology();
+      result.addTechnology("React");
 
       // Assert
       expect(result.form.value.technologies).toContain("React");
-      expect(result.techInput.value).toBe("");
     });
 
     it("should not add empty technology", () => {
       // Arrange
       const { result } = mount(() => useCreateProjectForm());
-      result.techInput.value = "";
 
       // Act
-      result.addTechnology();
+      result.addTechnology("");
 
       // Assert
       expect(result.form.value.technologies.length).toBe(0);
@@ -217,12 +212,10 @@ describe("useCreateProjectForm composable", () => {
     it("should not add duplicate technology", () => {
       // Arrange
       const { result } = mount(() => useCreateProjectForm());
-      result.techInput.value = "Vue";
-      result.addTechnology();
+      result.addTechnology("Vue");
 
       // Act
-      result.techInput.value = "Vue";
-      result.addTechnology();
+      result.addTechnology("Vue");
 
       // Assert
       expect(result.form.value.technologies.length).toBe(1);
@@ -235,10 +228,8 @@ describe("useCreateProjectForm composable", () => {
     it("should remove technology by index", () => {
       // Arrange
       const { result } = mount(() => useCreateProjectForm());
-      result.techInput.value = "React";
-      result.addTechnology();
-      result.techInput.value = "Vue";
-      result.addTechnology();
+      result.addTechnology("React");
+      result.addTechnology("Vue");
 
       // Act
       result.removeTechnology(0);
@@ -252,10 +243,9 @@ describe("useCreateProjectForm composable", () => {
       // Arrange
       const { result } = mount(() => useCreateProjectForm());
       result.technologiesErrors.value = "At least one technology is required";
-      result.techInput.value = "Node.js";
 
       // Act
-      result.addTechnology();
+      result.addTechnology("Node.js");
 
       // Assert
       expect(result.technologiesErrors.value).toBe("");
@@ -266,25 +256,22 @@ describe("useCreateProjectForm composable", () => {
     it("should add experience to the list", () => {
       // Arrange
       const { result } = mount(() => useCreateProjectForm());
-      result.experienceInput.value = "Learned React fundamentals";
 
       // Act
-      result.addExperience();
+      result.addExperience("Learned React fundamentals");
 
       // Assert
       expect(result.form.value.gainedExperience).toContain(
         "Learned React fundamentals",
       );
-      expect(result.experienceInput.value).toBe("");
     });
 
     it("should not add empty experience", () => {
       // Arrange
       const { result } = mount(() => useCreateProjectForm());
-      result.experienceInput.value = "";
 
       // Act
-      result.addExperience();
+      result.addExperience("");
 
       // Assert
       expect(result.form.value.gainedExperience.length).toBe(0);
@@ -293,12 +280,10 @@ describe("useCreateProjectForm composable", () => {
     it("should not add duplicate experience", () => {
       // Arrange
       const { result } = mount(() => useCreateProjectForm());
-      result.experienceInput.value = "API integration";
-      result.addExperience();
+      result.addExperience("API integration");
 
       // Act
-      result.experienceInput.value = "API integration";
-      result.addExperience();
+      result.addExperience("API integration");
 
       // Assert
       expect(result.form.value.gainedExperience.length).toBe(1);
@@ -307,10 +292,8 @@ describe("useCreateProjectForm composable", () => {
     it("should remove experience by index", () => {
       // Arrange
       const { result } = mount(() => useCreateProjectForm());
-      result.experienceInput.value = "First experience";
-      result.addExperience();
-      result.experienceInput.value = "Second experience";
-      result.addExperience();
+      result.addExperience("First experience");
+      result.addExperience("Second experience");
 
       // Act
       result.removeExperience(0);
@@ -325,10 +308,9 @@ describe("useCreateProjectForm composable", () => {
       const { result } = mount(() => useCreateProjectForm());
       result.gainedExperienceErrors.value =
         "At least one experience is required";
-      result.experienceInput.value = "Database optimization";
 
       // Act
-      result.addExperience();
+      result.addExperience("Database optimization");
 
       // Assert
       expect(result.gainedExperienceErrors.value).toBe("");
@@ -358,8 +340,7 @@ describe("useCreateProjectForm composable", () => {
       // Arrange
       const { result } = mount(() => useCreateProjectForm());
       result.form.value.title = "Test Project";
-      result.techInput.value = "React";
-      result.addTechnology();
+      result.addTechnology("React");
       result.handleMainImageChange(mockUploadInfo());
 
       // Act
@@ -374,10 +355,8 @@ describe("useCreateProjectForm composable", () => {
     it("should show error if main image is invalid", async () => {
       // Arrange
       const { result } = mount(() => useCreateProjectForm());
-      result.techInput.value = "React";
-      result.addTechnology();
-      result.experienceInput.value = "Learning";
-      result.addExperience();
+      result.addTechnology("React");
+      result.addExperience("Learning");
 
       const errorUploadInfo: UploadFileInfo[] = mockUploadInfo({
         status: "error",
@@ -402,10 +381,8 @@ describe("useCreateProjectForm composable", () => {
       // Arrange
       const { result } = mount(() => useCreateProjectForm());
       result.form.value.title = "Test Project";
-      result.techInput.value = "React";
-      result.addTechnology();
-      result.experienceInput.value = "Learning";
-      result.addExperience();
+      result.addTechnology("React");
+      result.addExperience("Learning");
 
       // Act
       await result.submitCreateProject();
@@ -418,10 +395,8 @@ describe("useCreateProjectForm composable", () => {
       // Arrange
       const { result } = mount(() => useCreateProjectForm());
       result.form.value.title = "Test Project";
-      result.techInput.value = "React";
-      result.addTechnology();
-      result.experienceInput.value = "Learning";
-      result.addExperience();
+      result.addTechnology("React");
+      result.addExperience("Learning");
       const uploadInfo: UploadFileInfo[] = mockUploadInfo({ altText: "" });
       result.handleMainImageChange(uploadInfo);
 
@@ -442,11 +417,8 @@ describe("useCreateProjectForm composable", () => {
       });
 
       result.form.value.title = "Test Project";
-      result.techInput.value = "React";
-      result.addTechnology();
-      result.experienceInput.value = "Learning";
-      result.addExperience();
-
+      result.addTechnology("React");
+      result.addExperience("Learning");
       result.handleMainImageChange(mockUploadInfo());
 
       const otherUploadInfo: UploadFileInfo[] = mockUploadInfo({
@@ -471,10 +443,8 @@ describe("useCreateProjectForm composable", () => {
       const { result } = mount(() => useCreateProjectForm());
 
       result.form.value.title = "Test Project";
-      result.techInput.value = "React";
-      result.addTechnology();
-      result.experienceInput.value = "Learning";
-      result.addExperience();
+      result.addTechnology("React");
+      result.addExperience("Learning");
 
       result.handleMainImageChange(mockUploadInfo());
 

@@ -1,5 +1,4 @@
 import useVuelidate from "@vuelidate/core";
-import type FileUpload from "~/components/FileUpload.vue";
 import type { UploadFileInfo } from "~/types/components";
 import type { CreateProjectForm } from "~~/shared/types";
 
@@ -19,14 +18,6 @@ export function useCreateProjectForm() {
     technologies: [],
     gainedExperience: [],
   });
-
-  /**
-   * FileUpload refs
-   */
-
-  const mainImageUploadRef = ref<InstanceType<typeof FileUpload>>();
-
-  const otherImagesUploadRef = ref<InstanceType<typeof FileUpload>>();
 
   /**
    * Pending file state
@@ -90,16 +81,6 @@ export function useCreateProjectForm() {
    */
 
   /**
-   * Current value of the technology input before adding to the list
-   */
-  const techInput = ref("");
-
-  /**
-   * Current value of the experience input before adding to the list
-   */
-  const experienceInput = ref("");
-
-  /**
    * Whether technologies list has at least one entry
    */
   const technologiesErrors = ref("");
@@ -109,12 +90,11 @@ export function useCreateProjectForm() {
    */
   const gainedExperienceErrors = ref("");
 
-  const addTechnology = () => {
-    const value = techInput.value.trim();
-    if (!value) return;
-    if (form.value.technologies.includes(value)) return;
-    form.value.technologies.push(value);
-    techInput.value = "";
+  const addTechnology = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    if (form.value.technologies.includes(trimmed)) return;
+    form.value.technologies.push(trimmed);
     technologiesErrors.value = "";
   };
 
@@ -122,12 +102,11 @@ export function useCreateProjectForm() {
     form.value.technologies.splice(index, 1);
   };
 
-  const addExperience = () => {
-    const value = experienceInput.value.trim();
-    if (!value) return;
-    if (form.value.gainedExperience.includes(value)) return;
-    form.value.gainedExperience.push(value);
-    experienceInput.value = "";
+  const addExperience = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    if (form.value.gainedExperience.includes(trimmed)) return;
+    form.value.gainedExperience.push(trimmed);
     gainedExperienceErrors.value = "";
   };
 
@@ -249,13 +228,7 @@ export function useCreateProjectForm() {
     handleMainImageChange,
     handleOtherImagesChange,
 
-    // FileUpload refs
-    mainImageUploadRef,
-    otherImagesUploadRef,
-
     // Dynamic list state
-    techInput,
-    experienceInput,
     technologiesErrors,
     gainedExperienceErrors,
     addTechnology,

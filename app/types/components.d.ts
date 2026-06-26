@@ -638,3 +638,155 @@ export interface BaseOptionProps<T = string> {
    */
   label: string;
 }
+
+/**
+ * PROJECT FORM
+ *
+ * Props for the ProjectForm component
+ */
+export interface ProjectFormProps {
+  /**
+   * Form mode — controls labels and submit button text
+   */
+  mode: "create" | "edit";
+
+  /**
+   * Reactive project form fields bound to inputs
+   */
+  form: CreateProjectForm;
+
+  /**
+   * Whether the form is currently being submitted
+   */
+  isSubmitting: boolean;
+
+  /**
+   * Called when the user submits the form
+   */
+  onSubmit: () => Promise<void>;
+
+  /**
+   * Controlled file list for the main image slot (edit mode prefill)
+   */
+  mainImageFileList?: UploadFileInfo[];
+
+  /**
+   * Controlled file list for the additional images slot (edit mode prefill)
+   */
+  otherImagesFileList?: UploadFileInfo[];
+
+  /**
+   * Called when the main image FileUpload emits change
+   */
+  onMainImageChange: (files: UploadFileInfo[]) => void;
+
+  /**
+   * Called when the additional images FileUpload emits change
+   */
+  onOtherImagesChange: (files: UploadFileInfo[]) => void;
+
+  /**
+   * Called when the main image FileUpload emits update:fileList (controlled mode)
+   */
+  onMainImageFileListUpdate?: (files: UploadFileInfo[]) => void;
+
+  /**
+   * Called when the additional images FileUpload emits update:fileList (controlled mode)
+   */
+  onOtherImagesFileListUpdate?: (files: UploadFileInfo[]) => void;
+
+  /**
+   * Validation error message for the technologies list
+   */
+  technologiesErrors: string;
+
+  /**
+   * Appends a technology to the form list
+   */
+  addTechnology: (value: string) => void;
+
+  /**
+   * Removes a technology from the form list by index
+   */
+  removeTechnology: (index: number) => void;
+
+  /**
+   * Validation error message for the gained experience list
+   */
+  gainedExperienceErrors: string;
+
+  /**
+   * Appends an experience entry to the form list
+   */
+  addExperience: (value: string) => void;
+
+  /**
+   * Removes an experience entry from the form list by index
+   */
+  removeExperience: (index: number) => void;
+
+  /**
+   * Marks a single form field as touched for Vuelidate display
+   */
+  touchField: (field: keyof typeof createProjectValidationRules) => void;
+
+  /**
+   * Vuelidate error messages for the title field
+   */
+  titleErrors: ErrorObject[];
+
+  /**
+   * Vuelidate error messages for the short description field
+   */
+  shortDescriptionErrors: ErrorObject[];
+
+  /**
+   * Vuelidate error messages for the long description field
+   */
+  longDescriptionErrors: ErrorObject[];
+
+  /**
+   * Vuelidate error messages for the start date field
+   */
+  startDateErrors: ErrorObject[];
+
+  /**
+   * Vuelidate error messages for the GitHub link field
+   */
+  githubLinkErrors: ErrorObject[];
+
+  /**
+   * Vuelidate error messages for the website link field
+   */
+  websiteLinkErrors: ErrorObject[];
+
+  /**
+   * Whether the title field has a validation error
+   */
+  isTitleInvalid: boolean;
+
+  /**
+   * Whether the short description field has a validation error
+   */
+  isShortDescriptionInvalid: boolean;
+
+  /**
+   * Whether the long description field has a validation error
+   */
+  isLongDescriptionInvalid: boolean;
+
+  /**
+   * Whether the start date field has a validation error
+   */
+  isStartDateInvalid: boolean;
+
+  /**
+   * Whether the GitHub link field has a validation error
+   */
+  isGithubLinkInvalid: boolean;
+
+  /**
+   * Whether the website link field has a validation error
+   */
+  isWebsiteLinkInvalid: boolean;
+}
