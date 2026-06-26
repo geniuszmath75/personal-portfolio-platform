@@ -1,11 +1,32 @@
 <template>
   <div class="bg-primary-500 min-h-screen py-20 px-16">
     <!-- Project title -->
-    <h2
-      class="text-2xl md:text-4xl font-bold text-secondary-500 text-center my-12"
+
+    <div
+      class="relative flex flex-col items-center justify-center gap-4 my-12 mx-auto max-w-7xl"
     >
-      {{ projectDetails?.title }}
-    </h2>
+      <h2
+        class="text-2xl md:text-4xl font-bold text-secondary-500 text-center my-12"
+      >
+        {{ projectDetails?.title }}
+      </h2>
+
+      <!-- Create btn inside header - only for desktop -->
+      <div class="absolute right-0 hidden md:block">
+        <ClientOnly>
+          <NuxtLink v-if="isAdmin" :to="`/projects/${projectId}/edit`">
+            <BaseBtn label="Edit project" btn-size="large">
+              <template #icon>
+                <Icon
+                  name="mdi:pencil"
+                  class="absolute left-2 text-secondary-500 text-2xl"
+                />
+              </template>
+            </BaseBtn>
+          </NuxtLink>
+        </ClientOnly>
+      </div>
+    </div>
 
     <!-- Image carousel -->
     <BaseCarousel
@@ -148,6 +169,8 @@
 
 <script setup lang="ts">
 const projectStore = useProjectsStore();
+const authStore = useAuthStore();
+
 const {
   projectDetails,
   imageList,
@@ -157,6 +180,7 @@ const {
   getProjectSourceProperties,
   linkPropertiesList,
 } = storeToRefs(projectStore);
+const { isAdmin } = storeToRefs(authStore);
 
 /**
  * Determines if carousel arrows should be shown (only when more than one image
