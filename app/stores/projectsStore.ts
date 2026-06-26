@@ -376,5 +376,102 @@ export const useProjectsStore = defineStore("projects", {
         this.loading = false;
       }
     },
+
+    /**
+     * Updates an existing project.
+     *
+     * Uploads only new image files (those provided as File objects),
+     * keeps existing srcPaths for unchanged images,
+     * then sends the full project payload to PUT /projects/:id.
+     *
+     * @param projectId - id of the project to update
+     * @param formData - validated form data
+     * @param mainImageFile - new main image file with alt text, or null if unchanged
+     * @param existingMainImage - current main image from DB, used when no new file provided
+     * @param otherImageFiles - mix of new files and existing images (already uploaded)
+     * @returns true on success, false otherwise
+     * @async
+     */
+    async updateProject(
+      projectId: string,
+      formData: CreateProjectForm,
+      mainImageFile: { file: File; altText: string } | null,
+      existingMainImage: { srcPath: string; altText: string },
+      otherImageFiles: {
+        file: File | null;
+        altText: string;
+        srcPath?: string;
+      }[],
+    ): Promise<boolean> {
+      const { baseApiPath } = useRuntimeConfig().public;
+      this.loading = true;
+
+      try {
+        // Upload new main image only if a new file was selected
+        let mainImageUrl: string;
+        if (mainImageFile) {
+          const uploaded = await this.uploadProjectImage(mainImageFile.file);
+          if (!uploaded) {
+            showErrorToast("Failed to upload main image");
+            return false;
+          }
+          mainImageUrl = uploaded;
+        } else {
+          // Keep existing srcPath
+          mainImageUrl = existingMainImage.srcPath;
+        }
+
+        // Upload only new otherImages files, keep srcPath for existing ones
+        const otherImageResults = await Promise.all(
+          otherImageFiles.map(async (item) => {
+            if (item.file) {
+              // New file — upload it
+              const uploaded = await this.uploadProjectImage(
+                item.file,
+                UploadCategory.PROJECTS,
+              );
+              if (!uploaded) return null;
+              return { srcPath: uploaded, altText: item.altText };
+            }
+            // Existing image — keep as is
+            return { srcPath: item.srcPath, altText: item.altText };
+          }),
+        );
+
+        const hasFailedUpload = otherImageResults.some((r) => r === null);
+        if (hasFailedUpload) {
+          showErrorToast("One or more additional images failed to upload");
+          return false;
+        }
+
+        const payload = {
+          ...formData,
+          mainImage: {
+            srcPath: mainImageUrl,
+            altText: mainImageFile
+              ? mainImageFile.altText
+              : existingMainImage.altText,
+          },
+          otherImages: otherImageResults,
+          githubLink: formData.githubLink || null,
+          websiteLink: formData.websiteLink || null,
+          endDate: formData.endDate || null,
+        };
+
+        await $fetch(`/projects/${projectId}`, {
+          baseURL: baseApiPath,
+          method: "PUT",
+          credentials: "include",
+          body: payload,
+        });
+
+        return true;
+      } catch (error) {
+        handleError(error, "Failed to update project");
+        return false;
+      } finally {
+        this.loading = false;
+      }
+    },
   },
 });
