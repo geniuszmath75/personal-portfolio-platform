@@ -126,6 +126,7 @@
           <!-- Remove button -->
           <button
             v-if="!disabled && fileItem.status !== 'uploading'"
+            type="button"
             class="flex p-2 text-secondary-500 hover:text-additional-500 transition-colors"
             @click="removeFile(fileItem.id)"
           >
