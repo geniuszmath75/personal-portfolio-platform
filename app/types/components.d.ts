@@ -432,6 +432,12 @@ export interface UploadFileInfo {
    * Alternative text used for image accessibility
    */
   altText: string;
+
+  /**
+   * Image path for pre-existing files loaded from the database.
+   * Set when file is null (edit mode); omitted for newly selected uploads.
+   */
+  srcPath?: string;
 }
 
 /**
