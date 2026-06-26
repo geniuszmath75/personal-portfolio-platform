@@ -20,7 +20,7 @@ export function useFileUpload(
 
   /**
    * Internal file list used when component operates in uncontrolled mode
-   * (nofileList prop)
+   * (no fileList prop).
    */
   const internalFiles = ref<UploadFileInfo[]>([]);
 
@@ -73,14 +73,6 @@ export function useFileUpload(
    ********/
 
   /**
-   * Generates a unique file identifier based on timestamp and random suffix.
-   * @returns Unique string ID in the format "file-{timestamp}-{random}"
-   */
-  function generateId(): string {
-    return `file-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  }
-
-  /**
    * Formats a byte count into a human-readable string (B / KB / MB).
    * @param bytes - raw file size in bytes
    */
@@ -98,7 +90,7 @@ export function useFileUpload(
   function buildFileInfo(file: File): UploadFileInfo {
     const isImage = file.type.startsWith("image/");
     return {
-      id: generateId(),
+      id: crypto.randomUUID(),
       name: file.name,
       file,
       status: "pending",
@@ -115,16 +107,30 @@ export function useFileUpload(
    * Applies a partial update to a single file entry identified by ID.
    * Handles both controlled and uncontrolled modes.
    *
+   * In controlled mode, pass baseList when props.fileList may still be stale
+   * (e.g. immediately after addFiles). Returns the updated list for chaining
+   * in async upload callbacks.
+   *
    * @param id - target file ID
    * @param patch - partial UploadFileInfo fields to merge
+   * @param baseList - list to patch instead of files.value (controlled mode)
+   * @returns the updated file list after the patch is applied
    */
-  function updateFile(id: string, patch: Partial<UploadFileInfo>) {
-    const list = files.value.map((f) => (f.id === id ? { ...f, ...patch } : f));
+  function updateFile(
+    id: string,
+    patch: Partial<UploadFileInfo>,
+    baseList?: UploadFileInfo[],
+  ): UploadFileInfo[] {
+    const source = baseList ?? files.value;
+    const list = source.map((f) => (f.id === id ? { ...f, ...patch } : f));
+
     if (props.fileList !== undefined) {
       callbacks.onUpdateFileList(list);
     } else {
       internalFiles.value = list;
     }
+
+    return list;
   }
 
   /**
@@ -132,15 +138,19 @@ export function useFileUpload(
    * Handles both controlled and uncontrolled modes.
    *
    * @param newFiles - file entries to append
+   * @returns the list after append (parent must sync fileList in controlled mode)
    */
-  function addFiles(newFiles: UploadFileInfo[]) {
+  function addFiles(newFiles: UploadFileInfo[]): UploadFileInfo[] {
     const list = [...files.value, ...newFiles];
+
     if (props.fileList !== undefined) {
       callbacks.onUpdateFileList(list);
     } else {
       internalFiles.value = list;
     }
+
     callbacks.onChange(list);
+    return list;
   }
 
   /************
@@ -184,29 +194,44 @@ export function useFileUpload(
    *************/
 
   /**
-   * Initiates the upload for a single file entry.
-   * Delegates to customRequest if provided, falls back to XHR against action URL.
-   * If neither is configured, file remains in 'pending' status (manual submit mode).
+   * Initiates the upload lifecycle for a single file entry.
+   * No-op when neither action nor customRequest is configured — in that case
+   * the file stays "pending" as set by addFiles (manual submit mode).
+   *
+   * Delegates to customRequest if provided, otherwise uses XHR against action URL.
    *
    * @param fileInfo - the file entry to upload
+   * @param baseList - list from addFiles to avoid stale props.fileList in controlled mode
    */
-  function uploadFile(fileInfo: UploadFileInfo) {
+  function uploadFile(fileInfo: UploadFileInfo, baseList?: UploadFileInfo[]) {
     if (!fileInfo.file) return;
 
-    updateFile(fileInfo.id, { status: "uploading", percentage: 0 });
+    if (!props.action && !props.customRequest) {
+      return;
+    }
+
+    let currentList = updateFile(
+      fileInfo.id,
+      { status: "uploading", percentage: 0 },
+      baseList,
+    );
 
     if (props.customRequest) {
       props.customRequest({
         file: fileInfo,
         onProgress: (percent) =>
-          updateFile(fileInfo.id, { percentage: percent }),
+          (currentList = updateFile(
+            fileInfo.id,
+            { percentage: percent },
+            currentList,
+          )),
         onFinish: (url) => {
           const updated = {
             status: "finished" as UploadFileStatus,
             percentage: 100,
             url: url ?? null,
           };
-          updateFile(fileInfo.id, updated);
+          currentList = updateFile(fileInfo.id, updated, currentList);
           callbacks.onFinish({ ...fileInfo, ...updated });
         },
         onError: (message) => {
@@ -214,16 +239,10 @@ export function useFileUpload(
             status: "error" as UploadFileStatus,
             errorMessage: message ?? "Upload failed",
           };
-          updateFile(fileInfo.id, updated);
+          currentList = updateFile(fileInfo.id, updated, currentList);
           callbacks.onError({ ...fileInfo, ...updated });
         },
       });
-      return;
-    }
-
-    if (!props.action) {
-      // No transport configured - leave as pending for manual submit
-      updateFile(fileInfo.id, { status: "pending" });
       return;
     }
 
@@ -235,9 +254,13 @@ export function useFileUpload(
 
     xhr.upload.addEventListener("progress", (e) => {
       if (e.lengthComputable) {
-        updateFile(fileInfo.id, {
-          percentage: Math.round((e.loaded / e.total) * 100),
-        });
+        currentList = updateFile(
+          fileInfo.id,
+          {
+            percentage: Math.round((e.loaded / e.total) * 100),
+          },
+          currentList,
+        );
       }
     });
 
@@ -247,14 +270,14 @@ export function useFileUpload(
           status: "finished" as UploadFileStatus,
           percentage: 100,
         };
-        updateFile(fileInfo.id, updated);
+        currentList = updateFile(fileInfo.id, updated, currentList);
         callbacks.onFinish({ ...fileInfo, ...updated });
       } else {
         const updated = {
           status: "error" as UploadFileStatus,
           errorMessage: `Server error: ${xhr.status}`,
         };
-        updateFile(fileInfo.id, updated);
+        currentList = updateFile(fileInfo.id, updated, currentList);
         callbacks.onError({ ...fileInfo, ...updated });
       }
     });
@@ -264,11 +287,14 @@ export function useFileUpload(
         status: "error" as UploadFileStatus,
         errorMessage: "Network error",
       };
-      updateFile(fileInfo.id, updated);
+      currentList = updateFile(fileInfo.id, updated, currentList);
       callbacks.onError({ ...fileInfo, ...updated });
     });
 
-    xhr.open("POST", props.action);
+    const action = props.action;
+    if (!action) return;
+
+    xhr.open("POST", action);
     xhr.withCredentials = props.withCredentials;
     Object.entries(props.headers).forEach(([k, v]) =>
       xhr.setRequestHeader(k, v),
@@ -278,9 +304,11 @@ export function useFileUpload(
 
   /**
    * Processes a FileList from either a drop or input change event.
-   * Validates each file, builds UploadFileInfo entries, and starts uploads.
+   * Validates each file, builds UploadFileInfo entries, appends via addFiles,
+   * then starts uploadFile for pending entries when a transport is configured.
    *
    * @param raw - native FileList or null
+   * @returns the list after addFiles, or undefined when nothing was processed
    */
   function processFiles(raw: FileList | null) {
     if (!raw || isDisabled.value) return;
@@ -299,10 +327,14 @@ export function useFileUpload(
         );
       });
 
-    addFiles(toAdd);
+    const list = addFiles(toAdd);
 
     // Start upload only for files that passed validation
-    toAdd.filter((f) => f.status === "pending").forEach(uploadFile);
+    toAdd
+      .filter((f) => f.status === "pending")
+      .forEach((f) => uploadFile(f, list));
+
+    return list;
   }
 
   /**
@@ -335,7 +367,9 @@ export function useFileUpload(
    ****************/
 
   /**
-   * Retry a failed upload for the given file ID
+   * Retry a failed upload for the given file ID.
+   * Resets the entry to pending and re-runs uploadFile when a transport is configured.
+   *
    * @param id - ID of the file entry to retry
    */
   function retry(id: string) {
@@ -346,11 +380,14 @@ export function useFileUpload(
         percentage: null,
         errorMessage: null,
       };
-      updateFile(id, reset);
-      uploadFile({
-        ...fileInfo,
-        ...reset,
-      });
+      const list = updateFile(id, reset);
+      uploadFile(
+        {
+          ...fileInfo,
+          ...reset,
+        },
+        list,
+      );
     }
   }
 
@@ -369,7 +406,7 @@ export function useFileUpload(
   }
 
   /**
-   * Return only successfully uploaded files
+   * Return entries with status "finished" (uploaded or pre-existing from server).
    */
   function getFinishedFiles(): UploadFileInfo[] {
     return files.value.filter((f) => f.status === "finished");
