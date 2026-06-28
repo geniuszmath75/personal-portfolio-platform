@@ -4,6 +4,22 @@ import type { ProjectModel } from "../types/index.d.ts";
 import { ImageSchema } from "./Image";
 import { ProjectSourceType, ProjectStatusType } from "../../shared/types/enums";
 
+/**
+ * Resolves startDate in endDate validators for both document and update (query) context.
+ */
+function getStartDateFromValidatorContext(ctx: unknown): Date | undefined {
+  if (
+    ctx &&
+    typeof ctx === "object" &&
+    "get" in ctx &&
+    typeof ctx.get === "function"
+  ) {
+    return ctx.get("startDate") as Date | undefined;
+  }
+
+  return undefined;
+}
+
 const ProjectSchema = new mongoose.Schema<IProject, ProjectModel>(
   {
     title: {
@@ -33,12 +49,13 @@ const ProjectSchema = new mongoose.Schema<IProject, ProjectModel>(
     endDate: {
       type: Date,
       validate: {
-        validator: function (this: IProject, value: Date) {
-          // endDate undefined
+        validator: function (value: Date) {
           if (!value) return true;
 
-          // check if endDate is later than startDate
-          return value > this.startDate;
+          const startDate = getStartDateFromValidatorContext(this);
+          if (!startDate) return true;
+
+          return value > startDate;
         },
         message: "End date must be later than startDate.",
       },
@@ -60,7 +77,7 @@ const ProjectSchema = new mongoose.Schema<IProject, ProjectModel>(
     githubLink: {
       type: String,
       match: [
-        /^https:\/\/(?:www\.)github\.com\/.+$/,
+        /^https:\/\/(?:www\.)?github\.com\/.+$/,
         "GitHub link is not valid",
       ],
       maxLength: [100, "GitHub link must be at most 100 characters long"],

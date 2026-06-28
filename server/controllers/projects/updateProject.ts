@@ -48,6 +48,7 @@ export default defineEventHandler(async (event) => {
       {
         returnDocument: "after",
         runValidators: true,
+        context: "query",
       },
     );
 
