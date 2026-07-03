@@ -95,30 +95,39 @@ describe("useCreateProjectForm composable", () => {
   });
 
   describe("Main image handling", () => {
-    it("should handle main image with valid file", () => {
-      // Arrange
+    it("should pass valid main image to createProject on submit", async () => {
       const { result } = mount(() => useCreateProjectForm());
 
-      // Act
+      result.addTechnology("React");
+      result.addExperience("Learning");
       result.handleMainImageChange(mockUploadInfo());
 
-      // Assert
-      expect(result.form.value.title).toBe("");
+      projectsStore.createProject = vi.fn().mockResolvedValue(true);
+
+      await result.submitCreateProject();
+
+      expect(projectsStore.createProject).toHaveBeenCalledWith(
+        expect.any(Object),
+        { file: mockFile, altText: "Main image" },
+        [],
+      );
     });
 
-    it("should clear main image when no file provided", () => {
-      // Arrange
+    it("should clear pending main image when file list becomes empty", async () => {
       const { result } = mount(() => useCreateProjectForm());
 
-      // Act
+      result.addTechnology("React");
+      result.addExperience("Learning");
+      result.handleMainImageChange(mockUploadInfo());
       result.handleMainImageChange([]);
 
-      // Assert
-      expect(result.form.value.title).toBe("");
+      await result.submitCreateProject();
+
+      expect(showErrorToast).toHaveBeenCalledWith("Main image is required");
+      expect(projectsStore.createProject).not.toHaveBeenCalled();
     });
 
-    it("should mark main image as invalid on upload error", () => {
-      // Arrange
+    it("should mark main image as invalid on upload error", async () => {
       const { result } = mount(() => useCreateProjectForm());
       const errorUploadInfo: UploadFileInfo[] = mockUploadInfo({
         status: "error",
@@ -127,35 +136,81 @@ describe("useCreateProjectForm composable", () => {
         errorMessage: "Upload failed",
       });
 
-      // Act
+      result.addTechnology("React");
+      result.addExperience("Learning");
       result.handleMainImageChange(errorUploadInfo);
 
-      // Assert
-      expect(result.form.value.title).toBe("");
+      await result.submitCreateProject();
+
+      expect(showErrorToast).toHaveBeenCalledWith(
+        "Please fix the main image before submitting",
+      );
+      expect(projectsStore.createProject).not.toHaveBeenCalled();
+    });
+
+    it("should ignore main image entries without a file object", async () => {
+      const { result } = mount(() => useCreateProjectForm());
+
+      result.addTechnology("React");
+      result.addExperience("Learning");
+      result.handleMainImageChange(
+        mockUploadInfo({ file: null, status: "pending" }),
+      );
+
+      await result.submitCreateProject();
+
+      expect(showErrorToast).toHaveBeenCalledWith("Main image is required");
     });
   });
 
   describe("Other images handling", () => {
-    it("should add multiple other images", () => {
-      // Arrange
+    it("should pass multiple valid other images to createProject", async () => {
       const { result } = mount(() => useCreateProjectForm());
+      const otherFile1 = new File(["a"], "image1.jpg", { type: "image/jpeg" });
+      const otherFile2 = new File(["b"], "image2.jpg", { type: "image/jpeg" });
       const uploadInfo: UploadFileInfo[] = [
-        ...mockUploadInfo({ id: "1", name: "image1.jpg", altText: "Image 1" }),
-        ...mockUploadInfo({ id: "2", name: "image2.jpg", altText: "Image 2" }),
+        ...mockUploadInfo({
+          id: "1",
+          name: "image1.jpg",
+          file: otherFile1,
+          altText: "Image 1",
+        }),
+        ...mockUploadInfo({
+          id: "2",
+          name: "image2.jpg",
+          file: otherFile2,
+          altText: "Image 2",
+        }),
       ];
 
-      // Act
+      result.addTechnology("React");
+      result.addExperience("Learning");
+      result.handleMainImageChange(mockUploadInfo());
       result.handleOtherImagesChange(uploadInfo);
 
-      // Assert
-      expect(result.form.value.title).toBe("");
+      projectsStore.createProject = vi.fn().mockResolvedValue(true);
+
+      await result.submitCreateProject();
+
+      expect(projectsStore.createProject).toHaveBeenCalledWith(
+        expect.any(Object),
+        { file: mockFile, altText: "Main image" },
+        [
+          { file: otherFile1, altText: "Image 1" },
+          { file: otherFile2, altText: "Image 2" },
+        ],
+      );
     });
 
-    it("should filter out error images", () => {
-      // Arrange
+    it("should filter out error images from other images", async () => {
       const { result } = mount(() => useCreateProjectForm());
+      const validFile = new File(["a"], "valid.jpg", { type: "image/jpeg" });
       const uploadInfo: UploadFileInfo[] = [
-        ...mockUploadInfo({ id: "1", altText: "Valid image" }),
+        ...mockUploadInfo({
+          id: "1",
+          file: validFile,
+          altText: "Valid image",
+        }),
         ...mockUploadInfo({
           id: "2",
           name: "error.jpg",
@@ -166,23 +221,40 @@ describe("useCreateProjectForm composable", () => {
         }),
       ];
 
-      // Act
+      result.addTechnology("React");
+      result.addExperience("Learning");
+      result.handleMainImageChange(mockUploadInfo());
       result.handleOtherImagesChange(uploadInfo);
 
-      // Assert
-      expect(result.form.value.title).toBe("");
+      projectsStore.createProject = vi.fn().mockResolvedValue(true);
+
+      await result.submitCreateProject();
+
+      expect(projectsStore.createProject).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(Object),
+        [{ file: validFile, altText: "Valid image" }],
+      );
     });
 
-    it("should clear other images when empty array provided", () => {
-      // Arrange
+    it("should clear other images when empty array provided", async () => {
       const { result } = mount(() => useCreateProjectForm());
-      result.handleOtherImagesChange(mockUploadInfo({ altText: "Image" }));
 
-      // Act
+      result.addTechnology("React");
+      result.addExperience("Learning");
+      result.handleMainImageChange(mockUploadInfo());
+      result.handleOtherImagesChange(mockUploadInfo({ altText: "Image" }));
       result.handleOtherImagesChange([]);
 
-      // Assert
-      expect(result.form.value.title).toBe("");
+      projectsStore.createProject = vi.fn().mockResolvedValue(true);
+
+      await result.submitCreateProject();
+
+      expect(projectsStore.createProject).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(Object),
+        [],
+      );
     });
   });
 
@@ -204,9 +276,18 @@ describe("useCreateProjectForm composable", () => {
 
       // Act
       result.addTechnology("");
+      result.addTechnology("   ");
 
       // Assert
       expect(result.form.value.technologies.length).toBe(0);
+    });
+
+    it("should trim technology before adding", () => {
+      const { result } = mount(() => useCreateProjectForm());
+
+      result.addTechnology("  Vue  ");
+
+      expect(result.form.value.technologies).toEqual(["Vue"]);
     });
 
     it("should not add duplicate technology", () => {
@@ -272,9 +353,18 @@ describe("useCreateProjectForm composable", () => {
 
       // Act
       result.addExperience("");
+      result.addExperience("   ");
 
       // Assert
       expect(result.form.value.gainedExperience.length).toBe(0);
+    });
+
+    it("should trim experience before adding", () => {
+      const { result } = mount(() => useCreateProjectForm());
+
+      result.addExperience("  API design  ");
+
+      expect(result.form.value.gainedExperience).toEqual(["API design"]);
     });
 
     it("should not add duplicate experience", () => {
@@ -462,6 +552,22 @@ describe("useCreateProjectForm composable", () => {
       expect(navigateToMock).toHaveBeenCalledWith("/projects");
 
       // Assert - check isSubmitting is reset after submission
+      expect(result.isSubmitting.value).toBe(false);
+    });
+
+    it("should not navigate when createProject returns false", async () => {
+      const { result } = mount(() => useCreateProjectForm());
+
+      result.addTechnology("React");
+      result.addExperience("Learning");
+      result.handleMainImageChange(mockUploadInfo());
+
+      projectsStore.createProject = vi.fn().mockResolvedValue(false);
+
+      await result.submitCreateProject();
+
+      expect(showSuccessToast).not.toHaveBeenCalled();
+      expect(navigateToMock).not.toHaveBeenCalled();
       expect(result.isSubmitting.value).toBe(false);
     });
   });

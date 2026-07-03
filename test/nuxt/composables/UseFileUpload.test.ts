@@ -283,17 +283,67 @@ describe("useFileUpload", () => {
   describe("processFiles (controlled)", () => {
     it("should call onUpdateFileList instead of mutating internal state", () => {
       const callbacks = makeCallbacks();
-      const externalList = ref<UploadFileInfo[]>([]);
 
       const { result } = mount(() =>
-        useFileUpload(makeProps({ fileList: externalList.value }), callbacks),
+        useFileUpload(makeProps({ fileList: [] }), callbacks),
       );
 
       result.processFiles(makeFileList([makeFile()]));
 
       expect(callbacks.onUpdateFileList).toHaveBeenCalled();
-      // Internal files array stays empty in controlled mode
       expect(result.files.value).toHaveLength(0);
+    });
+
+    it("should return list from processFiles", () => {
+      const callbacks = makeCallbacks();
+
+      const { result } = mount(() =>
+        useFileUpload(makeProps({ fileList: [] }), callbacks),
+      );
+
+      const list = result.processFiles(makeFileList([makeFile("doc.txt")]));
+
+      expect(list).toHaveLength(1);
+      expect(list![0]).toMatchObject({
+        name: "doc.txt",
+        status: "pending",
+      });
+    });
+
+    it("should emit a single onUpdateFileList call in manual submit mode", () => {
+      const callbacks = makeCallbacks();
+
+      const { result } = mount(() =>
+        useFileUpload(makeProps({ fileList: [] }), callbacks),
+      );
+
+      result.processFiles(makeFileList([makeFile()]));
+
+      expect(callbacks.onUpdateFileList).toHaveBeenCalledTimes(1);
+      expect(callbacks.onUpdateFileList).toHaveBeenCalledWith([
+        expect.objectContaining({ status: "pending" }),
+      ]);
+    });
+
+    it("should chain upload updates from addFiles baseList without wiping the list", () => {
+      const customRequest = vi.fn();
+      const callbacks = makeCallbacks();
+
+      const { result } = mount(() =>
+        useFileUpload(makeProps({ fileList: [], customRequest }), callbacks),
+      );
+
+      result.processFiles(makeFileList([makeFile()]));
+
+      const updateCalls = callbacks.onUpdateFileList.mock.calls.map(
+        (call) => call[0] as UploadFileInfo[],
+      );
+
+      expect(updateCalls.length).toBeGreaterThanOrEqual(2);
+      expect(updateCalls[0]).toHaveLength(1);
+      expect(updateCalls[0]![0]!.status).toBe("pending");
+      expect(updateCalls[1]![0]!.status).toBe("uploading");
+      updateCalls.forEach((list) => expect(list).toHaveLength(1));
     });
   });
 
@@ -676,13 +726,13 @@ describe("useFileUpload", () => {
 
   describe("upload with no transport configured", () => {
     it("should keep file in pending state when neither action nor customRequest is set", () => {
-      const { result } = mount(() =>
-        useFileUpload(makeProps(), makeCallbacks()),
-      );
+      const callbacks = makeCallbacks();
+      const { result } = mount(() => useFileUpload(makeProps(), callbacks));
 
       result.processFiles(makeFileList([makeFile()]));
-      // Transitions: pending → uploading → pending (no transport)
+
       expect(result.files.value[0]!.status).toBe("pending");
+      expect(callbacks.onUpdateFileList).not.toHaveBeenCalled();
     });
   });
 });

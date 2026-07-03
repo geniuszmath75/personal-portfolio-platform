@@ -670,4 +670,195 @@ describe("projectsStore", () => {
 
     consoleErrorSpy.mockRestore();
   });
+
+  describe("updateProject", () => {
+    const projectId = "abc123";
+    const existingMainImage = {
+      srcPath: "/images/projects/existing-main.jpg",
+      altText: "Existing main",
+    };
+
+    it("should upload new images and PUT project successfully", async () => {
+      const store = useProjectsStore();
+      const mainImageFile = {
+        file: new File(["main"], "main.jpg", { type: "image/jpeg" }),
+        altText: "New main image",
+      };
+      const otherImageFiles = [
+        {
+          file: null,
+          srcPath: "/images/projects/existing-other.jpg",
+          altText: "Kept other image",
+        },
+        {
+          file: new File(["other"], "other.jpg", { type: "image/jpeg" }),
+          altText: "New other image",
+        },
+      ];
+
+      const uploadSpy = vi
+        .spyOn(store, "uploadProjectImage")
+        .mockResolvedValueOnce("/uploads/projects/new-main.jpg")
+        .mockResolvedValueOnce("/uploads/projects/new-other.jpg");
+
+      const fetchMock = vi.fn().mockResolvedValue({});
+      vi.stubGlobal("$fetch", fetchMock);
+
+      const result = await store.updateProject(
+        projectId,
+        mockFormData,
+        mainImageFile,
+        existingMainImage,
+        otherImageFiles,
+      );
+
+      expect(result).toBe(true);
+      expect(store.loading).toBe(false);
+      expect(uploadSpy).toHaveBeenCalledTimes(2);
+      expect(uploadSpy).toHaveBeenNthCalledWith(1, mainImageFile.file);
+      expect(uploadSpy).toHaveBeenNthCalledWith(
+        2,
+        otherImageFiles[1]!.file,
+        "projects",
+      );
+      expect(fetchMock).toHaveBeenCalledWith(`/projects/${projectId}`, {
+        baseURL: "/api/v1",
+        method: "PUT",
+        credentials: "include",
+        body: {
+          ...mockFormData,
+          mainImage: {
+            srcPath: "/uploads/projects/new-main.jpg",
+            altText: "New main image",
+          },
+          otherImages: [
+            {
+              srcPath: "/images/projects/existing-other.jpg",
+              altText: "Kept other image",
+            },
+            {
+              srcPath: "/uploads/projects/new-other.jpg",
+              altText: "New other image",
+            },
+          ],
+          githubLink: "https://github.com/test/project",
+          websiteLink: null,
+          endDate: null,
+        },
+      });
+    });
+
+    it("should keep existing main image when no new file is provided", async () => {
+      const store = useProjectsStore();
+      const otherImageFiles = [
+        {
+          file: null,
+          srcPath: "/images/projects/existing-other.jpg",
+          altText: "Kept other image",
+        },
+      ];
+
+      const uploadSpy = vi.spyOn(store, "uploadProjectImage");
+      vi.stubGlobal("$fetch", vi.fn().mockResolvedValue({}));
+
+      const result = await store.updateProject(
+        projectId,
+        mockFormData,
+        null,
+        existingMainImage,
+        otherImageFiles,
+      );
+
+      expect(result).toBe(true);
+      expect(uploadSpy).not.toHaveBeenCalled();
+      expect($fetch).toHaveBeenCalledWith(
+        `/projects/${projectId}`,
+        expect.objectContaining({
+          method: "PUT",
+          body: expect.objectContaining({
+            mainImage: {
+              srcPath: existingMainImage.srcPath,
+              altText: existingMainImage.altText,
+            },
+            otherImages: [
+              {
+                srcPath: "/images/projects/existing-other.jpg",
+                altText: "Kept other image",
+              },
+            ],
+          }),
+        }),
+      );
+    });
+
+    it("should fail if main image upload fails", async () => {
+      const store = useProjectsStore();
+      const mainImageFile = {
+        file: new File(["main"], "main.jpg", { type: "image/jpeg" }),
+        altText: "New main image",
+      };
+
+      vi.spyOn(store, "uploadProjectImage").mockResolvedValueOnce(null);
+
+      const result = await store.updateProject(
+        projectId,
+        mockFormData,
+        mainImageFile,
+        existingMainImage,
+        [],
+      );
+
+      expect(result).toBe(false);
+      expect(store.loading).toBe(false);
+    });
+
+    it("should fail if other image upload fails", async () => {
+      const store = useProjectsStore();
+      const otherImageFiles = [
+        {
+          file: new File(["other"], "other.jpg", { type: "image/jpeg" }),
+          altText: "New other image",
+        },
+      ];
+
+      vi.spyOn(store, "uploadProjectImage").mockResolvedValueOnce(null);
+
+      const result = await store.updateProject(
+        projectId,
+        mockFormData,
+        null,
+        existingMainImage,
+        otherImageFiles,
+      );
+
+      expect(result).toBe(false);
+      expect(store.loading).toBe(false);
+    });
+
+    it("should handle API errors gracefully", async () => {
+      const store = useProjectsStore();
+
+      vi.stubGlobal(
+        "$fetch",
+        vi.fn().mockRejectedValue(new Error("API error")),
+      );
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+
+      const result = await store.updateProject(
+        projectId,
+        mockFormData,
+        null,
+        existingMainImage,
+        [],
+      );
+
+      expect(result).toBe(false);
+      expect(store.loading).toBe(false);
+      expect(consoleErrorSpy).toHaveBeenCalled();
+
+      consoleErrorSpy.mockRestore();
+    });
+  });
 });

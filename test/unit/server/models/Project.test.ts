@@ -3,6 +3,26 @@ import { Project } from "../../../../server/models/Project";
 import type { HydratedDocument } from "mongoose";
 import type { IProject } from "../../../../shared/types";
 
+const validProjectFields = {
+  title: "Test title",
+  technologies: ["Vue", "Nuxt"],
+  startDate: new Date("2025-09-01"),
+  shortDescription: "Short description",
+  longDescription:
+    "Lorem ipsum dolor sit amet consectetur adipiscing elit quisque faucibus ex sapien.",
+  mainImage: {
+    srcPath: "/images/projects/image.jpg",
+    altText: "image.png",
+  },
+  gainedExperience: ["Experience 1"],
+};
+
+const getEndDateValidator = () =>
+  Project.schema.path("endDate").validators[0].validator as (
+    this: { get?: (key: string) => unknown },
+    value?: Date,
+  ) => boolean;
+
 describe("Project model", () => {
   /**
    * TITLE
@@ -217,6 +237,57 @@ describe("Project model", () => {
   });
 
   /**
+   * END DATE VALIDATOR (query context)
+   */
+  describe("endDate validator", () => {
+    it("should allow empty endDate regardless of context", () => {
+      const validator = getEndDateValidator();
+      const queryContext = {
+        get: (key: string) =>
+          key === "startDate" ? new Date("2025-09-01") : undefined,
+      };
+
+      expect(validator.call(queryContext, undefined)).toBe(true);
+    });
+
+    it("should compare endDate against startDate from query context on update", () => {
+      const validator = getEndDateValidator();
+      const queryContext = {
+        get: (key: string) =>
+          key === "startDate" ? new Date("2025-09-01") : undefined,
+      };
+
+      expect(validator.call(queryContext, new Date("2025-09-02"))).toBe(true);
+      expect(validator.call(queryContext, new Date("2025-08-31"))).toBe(false);
+    });
+
+    it("should skip endDate comparison when startDate is missing from query context", () => {
+      const validator = getEndDateValidator();
+      const queryContext = {
+        get: () => undefined,
+      };
+
+      expect(validator.call(queryContext, new Date("2025-09-02"))).toBe(true);
+    });
+
+    it("should skip endDate comparison when context has no get method", () => {
+      const validator = getEndDateValidator();
+
+      expect(validator.call({}, new Date("2025-09-02"))).toBe(true);
+    });
+
+    it("should compare endDate against document startDate on save", () => {
+      const project: HydratedDocument<IProject> = new Project({
+        ...validProjectFields,
+        endDate: new Date("2025-09-02"),
+      });
+
+      const validationError = project.validateSync();
+      expect(validationError).toBeUndefined();
+    });
+  });
+
+  /**
    * SHORT DESCRIPTION
    */
   describe("shortDescription", () => {
@@ -299,7 +370,7 @@ describe("Project model", () => {
         startDate: new Date("2025-09-01"),
         shortDescription: "Short description",
         longDescription: shortLongDescription,
-        mmainImage: {
+        mainImage: {
           srcPath: "/images/projects/image.jpg",
           altText: "image.png",
         },
@@ -341,6 +412,26 @@ describe("Project model", () => {
    * GITHUB LINK
    */
   describe("githubLink", () => {
+    it("should accept GitHub link without www subdomain", () => {
+      const project: HydratedDocument<IProject> = new Project({
+        ...validProjectFields,
+        githubLink: "https://github.com/user/repo",
+      });
+
+      const validationError = project.validateSync();
+      expect(validationError?.errors.githubLink).toBeUndefined();
+    });
+
+    it("should accept GitHub link with www subdomain", () => {
+      const project: HydratedDocument<IProject> = new Project({
+        ...validProjectFields,
+        githubLink: "https://www.github.com/user/repo",
+      });
+
+      const validationError = project.validateSync();
+      expect(validationError?.errors.githubLink).toBeUndefined();
+    });
+
     it("should reject invalid format", () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",

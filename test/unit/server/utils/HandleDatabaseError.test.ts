@@ -29,6 +29,7 @@ describe("handleDatabaseError util", () => {
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         "Unhandled database error:",
         errorMessage,
+        unknownError.stack,
       );
 
       consoleErrorSpy.mockRestore();
@@ -142,6 +143,30 @@ describe("handleDatabaseError util", () => {
   });
 
   /**
+   * Mongoose CastError handling
+   */
+  describe("Mongoose CastError handling", () => {
+    it("should return bad request with field path in message", () => {
+      // Arrange
+      const castError = new mongoose.Error.CastError(
+        "ObjectId",
+        "invalid-id",
+        "_id",
+      );
+
+      // Act
+      const result = handleDatabaseError(castError);
+
+      // Assert
+      expect(result).toEqual({
+        code: 400,
+        statusMessage: "Bad Request",
+        message: "Invalid value for field '_id'",
+      });
+    });
+  });
+
+  /**
    * MongoDB Duplicate Key Error handling
    */
   describe("MongoDB MongoServerError (duplicate key) handling", () => {
@@ -230,6 +255,7 @@ describe("handleDatabaseError util", () => {
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         "Unhandled database error:",
         errorMessage,
+        serverError.stack,
       );
 
       consoleErrorSpy.mockRestore();
