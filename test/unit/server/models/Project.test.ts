@@ -28,7 +28,7 @@ describe("Project model", () => {
    * TITLE
    */
   describe("title", () => {
-    it("should be required", () => {
+    it("should be required", async () => {
       const project: HydratedDocument<IProject> = new Project({
         technologies: ["Vue", "Nuxt"],
         startDate: new Date("2025-09-01"),
@@ -42,12 +42,14 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.title).toBeDefined();
-      expect(validationError?.errors.title.message).toBe("Title is required");
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          title: expect.objectContaining({ message: "Title is required" }),
+        }),
+      });
     });
 
-    it("should reject too short title", () => {
+    it("should reject too short title", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Ab",
         technologies: ["Vue", "Nuxt"],
@@ -62,14 +64,16 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.title).toBeDefined();
-      expect(validationError?.errors.title.message).toBe(
-        "Title must be at least 3 characters long.",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          title: expect.objectContaining({
+            message: "Title must be at least 3 characters long.",
+          }),
+        }),
+      });
     });
 
-    it("should reject too long title", () => {
+    it("should reject too long title", async () => {
       const longTitle = "a".repeat(33);
       const project: HydratedDocument<IProject> = new Project({
         title: longTitle,
@@ -85,11 +89,13 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.title).toBeDefined();
-      expect(validationError?.errors.title.message).toBe(
-        "Title must be at most 32 characters long.",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          title: expect.objectContaining({
+            message: "Title must be at most 32 characters long.",
+          }),
+        }),
+      });
     });
   });
 
@@ -97,7 +103,7 @@ describe("Project model", () => {
    * TECHNOLOGIES
    */
   describe("technologies", () => {
-    it("should reject empty technologies array", () => {
+    it("should reject empty technologies array", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: [],
@@ -112,14 +118,16 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.technologies).toBeDefined();
-      expect(validationError?.errors.technologies.message).toBe(
-        "At least one technology is required.",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          technologies: expect.objectContaining({
+            message: "At least one technology is required.",
+          }),
+        }),
+      });
     });
 
-    it("should reject too short technology name", () => {
+    it("should reject too short technology name", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["", "Vue"],
@@ -134,11 +142,13 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.technologies).toBeDefined();
-      expect(validationError?.errors.technologies.message).toBe(
-        "Each technology must be at least 1 character long.",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          technologies: expect.objectContaining({
+            message: "Each technology must be at least 1 character long.",
+          }),
+        }),
+      });
     });
   });
 
@@ -146,7 +156,7 @@ describe("Project model", () => {
    * START DATE
    */
   describe("startDate", () => {
-    it("should be required", () => {
+    it("should be required", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -160,11 +170,13 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.startDate).toBeDefined();
-      expect(validationError?.errors.startDate.message).toBe(
-        "Start date is required",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          startDate: expect.objectContaining({
+            message: "Start date is required",
+          }),
+        }),
+      });
     });
   });
 
@@ -172,7 +184,7 @@ describe("Project model", () => {
    * END DATE
    */
   describe("endDate", () => {
-    it("should allow empty value", () => {
+    it("should allow empty value", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -187,12 +199,11 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError).toBeUndefined();
+      await expect(project.validate()).resolves.toBeUndefined();
       expect(project.endDate).toBeUndefined();
     });
 
-    it("should allow endDate later than startDate", () => {
+    it("should allow endDate later than startDate", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -208,11 +219,10 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError).toBeUndefined();
+      await expect(project.validate()).resolves.toBeUndefined();
     });
 
-    it("should throw validation error if endDate <= startDate", () => {
+    it("should throw validation error if endDate <= startDate", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -228,11 +238,13 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.endDate).toBeDefined();
-      expect(validationError?.errors.endDate.message).toBe(
-        "End date must be later than startDate.",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          endDate: expect.objectContaining({
+            message: "End date must be later than startDate.",
+          }),
+        }),
+      });
     });
   });
 
@@ -240,7 +252,7 @@ describe("Project model", () => {
    * END DATE VALIDATOR (query context)
    */
   describe("endDate validator", () => {
-    it("should allow empty endDate regardless of context", () => {
+    it("should allow empty endDate regardless of context", async () => {
       const validator = getEndDateValidator();
       const queryContext = {
         get: (key: string) =>
@@ -276,14 +288,13 @@ describe("Project model", () => {
       expect(validator.call({}, new Date("2025-09-02"))).toBe(true);
     });
 
-    it("should compare endDate against document startDate on save", () => {
+    it("should compare endDate against document startDate on save", async () => {
       const project: HydratedDocument<IProject> = new Project({
         ...validProjectFields,
         endDate: new Date("2025-09-02"),
       });
 
-      const validationError = project.validateSync();
-      expect(validationError).toBeUndefined();
+      await expect(project.validate()).resolves.toBeUndefined();
     });
   });
 
@@ -291,7 +302,7 @@ describe("Project model", () => {
    * SHORT DESCRIPTION
    */
   describe("shortDescription", () => {
-    it("should be required", () => {
+    it("should be required", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -305,14 +316,16 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.shortDescription).toBeDefined();
-      expect(validationError?.errors.shortDescription.message).toBe(
-        "Short description is required",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          shortDescription: expect.objectContaining({
+            message: "Short description is required",
+          }),
+        }),
+      });
     });
 
-    it("should reject too long shortDescription", () => {
+    it("should reject too long shortDescription", async () => {
       const longShortDescription = "a".repeat(65);
 
       const project: HydratedDocument<IProject> = new Project({
@@ -329,11 +342,13 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.shortDescription).toBeDefined();
-      expect(validationError?.errors.shortDescription.message).toBe(
-        "Short description must be at most 64 characters long.",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          shortDescription: expect.objectContaining({
+            message: "Short description must be at most 64 characters long.",
+          }),
+        }),
+      });
     });
   });
 
@@ -341,7 +356,7 @@ describe("Project model", () => {
    * LONG DESCRIPTION
    */
   describe("longDescription", () => {
-    it("should be required", () => {
+    it("should be required", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -354,14 +369,16 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.longDescription).toBeDefined();
-      expect(validationError?.errors.longDescription.message).toBe(
-        "Long description is required",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          longDescription: expect.objectContaining({
+            message: "Long description is required",
+          }),
+        }),
+      });
     });
 
-    it("should reject too short longDescription", () => {
+    it("should reject too short longDescription", async () => {
       const shortLongDescription = "a".repeat(63);
 
       const project: HydratedDocument<IProject> = new Project({
@@ -377,14 +394,16 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.longDescription).toBeDefined();
-      expect(validationError?.errors.longDescription.message).toBe(
-        "Long description must be at least 64 characters long.",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          longDescription: expect.objectContaining({
+            message: "Long description must be at least 64 characters long.",
+          }),
+        }),
+      });
     });
 
-    it("should reject too long longDescription", () => {
+    it("should reject too long longDescription", async () => {
       const longLongDescription = "a".repeat(1025);
 
       const project: HydratedDocument<IProject> = new Project({
@@ -400,11 +419,13 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.longDescription).toBeDefined();
-      expect(validationError?.errors.longDescription.message).toBe(
-        "Long description must be at most 1024 characters long.",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          longDescription: expect.objectContaining({
+            message: "Long description must be at most 1024 characters long.",
+          }),
+        }),
+      });
     });
   });
 
@@ -412,27 +433,25 @@ describe("Project model", () => {
    * GITHUB LINK
    */
   describe("githubLink", () => {
-    it("should accept GitHub link without www subdomain", () => {
+    it("should accept GitHub link without www subdomain", async () => {
       const project: HydratedDocument<IProject> = new Project({
         ...validProjectFields,
         githubLink: "https://github.com/user/repo",
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.githubLink).toBeUndefined();
+      await expect(project.validate()).resolves.toBeUndefined();
     });
 
-    it("should accept GitHub link with www subdomain", () => {
+    it("should accept GitHub link with www subdomain", async () => {
       const project: HydratedDocument<IProject> = new Project({
         ...validProjectFields,
         githubLink: "https://www.github.com/user/repo",
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.githubLink).toBeUndefined();
+      await expect(project.validate()).resolves.toBeUndefined();
     });
 
-    it("should reject invalid format", () => {
+    it("should reject invalid format", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -448,14 +467,16 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.githubLink).toBeDefined();
-      expect(validationError?.errors.githubLink.message).toBe(
-        "GitHub link is not valid",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          githubLink: expect.objectContaining({
+            message: "GitHub link is not valid",
+          }),
+        }),
+      });
     });
 
-    it("should reject too long GitHub link", () => {
+    it("should reject too long GitHub link", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -472,11 +493,13 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.githubLink).toBeDefined();
-      expect(validationError?.errors.githubLink.message).toBe(
-        "GitHub link must be at most 100 characters long",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          githubLink: expect.objectContaining({
+            message: "GitHub link must be at most 100 characters long",
+          }),
+        }),
+      });
     });
   });
 
@@ -484,7 +507,7 @@ describe("Project model", () => {
    * PROJECT SOURCE
    */
   describe("projectSource", () => {
-    it("should set default projectSource to HOBBY", () => {
+    it("should set default projectSource to HOBBY", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -499,12 +522,11 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError).toBeUndefined();
+      await expect(project.validate()).resolves.toBeUndefined();
       expect(project.projectSource).toBe("HOBBY");
     });
 
-    it("should reject invalid projectSource option", () => {
+    it("should reject invalid projectSource option", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -520,8 +542,11 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.projectSource).toBeDefined();
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          projectSource: expect.anything(),
+        }),
+      });
     });
   });
 
@@ -529,7 +554,7 @@ describe("Project model", () => {
    * WEBSITE LINK
    */
   describe("websiteLink", () => {
-    it("should reject invalid format", () => {
+    it("should reject invalid format", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -545,14 +570,16 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.websiteLink).toBeDefined();
-      expect(validationError?.errors.websiteLink.message).toBe(
-        "Website link is not valid",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          websiteLink: expect.objectContaining({
+            message: "Website link is not valid",
+          }),
+        }),
+      });
     });
 
-    it("should reject too long website link", () => {
+    it("should reject too long website link", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -569,11 +596,13 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.websiteLink).toBeDefined();
-      expect(validationError?.errors.websiteLink.message).toBe(
-        "Website link must be at most 100 characters long",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          websiteLink: expect.objectContaining({
+            message: "Website link must be at most 100 characters long",
+          }),
+        }),
+      });
     });
   });
 
@@ -581,7 +610,7 @@ describe("Project model", () => {
    * MAIN IMAGE
    */
   describe("mainImage", () => {
-    it("should be required", () => {
+    it("should be required", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -592,11 +621,13 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.mainImage).toBeDefined();
-      expect(validationError?.errors.mainImage.message).toBe(
-        "Main image is required",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          mainImage: expect.objectContaining({
+            message: "Main image is required",
+          }),
+        }),
+      });
     });
   });
 
@@ -604,7 +635,7 @@ describe("Project model", () => {
    * OTHER IMAGES
    */
   describe("otherImage", () => {
-    it("should allow missing otherImages field", () => {
+    it("should allow missing otherImages field", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -619,11 +650,10 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError).toBeUndefined();
+      await expect(project.validate()).resolves.toBeUndefined();
     });
 
-    it("should allow empty array for otherImages", () => {
+    it("should allow empty array for otherImages", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -639,11 +669,10 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError).toBeUndefined();
+      await expect(project.validate()).resolves.toBeUndefined();
     });
 
-    it("should validate elements inside otherImages", () => {
+    it("should validate elements inside otherImages", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -659,11 +688,13 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors["otherImages.0.srcPath"]).toBeDefined();
-      expect(validationError?.errors["otherImages.0.srcPath"].message).toBe(
-        "Image source path must point to a valid image file.",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          "otherImages.0.srcPath": expect.objectContaining({
+            message: "Image source path must point to a valid image file.",
+          }),
+        }),
+      });
     });
   });
 
@@ -671,7 +702,7 @@ describe("Project model", () => {
    * STATUS
    */
   describe("status", () => {
-    it("should set default status to COMPLETED", () => {
+    it("should set default status to COMPLETED", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -686,12 +717,11 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.status).toBeUndefined();
+      await expect(project.validate()).resolves.toBeUndefined();
       expect(project.status).toBe("COMPLETED");
     });
 
-    it("should reject invalid status", () => {
+    it("should reject invalid status", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["Vue", "Nuxt"],
@@ -707,8 +737,11 @@ describe("Project model", () => {
         gainedExperience: ["Experience 1"],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.status).toBeDefined();
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          status: expect.anything(),
+        }),
+      });
     });
   });
 
@@ -716,7 +749,7 @@ describe("Project model", () => {
    * GAINED EXPERIENCE
    */
   describe("gainedExperience", () => {
-    it("should reject empty experience array", () => {
+    it("should reject empty experience array", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: [],
@@ -731,14 +764,16 @@ describe("Project model", () => {
         gainedExperience: [],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.gainedExperience).toBeDefined();
-      expect(validationError?.errors.gainedExperience.message).toBe(
-        "At least one experience description is required.",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          gainedExperience: expect.objectContaining({
+            message: "At least one experience description is required.",
+          }),
+        }),
+      });
     });
 
-    it("should reject too short experience name", () => {
+    it("should reject too short experience name", async () => {
       const project: HydratedDocument<IProject> = new Project({
         title: "Test title",
         technologies: ["", "Vue"],
@@ -753,11 +788,14 @@ describe("Project model", () => {
         gainedExperience: [""],
       });
 
-      const validationError = project.validateSync();
-      expect(validationError?.errors.gainedExperience).toBeDefined();
-      expect(validationError?.errors.gainedExperience.message).toBe(
-        "Each experience description must be at least 1 character long.",
-      );
+      await expect(project.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          gainedExperience: expect.objectContaining({
+            message:
+              "Each experience description must be at least 1 character long.",
+          }),
+        }),
+      });
     });
   });
 });

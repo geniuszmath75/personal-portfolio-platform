@@ -44,27 +44,31 @@ describe("User model", () => {
    * EMAIL
    */
   describe("email", () => {
-    it("should be required", () => {
+    it("should be required", async () => {
       const user = new User({
         password: "password123",
         username: "testuser",
       });
 
-      const validationError = user.validateSync();
-      expect(validationError?.errors.email).toBeDefined();
-      expect(validationError?.errors.email?.message).toBe("Email is required");
+      await expect(user.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          email: expect.objectContaining({ message: "Email is required" }),
+        }),
+      });
     });
 
-    it("should reject invalid format", () => {
+    it("should reject invalid format", async () => {
       const user = new User({
         email: "not-an-email",
         password: "password123",
         username: "testuser",
       });
 
-      const validationError = user.validateSync();
-      expect(validationError?.errors.email).toBeDefined();
-      expect(validationError?.errors.email?.message).toBe("Email is not valid");
+      await expect(user.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          email: expect.objectContaining({ message: "Email is not valid" }),
+        }),
+      });
     });
   });
 
@@ -72,87 +76,103 @@ describe("User model", () => {
    * PASSWORD
    */
   describe("password", () => {
-    it("should be required", () => {
+    it("should be required", async () => {
       const user = new User({
         email: "test@example.com",
         username: "testuser",
       });
 
-      const validationError = user.validateSync();
-      expect(validationError?.errors.password).toBeDefined();
-      expect(validationError?.errors.password?.message).toBe(
-        "Password is required",
-      );
+      await expect(user.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          password: expect.objectContaining({
+            message: "Password is required",
+          }),
+        }),
+      });
     });
 
-    it("should reject too short password", () => {
+    it("should reject too short password", async () => {
       const user = new User({
         email: "test@example.com",
         password: "Sh0r!",
         username: "testuser",
       });
 
-      const validationError = user.validateSync();
-      expect(validationError?.errors.password).toBeDefined();
-      expect(validationError?.errors.password?.message).toBe(
-        "Password must be at least 8 characters long",
-      );
+      await expect(user.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          password: expect.objectContaining({
+            message: "Password must be at least 8 characters long",
+          }),
+        }),
+      });
     });
 
-    it("should reject password without at least 1 uppercase letter", () => {
+    it("should reject password without at least 1 uppercase letter", async () => {
       const user = new User({
         email: "test@example.com",
         password: "pass123!",
         username: "testuser",
       });
 
-      const validationError = user.validateSync();
-      expect(validationError?.errors.password).toBeDefined();
-      expect(validationError?.errors.password?.message).toBe(
-        "Password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character",
-      );
+      await expect(user.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          password: expect.objectContaining({
+            message:
+              "Password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character",
+          }),
+        }),
+      });
     });
 
-    it("should reject password without at least 1 lowercase letter", () => {
+    it("should reject password without at least 1 lowercase letter", async () => {
       const user = new User({
         email: "test@example.com",
         password: "PASS123!",
         username: "testuser",
       });
 
-      const validationError = user.validateSync();
-      expect(validationError?.errors.password).toBeDefined();
-      expect(validationError?.errors.password?.message).toBe(
-        "Password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character",
-      );
+      await expect(user.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          password: expect.objectContaining({
+            message:
+              "Password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character",
+          }),
+        }),
+      });
     });
 
-    it("should reject password without at least 1 digit", () => {
+    it("should reject password without at least 1 digit", async () => {
       const user = new User({
         email: "test@example.com",
         password: "Password!",
         username: "testuser",
       });
 
-      const validationError = user.validateSync();
-      expect(validationError?.errors.password).toBeDefined();
-      expect(validationError?.errors.password?.message).toBe(
-        "Password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character",
-      );
+      await expect(user.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          password: expect.objectContaining({
+            message:
+              "Password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character",
+          }),
+        }),
+      });
     });
 
-    it("should reject password without at least 1 special character", () => {
+    it("should reject password without at least 1 special character", async () => {
       const user = new User({
         email: "test@example.com",
         password: "Pass1234",
         username: "testuser",
       });
 
-      const validationError = user.validateSync();
-      expect(validationError?.errors.password).toBeDefined();
-      expect(validationError?.errors.password?.message).toBe(
-        "Password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character",
-      );
+      await expect(user.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          password: expect.objectContaining({
+            message:
+              "Password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character",
+          }),
+        }),
+      });
     });
   });
 
@@ -160,34 +180,38 @@ describe("User model", () => {
    * USERNAME
    */
   describe("username", () => {
-    it("should be required", () => {
+    it("should be required", async () => {
       const user = new User({
         email: "test@example.com",
         password: "password123",
       });
 
-      const validationError = user.validateSync();
-      expect(validationError?.errors.username).toBeDefined();
-      expect(validationError?.errors.username?.message).toBe(
-        "Username is required",
-      );
+      await expect(user.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          username: expect.objectContaining({
+            message: "Username is required",
+          }),
+        }),
+      });
     });
 
-    it("should reject too short username", () => {
+    it("should reject too short username", async () => {
       const user = new User({
         email: "test@example.com",
         password: "password123",
         username: "ab",
       });
 
-      const validationError = user.validateSync();
-      expect(validationError?.errors.username).toBeDefined();
-      expect(validationError?.errors.username?.message).toBe(
-        "Username must be at least 3 characters long",
-      );
+      await expect(user.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          username: expect.objectContaining({
+            message: "Username must be at least 3 characters long",
+          }),
+        }),
+      });
     });
 
-    it("should reject too long username", () => {
+    it("should reject too long username", async () => {
       const longName = "a".repeat(51);
       const user = new User({
         email: "test@example.com",
@@ -195,11 +219,13 @@ describe("User model", () => {
         username: longName,
       });
 
-      const validationError = user.validateSync();
-      expect(validationError?.errors.username).toBeDefined();
-      expect(validationError?.errors.username?.message).toBe(
-        "Username must be at most 50 characters long",
-      );
+      await expect(user.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          username: expect.objectContaining({
+            message: "Username must be at most 50 characters long",
+          }),
+        }),
+      });
     });
   });
 
@@ -207,7 +233,7 @@ describe("User model", () => {
    * ROLE
    */
   describe("role", () => {
-    it("should set default role to GUEST", () => {
+    it("should set default role to GUEST", async () => {
       const user = new User({
         email: "test@example.com",
         password: "password123",
@@ -217,7 +243,7 @@ describe("User model", () => {
       expect(user.role).toBe("GUEST");
     });
 
-    it("should reject invalid role", () => {
+    it("should reject invalid role", async () => {
       const user = new User({
         email: "test@example.com",
         password: "password123",
@@ -225,8 +251,11 @@ describe("User model", () => {
         role: "INVALID_ROLE",
       });
 
-      const validationError = user.validateSync();
-      expect(validationError?.errors.role).toBeDefined();
+      await expect(user.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          role: expect.anything(),
+        }),
+      });
     });
   });
 
@@ -234,19 +263,18 @@ describe("User model", () => {
    * AVATAR
    */
   describe("avatar", () => {
-    it("should set default value to null", () => {
+    it("should set default value to null", async () => {
       const user = new User({
         email: "test@example.com",
         password: "Password123!",
         username: "testuser",
       });
 
-      const validationError = user.validateSync();
-      expect(validationError).toBeUndefined();
+      await expect(user.validate()).resolves.toBeUndefined();
       expect(user.avatar).toBeNull();
     });
 
-    it("should accept String value", () => {
+    it("should accept String value", async () => {
       const user = new User({
         email: "test@example.com",
         password: "Password123!",
@@ -254,8 +282,7 @@ describe("User model", () => {
         avatar: "https://example.com/avatar.png",
       });
 
-      const validationError = user.validateSync();
-      expect(validationError).toBeUndefined();
+      await expect(user.validate()).resolves.toBeUndefined();
       expect(user.avatar).toBe("https://example.com/avatar.png");
     });
   });

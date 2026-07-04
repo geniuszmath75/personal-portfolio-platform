@@ -7,19 +7,21 @@ describe("Section model", () => {
    * TITLE
    */
   describe("title", () => {
-    it("should be required", () => {
+    it("should be required", async () => {
       const section = new Section({
         slug: "test-slug",
         type: ISectionType.HERO,
         order: 1,
       });
 
-      const validationError = section.validateSync();
-      expect(validationError?.errors.title).toBeDefined();
-      expect(validationError?.errors.title.message).toBe("Title is required");
+      await expect(section.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          title: expect.objectContaining({ message: "Title is required" }),
+        }),
+      });
     });
 
-    it("should reject too short title", () => {
+    it("should reject too short title", async () => {
       const section = new Section({
         title: "ab",
         slug: "test-slug",
@@ -27,14 +29,16 @@ describe("Section model", () => {
         order: 1,
       });
 
-      const validationError = section.validateSync();
-      expect(validationError?.errors.title).toBeDefined();
-      expect(validationError?.errors.title.message).toBe(
-        "Title must be at least 3 character long.",
-      );
+      await expect(section.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          title: expect.objectContaining({
+            message: "Title must be at least 3 character long.",
+          }),
+        }),
+      });
     });
 
-    it("should reject too long title", () => {
+    it("should reject too long title", async () => {
       const longTitle = "a".repeat(65);
       const section = new Section({
         title: longTitle,
@@ -43,11 +47,13 @@ describe("Section model", () => {
         order: 1,
       });
 
-      const validationError = section.validateSync();
-      expect(validationError?.errors.title).toBeDefined();
-      expect(validationError?.errors.title.message).toBe(
-        "Title must be at most 64 character long.",
-      );
+      await expect(section.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          title: expect.objectContaining({
+            message: "Title must be at most 64 character long.",
+          }),
+        }),
+      });
     });
   });
 
@@ -55,16 +61,18 @@ describe("Section model", () => {
    * SLUG
    */
   describe("slug", () => {
-    it("should be required", () => {
+    it("should be required", async () => {
       const section = new Section({
         title: "Test title",
         type: ISectionType.HERO,
         order: 1,
       });
 
-      const validationError = section.validateSync();
-      expect(validationError?.errors.slug).toBeDefined();
-      expect(validationError?.errors.slug.message).toBe("Slug is required");
+      await expect(section.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          slug: expect.objectContaining({ message: "Slug is required" }),
+        }),
+      });
     });
   });
 
@@ -72,7 +80,7 @@ describe("Section model", () => {
    * TYPE
    */
   describe("type", () => {
-    it("should set default type to HERO", () => {
+    it("should set default type to HERO", async () => {
       const section = new Section({
         title: "Test title",
         slug: "test-slug",
@@ -82,7 +90,7 @@ describe("Section model", () => {
       expect(section.type).toBe("HERO");
     });
 
-    it("should reject invalid role", () => {
+    it("should reject invalid role", async () => {
       const section = new Section({
         title: "Test title",
         slug: "test-slug",
@@ -90,8 +98,11 @@ describe("Section model", () => {
         type: "INVALID_ROLE",
       });
 
-      const validationError = section.validateSync();
-      expect(validationError?.errors.type).toBeDefined();
+      await expect(section.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          type: expect.anything(),
+        }),
+      });
     });
   });
 
@@ -99,16 +110,18 @@ describe("Section model", () => {
    * ORDER
    */
   describe("order", () => {
-    it("should be required", () => {
+    it("should be required", async () => {
       const section = new Section({
         title: "Test title",
         slug: "test-slug",
         type: ISectionType.HERO,
       });
 
-      const validationError = section.validateSync();
-      expect(validationError?.errors.order).toBeDefined();
-      expect(validationError?.errors.order.message).toBe("Order is required");
+      await expect(section.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          order: expect.objectContaining({ message: "Order is required" }),
+        }),
+      });
     });
   });
 
@@ -120,7 +133,7 @@ describe("Section model", () => {
      * BASE BLOCK
      */
     describe("BaseBlock", () => {
-      it("should require 'kind' field", () => {
+      it("should require 'kind' field", async () => {
         const section = new Section({
           title: "Test title",
           slug: "test-slug",
@@ -129,11 +142,13 @@ describe("Section model", () => {
           blocks: [{ paragraphs: ["Paragraph 1"] }],
         });
 
-        const validationError = section.validateSync();
-        expect(validationError?.errors["blocks.0.kind"]).toBeDefined();
-        expect(validationError?.errors["blocks.0.kind"].message).toBe(
-          "Base block kind is required.",
-        );
+        await expect(section.validate()).rejects.toMatchObject({
+          errors: expect.objectContaining({
+            "blocks.0.kind": expect.objectContaining({
+              message: "Base block kind is required.",
+            }),
+          }),
+        });
       });
     });
 
@@ -141,7 +156,7 @@ describe("Section model", () => {
      * PARAGRAPH BLOCK
      */
     describe("ParagraphBlock", () => {
-      it("should reject empty paragraphs array", () => {
+      it("should reject empty paragraphs array", async () => {
         const section = new Section({
           title: "Test title",
           slug: "test-slug",
@@ -150,14 +165,16 @@ describe("Section model", () => {
           blocks: [{ kind: BlockKind.PARAGRAPH, paragraphs: [] }],
         });
 
-        const validationError = section.validateSync();
-        expect(validationError?.errors["blocks.0.paragraphs"]).toBeDefined();
-        expect(validationError?.errors["blocks.0.paragraphs"].message).toBe(
-          "At least one paragraph is required.",
-        );
+        await expect(section.validate()).rejects.toMatchObject({
+          errors: expect.objectContaining({
+            "blocks.0.paragraphs": expect.objectContaining({
+              message: "At least one paragraph is required.",
+            }),
+          }),
+        });
       });
 
-      it("should reject too short paragraph", () => {
+      it("should reject too short paragraph", async () => {
         const section = new Section({
           title: "Test title",
           slug: "test-slug",
@@ -166,11 +183,13 @@ describe("Section model", () => {
           blocks: [{ kind: BlockKind.PARAGRAPH, paragraphs: [""] }],
         });
 
-        const validationError = section.validateSync();
-        expect(validationError?.errors["blocks.0.paragraphs"]).toBeDefined();
-        expect(validationError?.errors["blocks.0.paragraphs"].message).toBe(
-          "Each paragraph must be at least 1 character long.",
-        );
+        await expect(section.validate()).rejects.toMatchObject({
+          errors: expect.objectContaining({
+            "blocks.0.paragraphs": expect.objectContaining({
+              message: "Each paragraph must be at least 1 character long.",
+            }),
+          }),
+        });
       });
     });
 
@@ -178,7 +197,7 @@ describe("Section model", () => {
      * IMAGE BLOCK
      */
     describe("ImageBlock", () => {
-      it("should reject empty image array", () => {
+      it("should reject empty image array", async () => {
         const section = new Section({
           title: "Test title",
           slug: "test-slug",
@@ -187,11 +206,13 @@ describe("Section model", () => {
           blocks: [{ kind: BlockKind.IMAGE, images: [] }],
         });
 
-        const validationError = section.validateSync();
-        expect(validationError?.errors["blocks.0.images"]).toBeDefined();
-        expect(validationError?.errors["blocks.0.images"].message).toBe(
-          "At least one image is required.",
-        );
+        await expect(section.validate()).rejects.toMatchObject({
+          errors: expect.objectContaining({
+            "blocks.0.images": expect.objectContaining({
+              message: "At least one image is required.",
+            }),
+          }),
+        });
       });
     });
 
@@ -199,7 +220,7 @@ describe("Section model", () => {
      * BUTTON BLOCK
      */
     describe("ButtonBlock", () => {
-      it("should reject empty button array", () => {
+      it("should reject empty button array", async () => {
         const section = new Section({
           title: "Test title",
           slug: "test-slug",
@@ -208,14 +229,16 @@ describe("Section model", () => {
           blocks: [{ kind: BlockKind.BUTTON, buttons: [] }],
         });
 
-        const validationError = section.validateSync();
-        expect(validationError?.errors["blocks.0.buttons"]).toBeDefined();
-        expect(validationError?.errors["blocks.0.buttons"].message).toBe(
-          "At least one button is required.",
-        );
+        await expect(section.validate()).rejects.toMatchObject({
+          errors: expect.objectContaining({
+            "blocks.0.buttons": expect.objectContaining({
+              message: "At least one button is required.",
+            }),
+          }),
+        });
       });
 
-      it("should reject too short button", () => {
+      it("should reject too short button", async () => {
         const section = new Section({
           title: "Test title",
           slug: "test-slug",
@@ -224,11 +247,13 @@ describe("Section model", () => {
           blocks: [{ kind: BlockKind.BUTTON, buttons: [""] }],
         });
 
-        const validationError = section.validateSync();
-        expect(validationError?.errors["blocks.0.buttons"]).toBeDefined();
-        expect(validationError?.errors["blocks.0.buttons"].message).toBe(
-          "Each button must be at least 1 character long.",
-        );
+        await expect(section.validate()).rejects.toMatchObject({
+          errors: expect.objectContaining({
+            "blocks.0.buttons": expect.objectContaining({
+              message: "Each button must be at least 1 character long.",
+            }),
+          }),
+        });
       });
     });
 
@@ -240,7 +265,7 @@ describe("Section model", () => {
        * HEADER
        */
       describe("header", () => {
-        it("should reject too short header", () => {
+        it("should reject too short header", async () => {
           const section = new Section({
             title: "Test title",
             slug: "test-slug",
@@ -249,11 +274,14 @@ describe("Section model", () => {
             blocks: [{ kind: BlockKind.GROUP, header: "" }],
           });
 
-          const validationError = section.validateSync();
-          expect(validationError?.errors["blocks.0.header"]).toBeDefined();
-          expect(validationError?.errors["blocks.0.header"].message).toBe(
-            "Group block header must be at least 1 character long.",
-          );
+          await expect(section.validate()).rejects.toMatchObject({
+            errors: expect.objectContaining({
+              "blocks.0.header": expect.objectContaining({
+                message:
+                  "Group block header must be at least 1 character long.",
+              }),
+            }),
+          });
         });
       });
     });
@@ -266,7 +294,7 @@ describe("Section model", () => {
        * ICON
        */
       describe("icon", () => {
-        it("should be required", () => {
+        it("should be required", async () => {
           const section = new Section({
             title: "Test title",
             slug: "test-slug",
@@ -277,13 +305,13 @@ describe("Section model", () => {
             ],
           });
 
-          const validationError = section.validateSync();
-          expect(
-            validationError?.errors["blocks.0.items.0.icon"],
-          ).toBeDefined();
-          expect(validationError?.errors["blocks.0.items.0.icon"].message).toBe(
-            "Icon is required.",
-          );
+          await expect(section.validate()).rejects.toMatchObject({
+            errors: expect.objectContaining({
+              "blocks.0.items.0.icon": expect.objectContaining({
+                message: "Icon is required.",
+              }),
+            }),
+          });
         });
       });
 
@@ -291,7 +319,7 @@ describe("Section model", () => {
        * LABEL
        */
       describe("label", () => {
-        it("should be required", () => {
+        it("should be required", async () => {
           const section = new Section({
             title: "Test title",
             slug: "test-slug",
@@ -300,13 +328,13 @@ describe("Section model", () => {
             blocks: [{ kind: BlockKind.GROUP, items: [{ icon: "icon.svg" }] }],
           });
 
-          const validationError = section.validateSync();
-          expect(
-            validationError?.errors["blocks.0.items.0.label"],
-          ).toBeDefined();
-          expect(
-            validationError?.errors["blocks.0.items.0.label"].message,
-          ).toBe("Label is required.");
+          await expect(section.validate()).rejects.toMatchObject({
+            errors: expect.objectContaining({
+              "blocks.0.items.0.label": expect.objectContaining({
+                message: "Label is required.",
+              }),
+            }),
+          });
         });
       });
     });

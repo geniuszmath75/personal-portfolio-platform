@@ -10,42 +10,48 @@ describe("Image schema", () => {
    * SRC PATH
    */
   describe("srcPath", () => {
-    it("should be required", () => {
+    it("should be required", async () => {
       const imageDoc: HydratedDocument<Image> = new TestImageSchema({
         altText: "image.jpg",
       });
 
-      const validationError = imageDoc.validateSync();
-      expect(validationError?.errors.srcPath).toBeDefined();
-      expect(validationError?.errors.srcPath.message).toBe(
-        "Image source path is required",
-      );
+      await expect(imageDoc.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          srcPath: expect.objectContaining({
+            message: "Image source path is required",
+          }),
+        }),
+      });
     });
 
-    it("should reject path that do not point to a valid image file", () => {
+    it("should reject path that do not point to a valid image file", async () => {
       const imageDoc: HydratedDocument<Image> = new TestImageSchema({
         srcPath: "/images/projects/image.js",
         altText: "image.jpg",
       });
 
-      const validationError = imageDoc.validateSync();
-      expect(validationError?.errors.srcPath).toBeDefined();
-      expect(validationError?.errors.srcPath.message).toBe(
-        "Image source path must point to a valid image file.",
-      );
+      await expect(imageDoc.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          srcPath: expect.objectContaining({
+            message: "Image source path must point to a valid image file.",
+          }),
+        }),
+      });
     });
 
-    it("should reject too short source path", () => {
+    it("should reject too short source path", async () => {
       const imageDoc: HydratedDocument<Image> = new TestImageSchema({
         srcPath: "a.jpg",
         altText: "image.jpg",
       });
 
-      const validationError = imageDoc.validateSync();
-      expect(validationError?.errors.srcPath).toBeDefined();
-      expect(validationError?.errors.srcPath.message).toBe(
-        "Image source path must be at least 6 characters long",
-      );
+      await expect(imageDoc.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          srcPath: expect.objectContaining({
+            message: "Image source path must be at least 6 characters long",
+          }),
+        }),
+      });
     });
   });
 
@@ -53,16 +59,18 @@ describe("Image schema", () => {
    * ALT TEXT
    */
   describe("altText", () => {
-    it("should be required", () => {
+    it("should be required", async () => {
       const imageDoc: HydratedDocument<Image> = new TestImageSchema({
         srcPath: "/images/projects/image.jpg",
       });
 
-      const validationError = imageDoc.validateSync();
-      expect(validationError?.errors.altText).toBeDefined();
-      expect(validationError?.errors.altText.message).toBe(
-        "Alternative text is required",
-      );
+      await expect(imageDoc.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          altText: expect.objectContaining({
+            message: "Alternative text is required",
+          }),
+        }),
+      });
     });
   });
 });
