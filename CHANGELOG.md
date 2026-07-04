@@ -1,5 +1,36 @@
 ## Changelog
 
+### [v0.8.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.7.0...v0.8.0) - 4 July 2026
+
+#### New Features
+
+-  add project edit page with update form composable [`9a4ac75`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/9a4ac75f41e49e5d1eb0806cf85e033b4cc227f3)
+-  add updateProject action for PUT /projects/:id [`f9eeda3`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/f9eeda3870b4820dfca9bef0db49b9807b67374e)
+-  add update project endpoint and update handleDatabaseError util [`7e48a13`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/7e48a136fe60ad6350aac2239f71a2d518fbbbf2)
+
+#### Fixes
+
+-  fix controlled mode list sync after addFiles [`487e569`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/487e569f1b898e4580ea927fdb831138e6e92744)
+-  fix update validation for endDate and githubLink [`a43eb92`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/a43eb9218d2f581fed35eae6ad67e1e5b5018bda)
+-  fix controlled mode list sync after addFiles [`dd9f673`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/dd9f6738ad2ecb8399e156c44860d258841f28cd)
+
+#### Chores And Housekeeping
+
+-  update nuxt ecosystem, vue and vue-router to latest minor [`7041ca3`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/7041ca305360b586fe4dcc6214825c0ad9ccd0bc)
+-  update vitest, test utils and mongodb-memory-server to latest minor [`d932d36`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/d932d36f6aa5d873a8ce3632afdf5ff7cb572f07)
+-  update icon sets, prettier and minor dev tooling patches [`232834d`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/232834d7aa50c1dd94586c188882c644e2290a64)
+-  update mongoose and vue-tsc to latest minor [`bbd888e`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/bbd888eb470803a475f8df43820ffc7469cb9cf7)
+-  upgrade Node.js to v22 to resolve Object.groupBy compatibility issue [`95dc4ab`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/95dc4ab8683d74a477ed35f2482b5a9381146671)
+
+#### Refactoring and Updates
+
+-  extract shared ProjectForm for create page [`70828e0`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/70828e055a73cf7994430c94b2d267f511687830)
+-  move project detail page under [id]/index route [`f69e2e7`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/f69e2e7c363cb32c3ed3160213e792977c59483d)
+
+#### Changes to Test Assests
+
+-  add and update tests for project edit flow, FileUpload controlled mode and update validation [`af55208`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/af5520805b1179838aac8e0250b857b3535480de)
+
 ### [v0.7.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.6.0...v0.7.0) - 6 May 2026
 
 #### New Features
@@ -20,6 +51,10 @@
 #### Changes to Test Assests
 
 -  add unit tests for project controllers and validation utilities [`f455552`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/f4555527695112f45a4ca26a5dd92320e56bd38f)
+
+#### General Changes
+
+- release: 0.7.0 [`022d720`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/022d72043f724e7c2aadd8f39478a0b259ca170b)
 
 ### [v0.6.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.5.0...v0.6.0) - 19 March 2026
 
