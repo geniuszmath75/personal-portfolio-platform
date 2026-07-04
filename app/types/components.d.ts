@@ -370,11 +370,7 @@ export interface SidebarDropdownChild {
  * Status of the uploaded file
  */
 export type UploadFileStatus =
-  | "pending"
-  | "uploading"
-  | "finished"
-  | "error"
-  | "removed";
+  "pending" | "uploading" | "finished" | "error" | "removed";
 
 /**
  * UPLOAD FILE INFO
