@@ -3,10 +3,27 @@ import { Section } from "../../../../server/models/Section";
 import { ISectionType, BlockKind } from "../../../../shared/types/enums";
 
 describe("Section model", () => {
+  const validParagraphBlock = {
+    kind: BlockKind.PARAGRAPH,
+    paragraphs: ["Paragraph 1"],
+  };
+
   /**
    * TITLE
    */
   describe("title", () => {
+    it("should accept missing title", async () => {
+      const section = new Section({
+        slug: "test-slug",
+        type: ISectionType.HERO,
+        order: 1,
+        blocks: [validParagraphBlock],
+      });
+
+      await expect(section.validate()).resolves.toBeUndefined();
+      expect(section.title).toBeNull();
+    });
+
     it("should reject too short title", async () => {
       const section = new Section({
         title: "ab",
@@ -57,6 +74,42 @@ describe("Section model", () => {
       await expect(section.validate()).rejects.toMatchObject({
         errors: expect.objectContaining({
           slug: expect.objectContaining({ message: "Slug is required" }),
+        }),
+      });
+    });
+
+    it("should reject too short slug", async () => {
+      const section = new Section({
+        title: "Test title",
+        slug: "a",
+        type: ISectionType.HERO,
+        order: 1,
+        blocks: [validParagraphBlock],
+      });
+
+      await expect(section.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          slug: expect.objectContaining({
+            message: "Slug must be at least 2 characters long.",
+          }),
+        }),
+      });
+    });
+
+    it("should reject too long slug", async () => {
+      const section = new Section({
+        title: "Test title",
+        slug: "a".repeat(51),
+        type: ISectionType.HERO,
+        order: 1,
+        blocks: [validParagraphBlock],
+      });
+
+      await expect(section.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          slug: expect.objectContaining({
+            message: "Slug must be at most 50 characters long.",
+          }),
         }),
       });
     });
@@ -115,6 +168,24 @@ describe("Section model", () => {
    * BLOCKS
    */
   describe("blocks", () => {
+    it("should reject empty blocks array", async () => {
+      const section = new Section({
+        title: "Test title",
+        slug: "test-slug",
+        type: ISectionType.HERO,
+        order: 1,
+        blocks: [],
+      });
+
+      await expect(section.validate()).rejects.toMatchObject({
+        errors: expect.objectContaining({
+          blocks: expect.objectContaining({
+            message: "At least one block is required.",
+          }),
+        }),
+      });
+    });
+
     /**
      * BASE BLOCK
      */
@@ -247,6 +318,24 @@ describe("Section model", () => {
      * GROUP BLOCK
      */
     describe("GroupBlock", () => {
+      it("should reject empty items array", async () => {
+        const section = new Section({
+          title: "Test title",
+          slug: "test-slug",
+          type: ISectionType.HERO,
+          order: 1,
+          blocks: [{ kind: BlockKind.GROUP, items: [] }],
+        });
+
+        await expect(section.validate()).rejects.toMatchObject({
+          errors: expect.objectContaining({
+            "blocks.0.items": expect.objectContaining({
+              message: "At least one item is required.",
+            }),
+          }),
+        });
+      });
+
       /**
        * HEADER
        */
