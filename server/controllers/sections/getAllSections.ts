@@ -1,4 +1,4 @@
-import { Section } from "../models/Section";
+import { Section } from "~~/server/models/Section";
 
 export default defineEventHandler(async (event) => {
   // Home page sections

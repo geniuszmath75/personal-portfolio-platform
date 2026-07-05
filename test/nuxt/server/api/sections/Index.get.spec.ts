@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useH3TestUtils } from "../../../../setup";
 import { createMockH3Event } from "../../../../mock/h3-event";
 
-vi.mock("../../../../../server/controllers/getAllSections");
+vi.mock("../../../../../server/controllers/sections/getAllSections");
 
 useH3TestUtils();
 
@@ -13,7 +13,7 @@ describe("GET /api/v1/sections (index.get)", async () => {
 
   // Arrange: import handlers
   const getAllSectionsHandler =
-    await import("../../../../../server/controllers/getAllSections");
+    await import("../../../../../server/controllers/sections/getAllSections");
 
   type GetAllSectionsHandlerType = Awaited<
     ReturnType<typeof getAllSectionsHandler.default>

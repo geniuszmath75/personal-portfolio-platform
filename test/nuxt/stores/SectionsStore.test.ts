@@ -19,12 +19,17 @@ mockNuxtImport("useRuntimeConfig", () => {
 });
 
 describe("sectionsStore", () => {
+  const mockParagraphBlock: ParagraphBlock = {
+    kind: BlockKind.PARAGRAPH,
+    paragraphs: ["Section content"],
+  };
+
   const mockSections: ValidatedSection[] = [
     {
       _id: "1",
       slug: "hero",
       title: "Hero",
-      blocks: [],
+      blocks: [mockParagraphBlock],
       type: ISectionType.HERO,
       order: 2,
     },
@@ -32,7 +37,13 @@ describe("sectionsStore", () => {
       _id: "2",
       slug: "skills",
       title: "Skills",
-      blocks: [],
+      blocks: [
+        {
+          kind: BlockKind.GROUP,
+          header: "Skills",
+          items: [{ icon: "icon-vue.svg", label: "Vue" }],
+        },
+      ],
       type: ISectionType.SKILLS,
       order: 3,
     },
@@ -40,7 +51,12 @@ describe("sectionsStore", () => {
       _id: "3",
       slug: "contact",
       title: "Contact",
-      blocks: [],
+      blocks: [
+        {
+          kind: BlockKind.BUTTON,
+          buttons: ["Email me"],
+        },
+      ],
       type: ISectionType.CONTACT,
       order: 1,
     },
@@ -50,7 +66,12 @@ describe("sectionsStore", () => {
     _id: "4",
     slug: "about",
     title: "About me",
-    blocks: [],
+    blocks: [
+      {
+        kind: BlockKind.PARAGRAPH,
+        paragraphs: ["About me description"],
+      },
+    ],
     type: ISectionType.ABOUT_ME,
     order: 4,
   };
