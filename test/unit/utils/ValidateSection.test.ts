@@ -8,6 +8,12 @@ describe("validateSection util", () => {
     slug: "hero-section",
     order: 1,
     type: ISectionType.HERO,
+    blocks: [
+      {
+        kind: "PARAGRAPH",
+        paragraphs: ["Paragraph 1"],
+      },
+    ],
   };
 
   describe("valid data", () => {
@@ -75,8 +81,8 @@ describe("validateSection util", () => {
     });
 
     it("should accept nullable and optional title", () => {
-      const section1 = { ...baseSection, title: null, blocks: [] };
-      const section2 = { ...baseSection, blocks: [] };
+      const section1 = { ...baseSection, title: null };
+      const section2 = { ...baseSection };
 
       expect(() => sectionSchema.parse(section1)).not.toThrow();
       expect(() => sectionSchema.parse(section2)).not.toThrow();
@@ -85,17 +91,17 @@ describe("validateSection util", () => {
 
   describe("invalid data", () => {
     it("should reject empty slug", () => {
-      const section = { ...baseSection, slug: "", blocks: [] };
+      const section = { ...baseSection, slug: "" };
       expect(() => sectionSchema.parse(section)).toThrow();
     });
 
     it("should reject negative order", () => {
-      const section = { ...baseSection, order: -1, blocks: [] };
+      const section = { ...baseSection, order: -1 };
       expect(() => sectionSchema.parse(section)).toThrow();
     });
 
     it("should reject invalid section type", () => {
-      const section = { ...baseSection, type: "INVALID_TYPE", blocks: [] };
+      const section = { ...baseSection, type: "INVALID_TYPE" };
       expect(() => sectionSchema.parse(section)).toThrow();
     });
 

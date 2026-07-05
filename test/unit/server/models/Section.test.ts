@@ -7,20 +7,6 @@ describe("Section model", () => {
    * TITLE
    */
   describe("title", () => {
-    it("should be required", async () => {
-      const section = new Section({
-        slug: "test-slug",
-        type: ISectionType.HERO,
-        order: 1,
-      });
-
-      await expect(section.validate()).rejects.toMatchObject({
-        errors: expect.objectContaining({
-          title: expect.objectContaining({ message: "Title is required" }),
-        }),
-      });
-    });
-
     it("should reject too short title", async () => {
       const section = new Section({
         title: "ab",
