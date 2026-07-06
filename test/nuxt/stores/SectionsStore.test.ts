@@ -3,7 +3,11 @@ import { setActivePinia } from "pinia";
 import { createTestPinia } from "../../setup";
 import { useSectionsStore } from "../../../app/stores/sectionsStore";
 import type { ValidatedSection } from "../../../app/utils/validateSection";
-import { BlockKind, ISectionType } from "../../../shared/types/enums";
+import {
+  BlockKind,
+  ISectionType,
+  UploadCategory,
+} from "../../../shared/types/enums";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
 import type { ParagraphBlock } from "~~/shared/types";
 
@@ -228,6 +232,52 @@ describe("sectionsStore", () => {
 
       const result = store.getBlockElementsByKind(BlockKind.IMAGE);
       expect(result).toBeUndefined();
+    });
+  });
+
+  describe("uploadSectionImage", () => {
+    const mockFile = new File(["content"], "section.png", {
+      type: "image/png",
+    });
+    const mockUrl = "/uploads/sections/section.png";
+    const mockResponse = {
+      success: true,
+      data: {
+        url: mockUrl,
+        filename: "section.png",
+        size: 1024,
+        mimetype: "image/png",
+      },
+    };
+
+    it("should upload file and return URL on success", async () => {
+      const store = useSectionsStore();
+
+      vi.stubGlobal("$fetch", vi.fn().mockResolvedValue(mockResponse));
+
+      const result = await store.uploadSectionImage(mockFile);
+
+      expect($fetch).toHaveBeenCalledWith("/upload/image", {
+        baseURL: "/api/v1",
+        method: "POST",
+        credentials: "include",
+        body: expect.any(FormData),
+        query: { category: UploadCategory.SECTIONS },
+      });
+      expect(result).toBe(mockUrl);
+    });
+
+    it("should return null on failure", async () => {
+      const store = useSectionsStore();
+
+      vi.stubGlobal(
+        "$fetch",
+        vi.fn().mockRejectedValue(new Error("Upload failed")),
+      );
+
+      const result = await store.uploadSectionImage(mockFile);
+
+      expect(result).toBeNull();
     });
   });
 });

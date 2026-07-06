@@ -1,7 +1,14 @@
 import { describe, it, expect } from "vitest";
+import { UploadCategory } from "../../../../shared/types/enums";
 import { uploadCategorySchema } from "../../../../server/utils/validateUploadImage";
 
 describe("validateUploadImage util", () => {
+  it("should accept sections upload category", () => {
+    expect(uploadCategorySchema.parse(UploadCategory.SECTIONS)).toBe(
+      UploadCategory.SECTIONS,
+    );
+  });
+
   it("should reject invalid role", () => {
     const invalidRole = "INVALID_ROLE";
     expect(() => uploadCategorySchema.parse(invalidRole)).toThrow();

@@ -60,4 +60,5 @@ export enum ProjectStatusType {
 export enum UploadCategory {
   AVATARS = "avatars",
   PROJECTS = "projects",
+  SECTIONS = "sections",
 }

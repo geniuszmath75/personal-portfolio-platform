@@ -1,4 +1,5 @@
 import type { SectionsResponse, SectionResponse } from "~~/shared/types";
+import { UploadCategory } from "~~/shared/types/enums";
 
 export const useSectionsStore = defineStore("sections", {
   state: () => {
@@ -94,6 +95,36 @@ export const useSectionsStore = defineStore("sections", {
         this.setSectionDetails(validatedSection);
       } catch (error) {
         console.error("Failed to fetch section details:", error);
+      }
+    },
+
+    /**
+     * Uploads a single image file for a section block.
+     *
+     * @param file - image file selected in the section builder
+     * @returns public URL of the uploaded image or null on failure
+     * @async
+     */
+    async uploadSectionImage(file: File): Promise<string | null> {
+      const { baseApiPath } = useRuntimeConfig().public;
+
+      try {
+        const formData = new FormData();
+        formData.append("image", file);
+
+        const res = await $fetch("/upload/image", {
+          baseURL: baseApiPath,
+          method: "POST",
+          credentials: "include",
+          body: formData,
+          query: { category: UploadCategory.SECTIONS },
+        });
+
+        const validated = imageCreationResponseSchema.parse(res);
+        return validated.data.url;
+      } catch (error) {
+        handleError(error, "Failed to upload section image");
+        return null;
       }
     },
   },
