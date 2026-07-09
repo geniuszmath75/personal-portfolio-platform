@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { mount } from "vue-composable-tester";
 import { ref, computed } from "vue";
-import { useSectionInsertOrder } from "../../../app/composables/useSectionInsertOrder";
-import { ISectionType } from "../../../shared/types/enums";
+import { useSectionInsertOrder } from "~/composables/useSectionInsertOrder";
+import { ISectionType } from "~~/shared/types/enums";
+import type { SectionPlacement } from "~~/shared/config/sectionBuilder";
 
 describe("useSectionInsertOrder", () => {
   const createSection = (order: number): ValidatedSection => ({
@@ -21,13 +23,11 @@ describe("useSectionInsertOrder", () => {
       createSection(3),
     ]);
 
-    const { suggestedOrder } = useSectionInsertOrder(
-      placement,
-      insertAfter,
-      orderedSections,
+    const { result } = mount(() =>
+      useSectionInsertOrder(placement, insertAfter, orderedSections),
     );
 
-    expect(suggestedOrder.value).toBe(3);
+    expect(result.suggestedOrder.value).toBe(3);
   });
 
   it("should suggest max order + 1 when insertAfter is not provided", () => {
@@ -38,13 +38,11 @@ describe("useSectionInsertOrder", () => {
       createSection(4),
     ]);
 
-    const { suggestedOrder } = useSectionInsertOrder(
-      placement,
-      insertAfter,
-      orderedSections,
+    const { result } = mount(() =>
+      useSectionInsertOrder(placement, insertAfter, orderedSections),
     );
 
-    expect(suggestedOrder.value).toBe(5);
+    expect(result.suggestedOrder.value).toBe(5);
   });
 
   it("should suggest 1 when there are no existing sections", () => {
@@ -52,12 +50,10 @@ describe("useSectionInsertOrder", () => {
     const insertAfter = ref<number | null>(null);
     const orderedSections = computed(() => []);
 
-    const { suggestedOrder } = useSectionInsertOrder(
-      placement,
-      insertAfter,
-      orderedSections,
+    const { result } = mount(() =>
+      useSectionInsertOrder(placement, insertAfter, orderedSections),
     );
 
-    expect(suggestedOrder.value).toBe(1);
+    expect(result.suggestedOrder.value).toBe(1);
   });
 });

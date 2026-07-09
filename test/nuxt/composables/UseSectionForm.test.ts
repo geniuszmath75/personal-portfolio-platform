@@ -1,11 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "vue-composable-tester";
 import { setActivePinia } from "pinia";
+import { nextTick } from "vue";
+import { flushPromises } from "@vue/test-utils";
 import type { LocationQuery } from "vue-router";
 import { useSectionForm } from "~/composables/useSectionForm";
 import { useSectionsStore } from "~/stores/sectionsStore";
 import { createTestPinia } from "~~/test/setup";
-import { ISectionType } from "~~/shared/types/enums";
+import { BlockKind, ISectionType } from "~~/shared/types/enums";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
 
 const createMockRoute = (query: LocationQuery) => ({ query });
@@ -20,6 +22,17 @@ const { useRouteMock } = vi.hoisted(() => ({
 }));
 
 mockNuxtImport("useRoute", () => useRouteMock);
+
+const createSection = (
+  overrides: Partial<ValidatedSection> = {},
+): ValidatedSection => ({
+  _id: "section-id",
+  slug: "hero",
+  order: 1,
+  type: ISectionType.HERO,
+  blocks: [],
+  ...overrides,
+});
 
 describe("useSectionForm composable", () => {
   let sectionsStore: ReturnType<typeof useSectionsStore>;
@@ -65,15 +78,7 @@ describe("useSectionForm composable", () => {
   });
 
   it("should warn when duplicate home section type is selected", () => {
-    sectionsStore.setSections([
-      {
-        _id: "hero-id",
-        slug: "hero",
-        order: 1,
-        type: ISectionType.HERO,
-        blocks: [],
-      },
-    ]);
+    sectionsStore.setSections([createSection()]);
 
     const { result } = mount(() => useSectionForm());
 
@@ -102,5 +107,126 @@ describe("useSectionForm composable", () => {
 
     expect(isValid).toBe(false);
     expect(result.step.value).toBe(1);
+  });
+
+  it("should mark field as touched and expose validation state via touchField", async () => {
+    const { result } = mount(() => useSectionForm());
+
+    result.metadata.value.slug = "a";
+    result.touchField("slug");
+    await nextTick();
+
+    expect(result.isSlugInvalid.value).toBe(true);
+    expect(result.slugErrors.value.length).toBeGreaterThan(0);
+  });
+
+  it("should sync metadata order when suggested order changes", async () => {
+    useRouteMock.mockImplementation(() =>
+      createMockRoute({
+        placement: "home",
+      }),
+    );
+
+    const { result } = mount(() => useSectionForm());
+    await flushPromises();
+
+    expect(result.metadata.value.order).toBe(1);
+
+    sectionsStore.setSections([createSection({ order: 5 })]);
+    await nextTick();
+
+    expect(result.suggestedOrder.value).toBe(6);
+    expect(result.metadata.value.order).toBe(6);
+  });
+
+  it("should stop syncing order after markOrderAsEdited is called", async () => {
+    useRouteMock.mockImplementation(() =>
+      createMockRoute({
+        placement: "home",
+      }),
+    );
+
+    const { result } = mount(() => useSectionForm());
+    await flushPromises();
+
+    const orderBeforeManualEdit = result.metadata.value.order;
+    result.markOrderAsEdited();
+
+    sectionsStore.setSections([createSection({ order: 5 })]);
+    await nextTick();
+
+    expect(result.suggestedOrder.value).toBe(6);
+    expect(result.metadata.value.order).toBe(orderBeforeManualEdit);
+  });
+
+  it("should not reset type during initial placement watch when default type is valid", () => {
+    useRouteMock.mockImplementation(() =>
+      createMockRoute({
+        placement: "home",
+      }),
+    );
+
+    const { result } = mount(() => useSectionForm());
+
+    expect(result.metadata.value.type).toBe(ISectionType.HERO);
+  });
+
+  it("should reset section type when placement no longer supports it", async () => {
+    const { result } = mount(() => useSectionForm());
+
+    expect(result.metadata.value.type).toBe(ISectionType.HERO);
+
+    result.placement.value = "standalone";
+    await nextTick();
+
+    expect(result.metadata.value.type).toBe(ISectionType.ABOUT_ME);
+  });
+
+  it("should load metadata and blocks from an existing section", () => {
+    const { result } = mount(() => useSectionForm());
+    const section = createSection({
+      title: "About me",
+      slug: "about-me",
+      type: ISectionType.ABOUT_ME,
+      order: 7,
+      blocks: [
+        {
+          kind: BlockKind.PARAGRAPH,
+          paragraphs: ["Hello"],
+        },
+      ],
+    });
+
+    result.loadFromSection(section);
+
+    expect(result.metadata.value).toEqual({
+      title: "About me",
+      slug: "about-me",
+      type: ISectionType.ABOUT_ME,
+      order: 7,
+    });
+    expect(result.blocks.value).toEqual(section.blocks);
+  });
+
+  it("should preserve loaded order after suggested order changes", async () => {
+    useRouteMock.mockImplementation(() =>
+      createMockRoute({
+        placement: "home",
+      }),
+    );
+
+    const { result } = mount(() => useSectionForm());
+    result.loadFromSection(
+      createSection({
+        slug: "loaded-section",
+        order: 7,
+      }),
+    );
+
+    sectionsStore.setSections([createSection({ order: 10 })]);
+    await nextTick();
+
+    expect(result.suggestedOrder.value).toBe(11);
+    expect(result.metadata.value.order).toBe(7);
   });
 });
