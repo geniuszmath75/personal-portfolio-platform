@@ -26,6 +26,7 @@ export default defineNuxtConfig({
     "/admin/**": { ssr: false },
     "/projects/create": { ssr: false },
     "/projects/*/edit": { ssr: false },
+    "/sections/create": { ssr: false },
   },
   vite: {
     optimizeDeps: {

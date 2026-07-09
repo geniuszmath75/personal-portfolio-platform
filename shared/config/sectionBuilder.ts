@@ -1,17 +1,44 @@
 import { BlockKind, ISectionType } from "../types/enums";
 import type { Block } from "../../shared/types";
 
+/**
+ * Placement context used by section create/edit flows.
+ */
 export type SectionPlacement = "home" | "standalone";
 
+/**
+ * Layout keys used to resolve preview/display section layouts.
+ */
 export type SectionLayoutKey = "hero" | "skills" | "contact" | "aboutMe";
 
+/**
+ * Builder configuration for a single section type.
+ */
 export interface SectionBuilderTypeConfig {
+  /**
+   * Determines where the section can be created.
+   */
   placement: SectionPlacement;
+
+  /**
+   * Block kinds that can be used in this section type.
+   */
   allowedBlocks: BlockKind[];
+
+  /**
+   * Layout identifier used by display and preview components.
+   */
   layout: SectionLayoutKey;
+
+  /**
+   * Optional per-kind limits for blocks inside this section type.
+   */
   maxBlocksPerKind?: Partial<Record<BlockKind, number>>;
 }
 
+/**
+ * Canonical builder config mapped by section type.
+ */
 export const SECTION_BUILDER_CONFIG: Record<
   ISectionType,
   SectionBuilderTypeConfig
@@ -47,10 +74,16 @@ export const SECTION_BUILDER_CONFIG: Record<
   },
 };
 
+/**
+ * Section types available on home placement.
+ */
 export const HOME_SECTION_TYPES = Object.entries(SECTION_BUILDER_CONFIG)
   .filter(([, config]) => config.placement === "home")
   .map(([type]) => type as ISectionType);
 
+/**
+ * Section types available on standalone placement.
+ */
 export const STANDALONE_SECTION_TYPES = Object.entries(SECTION_BUILDER_CONFIG)
   .filter(([, config]) => config.placement === "standalone")
   .map(([type]) => type as ISectionType);
