@@ -29,7 +29,7 @@ describe("SectionLayoutHero", () => {
     expect(screen.getByText("Subtext here")).toBeTruthy();
 
     expect(screen.getByText("PROJECTS").getAttribute("href")).toBe("/projects");
-    expect(screen.getByText("ABOUT").getAttribute("href")).toBe("/about-me");
+    expect(screen.getByText("ABOUT").getAttribute("href")).toBe("/about");
 
     expect(screen.getByAltText("hero image").getAttribute("src")).toBe(
       "/images/hero.png",

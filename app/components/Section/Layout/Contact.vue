@@ -4,7 +4,8 @@
   >
     <div class="mb-8">
       <h2
-        class="text-2xl font-default text-secondary-500 font-bold md:text-4xl"
+        class="text-2xl font-default font-bold md:text-4xl"
+        :class="getSectionTextColorClass(section.order)"
       >
         {{ section.title }}
       </h2>
@@ -15,7 +16,8 @@
         <p
           v-for="(text, j) in block.paragraphs"
           :key="'p-' + i + '-' + j"
-          class="text-secondary-500 text-lg md:text-xl"
+          class="text-lg md:text-xl"
+          :class="getSectionTextColorClass(section.order)"
         >
           {{ text }}
         </p>
@@ -36,7 +38,10 @@
               :name="item.icon"
               class="text-additional-500 lg:text-4xl md:text-3xl text-2xl"
             />
-            <span class="text-secondary-500 text-md md:text-lg">
+            <span
+              class="text-md md:text-lg"
+              :class="getSectionTextColorClass(section.order)"
+            >
               {{ item.label }}
             </span>
           </div>
@@ -53,7 +58,8 @@
           >
             <Icon
               :name="item.icon"
-              class="text-secondary-500 hover:text-additional-500 transition-all duration-200 lg:text-4xl md:text-3xl text-2xl"
+              class="hover:text-additional-500 transition-all duration-200 lg:text-4xl md:text-3xl text-2xl"
+              :class="getSectionTextColorClass(section.order)"
             />
           </NuxtLink>
         </div>

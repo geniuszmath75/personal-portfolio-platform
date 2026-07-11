@@ -2,7 +2,7 @@
   <section
     :class="[
       'flex items-center py-20 md:min-h-screen w-full',
-      section.order % 2 === 0 ? 'bg-secondary-500' : 'bg-primary-500',
+      getSectionBackgroundClass(section.order),
     ]"
   >
     <SectionLayoutHero

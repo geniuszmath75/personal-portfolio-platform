@@ -6,7 +6,8 @@
       <div class="flex flex-col items-center space-y-4 mt-4 md:mt-0">
         <template v-for="(block, i) in paragraphBlocks" :key="'p-' + i">
           <h1
-            class="text-4xl md:text-5xl lg:text-6xl text-center font-bold text-secondary-500 font-default"
+            class="text-4xl md:text-5xl lg:text-6xl text-center font-bold font-default"
+            :class="getSectionTextColorClass(section.order)"
           >
             {{ block.paragraphs[0] }}
           </h1>
@@ -15,7 +16,8 @@
               (_, index) => index > 0,
             )"
             :key="'p-' + i + '-' + j"
-            class="text-secondary-500 text-xl"
+            class="text-xl"
+            :class="getSectionTextColorClass(section.order)"
           >
             {{ text }}
           </p>
@@ -27,7 +29,7 @@
           <NuxtLink
             v-for="(btn, j) in block.buttons"
             :key="'btn-' + i + '-' + j"
-            :to="btn === 'PROJECTS' ? '/projects' : '/about-me'"
+            :to="'/'.concat(btn.toLowerCase().replace(/\s+/g, '-'))"
             :class="
               'px-5 md:px-6 py-3 md:py-4 text-sm md:text-base font-semibold transition duration-500 rounded-lg ' +
               (j === 0

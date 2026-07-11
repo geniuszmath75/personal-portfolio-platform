@@ -3,7 +3,10 @@
     class="container mx-auto flex flex-col items-center justify-center px-6 py-12 text-center"
   >
     <div class="mb-8">
-      <h2 class="text-2xl font-bold md:text-4xl">
+      <h2
+        class="text-2xl font-bold md:text-4xl"
+        :class="getSectionTextColorClass(section.order)"
+      >
         {{ section.title }}
       </h2>
     </div>
@@ -13,7 +16,8 @@
         <p
           v-for="(text, j) in block.paragraphs"
           :key="'p-' + i + '-' + j"
-          class="text-primary-500 text-lg md:text-xl"
+          class="text-lg md:text-xl"
+          :class="getSectionTextColorClass(section.order)"
         >
           {{ text }}
         </p>
