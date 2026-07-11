@@ -52,6 +52,8 @@ const btnStyleClasses = computed(() => {
       return "bg-secondary-500 text-primary-500 rounded-lg hover:bg-additional-500 hover:text-primary-500";
     case "sidebar--additional":
       return "bg-additional-500 text-primary-500 rounded-lg";
+    case "additional-transparent":
+      return "bg-primary-500 border border-additional-500 text-additional-500 rounded-lg hover:bg-primary-700";
     default:
       return "bg-additional-500 text-primary-500 rounded-lg hover:bg-additional-600 focus:ring-additional-500 focus:ring-offset-primary-500 disabled:hover:bg-additional-500 focus:ring-2 focus:ring-offset-2";
   }

@@ -222,7 +222,8 @@ export type BaseBtnStyle =
   | "mobile--login--logout"
   | "mobile--secondary"
   | "sidebar--secondary"
-  | "sidebar--additional";
+  | "sidebar--additional"
+  | "additional-transparent";
 
 /**
  * BASE BUTTON

@@ -163,6 +163,17 @@ describe("BaseBtn.vue", () => {
           "hover:text-primary-500",
         ],
       },
+      {
+        btnStyle: "additional-transparent",
+        expectedClasses: [
+          "bg-primary-500",
+          "border",
+          "border-additional-500",
+          "text-additional-500",
+          "rounded-lg",
+          "hover:bg-primary-700",
+        ],
+      },
     ])(
       "should apply correct style classes for btnStyle: $btnStyle",
       ({ btnStyle, expectedClasses }) => {
