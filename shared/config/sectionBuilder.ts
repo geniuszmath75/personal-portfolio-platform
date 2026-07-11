@@ -50,6 +50,7 @@ export const SECTION_BUILDER_CONFIG: Record<
     maxBlocksPerKind: {
       [BlockKind.IMAGE]: 1,
       [BlockKind.BUTTON]: 1,
+      [BlockKind.PARAGRAPH]: 1,
     },
   },
   [ISectionType.SKILLS]: {
