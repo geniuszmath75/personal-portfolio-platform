@@ -1,5 +1,5 @@
 <template>
-  <form class="max-w-3xl mx-auto space-y-8" @submit.prevent>
+  <form class="max-w-5xl mx-auto space-y-8" @submit.prevent>
     <section class="space-y-6">
       <h3
         class="text-lg font-semibold text-secondary-600 uppercase tracking-wider border-b border-primary-400 pb-2"

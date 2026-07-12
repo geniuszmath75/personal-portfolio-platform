@@ -34,24 +34,15 @@
         :on-order-input="markOrderAsEdited"
       />
 
-      <section
+      <SectionBlockBuilder
         v-else
         key="blocks-step"
-        class="max-w-3xl mx-auto space-y-6 text-center"
-        aria-label="Block builder"
-      >
-        <p class="text-secondary-500">
-          Block builder will be available in the next step of implementation.
-        </p>
-        <p class="text-sm text-secondary-700">
-          Metadata saved: <strong>{{ metadata.slug }}</strong> ({{
-            metadata.type
-          }}, order {{ metadata.order }})
-        </p>
-      </section>
+        v-model:blocks="blocks"
+        :metadata="metadata"
+      />
     </Transition>
 
-    <div class="max-w-3xl mx-auto flex justify-center mt-10 gap-4">
+    <div class="max-w-5xl mx-auto flex justify-center mt-10 gap-4">
       <Transition
         mode="out-in"
         enter-active-class="transition duration-300 ease-out"
@@ -91,6 +82,7 @@ const {
   step,
   placement,
   metadata,
+  blocks,
   typeOptions,
   showDuplicateTypeWarning,
   continueToBlockBuilder,
