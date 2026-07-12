@@ -1,5 +1,5 @@
 import type { Block } from "~~/shared/types";
-import type { ISectionType } from "~~/shared/types/enums";
+import type { BlockKind, ISectionType } from "~~/shared/types/enums";
 import type { SectionPlacement } from "~~/shared/config/sectionBuilder";
 import type { ErrorObject } from "@vuelidate/core";
 
@@ -167,4 +167,109 @@ export interface SectionBlockBuilderProps {
    * Disables builder actions during async operations.
    */
   disabled?: boolean;
+}
+
+/**
+ * Upload handler for section block images (delegates to sectionsStore).
+ */
+export type SectionUploadImageFn = (file: File) => Promise<string | null>;
+
+/**
+ * SECTION BUILDER PREVIEW SHELL
+ *
+ * Props for the live section preview wrapper in the block builder.
+ */
+export interface SectionBuilderPreviewShellProps {
+  /**
+   * Step 1 metadata driving layout type, order band and copy.
+   */
+  metadata: SectionMetadataFormState;
+
+  /**
+   * Draft blocks rendered inside the selected layout component.
+   */
+  blocks: Block[];
+}
+
+/**
+ * SECTION BUILDER SLOT
+ *
+ * Props for an empty block placeholder with an add action.
+ */
+export interface SectionBuilderSlotProps {
+  /**
+   * Block kind inserted when the user clicks add.
+   */
+  kind: BlockKind;
+
+  /**
+   * Human-readable block name shown on the add button.
+   */
+  label: string;
+
+  /**
+   * Disables the add action during async operations.
+   */
+  disabled?: boolean;
+}
+
+/**
+ * SECTION BLOCK EDITOR DRAWER
+ *
+ * Props for the inline block editor panel.
+ * Draft block is bound via `v-model`.
+ */
+export interface SectionBlockEditorDrawerProps {
+  /**
+   * Whether the editor panel is visible.
+   */
+  open: boolean;
+
+  /**
+   * Add vs edit copy and behaviour.
+   */
+  mode: SectionBlockEditorMode;
+
+  /**
+   * Validation or save error shown below the editor fields.
+   */
+  error: string;
+
+  /**
+   * Disables editor fields and actions.
+   */
+  disabled?: boolean;
+
+  /**
+   * True while an image block upload is in progress.
+   */
+  isUploadingImage?: boolean;
+
+  /**
+   * Uploads a section image and returns its public URL.
+   */
+  uploadImage: SectionUploadImageFn;
+}
+
+/**
+ * SECTION BLOCK EDITOR IMAGE
+ *
+ * Props for the IMAGE block editor fields.
+ * Block draft is bound via `v-model`.
+ */
+export interface SectionBlockEditorImageProps {
+  /**
+   * Disables file input and alt-text fields.
+   */
+  disabled?: boolean;
+
+  /**
+   * True while upload is in progress (disables save in parent drawer).
+   */
+  isUploading?: boolean;
+
+  /**
+   * Uploads a section image and returns its public URL.
+   */
+  uploadImage: SectionUploadImageFn;
 }

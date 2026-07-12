@@ -30,12 +30,8 @@
             v-for="(btn, j) in block.buttons"
             :key="'btn-' + i + '-' + j"
             :to="'/'.concat(btn.toLowerCase().replace(/\s+/g, '-'))"
-            :class="
-              'px-5 md:px-6 py-3 md:py-4 text-sm md:text-base font-semibold transition duration-500 rounded-lg ' +
-              (j === 0
-                ? 'text-primary-500 bg-additional-500 hover:bg-additional-600'
-                : 'text-additional-500 border-2 bg-transparent border-additional-500 hover:bg-additional-500 hover:text-primary-500')
-            "
+            class="px-5 md:px-6 py-3 md:py-4 text-sm md:text-base font-semibold transition duration-500 rounded-lg"
+            :class="getSectionBtnLinkColorClasses(section.order, j)"
           >
             {{ btn }}
           </NuxtLink>
