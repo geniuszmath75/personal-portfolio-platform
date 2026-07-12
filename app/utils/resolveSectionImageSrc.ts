@@ -1,10 +1,12 @@
 /**
  * Resolves a section image source path for display.
- * Uploaded images use absolute paths (/uploads/sections/...).
- * Legacy seed images use bare filenames resolved against /images/.
+ *
+ * Paths already usable as an `<img src>` - absolute URLs (`/uploads/...`,
+ * `/images/...`) and local `blob:` previews - are returned unchanged.
+ * Legacy seed filenames are resolved against `/images/`.
  */
 export function resolveSectionImageSrc(srcPath: string): string {
-  if (srcPath.startsWith("/")) {
+  if (srcPath.startsWith("/") || srcPath.startsWith("blob:")) {
     return srcPath;
   }
 
