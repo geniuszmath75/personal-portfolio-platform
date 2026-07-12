@@ -147,3 +147,24 @@ export interface SectionMetadataFormProps {
    */
   onOrderInput: () => void;
 }
+
+/**
+ * Block editor mode in the section builder.
+ */
+export type SectionBlockEditorMode = "add" | "edit";
+
+/**
+ * Props for the SectionBlockBuilder component.
+ * Blocks are bound via `v-model:blocks`.
+ */
+export interface SectionBlockBuilderProps {
+  /**
+   * Metadata from step 1 used by the live preview.
+   */
+  metadata: SectionMetadataFormState;
+
+  /**
+   * Disables builder actions during async operations.
+   */
+  disabled?: boolean;
+}
