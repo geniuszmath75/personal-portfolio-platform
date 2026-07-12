@@ -25,4 +25,25 @@ describe("ValidateSectionBlockDraft", () => {
       }),
     ).toBeNull();
   });
+
+  it("should accept image blocks with a pending file and empty srcPath", () => {
+    expect(
+      validateSectionBlockDraft(
+        {
+          kind: BlockKind.IMAGE,
+          images: [{ srcPath: "", altText: "Hero image" }],
+        },
+        { hasPendingImageFile: true },
+      ),
+    ).toBeNull();
+  });
+
+  it("should reject image blocks without srcPath or pending file", () => {
+    expect(
+      validateSectionBlockDraft({
+        kind: BlockKind.IMAGE,
+        images: [{ srcPath: "", altText: "Hero image" }],
+      }),
+    ).toBe("Image is required");
+  });
 });

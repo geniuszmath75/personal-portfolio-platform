@@ -2,6 +2,7 @@ import type { Block } from "~~/shared/types";
 import type { BlockKind, ISectionType } from "~~/shared/types/enums";
 import type { SectionPlacement } from "~~/shared/config/sectionBuilder";
 import type { ErrorObject } from "@vuelidate/core";
+import type { UploadFileInfo } from "~/types/components";
 
 /**
  * Available wizard steps in the section form flow.
@@ -170,9 +171,15 @@ export interface SectionBlockBuilderProps {
 }
 
 /**
- * Upload handler for section block images (delegates to sectionsStore).
+ * Pending section image kept until section submit uploads it.
+ * `file` is set for new selections; `srcPath` keeps an already-uploaded path.
  */
-export type SectionUploadImageFn = (file: File) => Promise<string | null>;
+export interface SectionPendingImageState {
+  file: File | null;
+  altText: string;
+  srcPath?: string;
+  previewUrl?: string;
+}
 
 /**
  * SECTION BUILDER PREVIEW SHELL
@@ -241,14 +248,19 @@ export interface SectionBlockEditorDrawerProps {
   disabled?: boolean;
 
   /**
-   * True while an image block upload is in progress.
+   * Controlled file list for the image block editor.
    */
-  isUploadingImage?: boolean;
+  imageFileList: UploadFileInfo[];
 
   /**
-   * Uploads a section image and returns its public URL.
+   * Persists image FileUpload state in controlled mode.
    */
-  uploadImage: SectionUploadImageFn;
+  onImageFileListUpdate: (files: UploadFileInfo[]) => void;
+
+  /**
+   * Syncs pending image selection from FileUpload @change.
+   */
+  onImageChange: (files: UploadFileInfo[]) => void;
 }
 
 /**
@@ -264,12 +276,7 @@ export interface SectionBlockEditorImageProps {
   disabled?: boolean;
 
   /**
-   * True while upload is in progress (disables save in parent drawer).
+   * Controlled file list for pending image selection.
    */
-  isUploading?: boolean;
-
-  /**
-   * Uploads a section image and returns its public URL.
-   */
-  uploadImage: SectionUploadImageFn;
+  fileList: UploadFileInfo[];
 }

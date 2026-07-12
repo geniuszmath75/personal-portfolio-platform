@@ -1,6 +1,9 @@
 <template>
   <div class="max-w-5xl mx-auto space-y-8">
-    <SectionBuilderPreviewShell :metadata="metadata" :blocks="blocks" />
+    <SectionBuilderPreviewShell
+      :metadata="metadata"
+      :blocks="blocksForPreview"
+    />
 
     <section class="space-y-4" aria-label="Add blocks">
       <h3
@@ -95,8 +98,12 @@
 
       <p
         v-if="!hasMinimumBlocks"
-        class="text-sm text-additional-500 font-semibold"
+        class="flex items-center gap-2 text-sm text-secondary-500 font-semibold"
       >
+        <Icon
+          name="material-symbols:error-outline"
+          class="text-2xl text-additional-500"
+        />
         At least one block is required.
       </p>
     </section>
@@ -107,8 +114,9 @@
       :mode="editorMode"
       :error="editorError"
       :disabled="disabled"
-      :is-uploading-image="isUploadingImage"
-      :upload-image="uploadDraftImage"
+      :image-file-list="draftImageFileList"
+      :on-image-file-list-update="handleDraftImageFileListUpdate"
+      :on-image-change="handleDraftImageChange"
       @close="closeEditor"
       @save="saveEditor"
     />
@@ -131,17 +139,19 @@ const sectionType = computed(() => props.metadata.type);
 const {
   addableBlockKinds,
   hasMinimumBlocks,
+  blocksForPreview,
   editorOpen,
   editorMode,
   draftBlock,
   editorError,
-  isUploadingImage,
+  draftImageFileList,
   openAddEditor,
   openEditEditor,
   closeEditor,
   saveEditor,
   removeBlock,
   moveBlock,
-  uploadDraftImage,
+  handleDraftImageFileListUpdate,
+  handleDraftImageChange,
 } = useSectionBlockBuilder(blocks, sectionType);
 </script>

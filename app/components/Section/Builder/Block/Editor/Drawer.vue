@@ -23,6 +23,13 @@
       v-model="draftBlock"
       :disabled="disabled"
     />
+    <SectionBuilderBlockEditorImage
+      v-else-if="draftBlock.kind === BlockKind.IMAGE"
+      :file-list="imageFileList"
+      :disabled="disabled"
+      @update:file-list="onImageFileListUpdate"
+      @change="onImageChange"
+    />
     <SectionBuilderBlockEditorButton
       v-else-if="draftBlock.kind === BlockKind.BUTTON"
       v-model="draftBlock"
@@ -34,7 +41,14 @@
       :disabled="disabled"
     />
 
-    <p v-if="error" class="text-sm text-additional-500 font-semibold">
+    <p
+      v-if="error"
+      class="flex items-center gap-2 text-sm text-secondary-500 font-semibold"
+    >
+      <Icon
+        name="material-symbols:error-outline"
+        class="text-2xl text-additional-500"
+      />
       {{ error }}
     </p>
 
@@ -51,7 +65,7 @@
         type="button"
         label="Save block"
         btn-size="small"
-        :is-disabled="disabled || isUploadingImage"
+        :is-disabled="disabled"
         @click="emit('save')"
       />
     </div>

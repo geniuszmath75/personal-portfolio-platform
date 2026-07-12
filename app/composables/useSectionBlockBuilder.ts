@@ -1,8 +1,13 @@
 import { getAddableBlockKinds } from "~~/shared/config/sectionBuilder";
 import { type ISectionType, BlockKind } from "~~/shared/types/enums";
+import type { UploadFileInfo } from "~/types/components";
+import type {
+  SectionPendingImageState,
+  SectionBlockEditorMode,
+} from "~/types/sectionForm";
 import { createEmptySectionBlock } from "~/utils/createEmptySectionBlock";
+import { resolveSectionImageSrc } from "~/utils/resolveSectionImageSrc";
 import { validateSectionBlockDraft } from "~/utils/validateSectionBlockDraft";
-import type { SectionBlockEditorMode } from "~/types/sectionForm";
 
 function normalizeBlockDraft(block: Block): Block {
   switch (block.kind) {
@@ -42,18 +47,67 @@ function normalizeBlockDraft(block: Block): Block {
   }
 }
 
+function reindexPendingImagesAfterRemoval(
+  pendingImages: Map<number, SectionPendingImageState>,
+  removedIndex: number,
+): Map<number, SectionPendingImageState> {
+  const next = new Map<number, SectionPendingImageState>();
+
+  for (const [index, value] of pendingImages) {
+    if (index < removedIndex) {
+      next.set(index, value);
+    } else if (index > removedIndex) {
+      next.set(index - 1, value);
+    }
+  }
+
+  return next;
+}
+
+function swapPendingImages(
+  pendingImages: Map<number, SectionPendingImageState>,
+  fromIndex: number,
+  toIndex: number,
+): Map<number, SectionPendingImageState> {
+  const next = new Map(pendingImages);
+  const fromValue = next.get(fromIndex);
+  const toValue = next.get(toIndex);
+
+  if (fromValue) {
+    next.set(toIndex, fromValue);
+  } else {
+    next.delete(toIndex);
+  }
+
+  if (toValue) {
+    next.set(fromIndex, toValue);
+  } else {
+    next.delete(fromIndex);
+  }
+
+  return next;
+}
+
+function revokePendingPreview(pending: SectionPendingImageState | undefined) {
+  if (pending?.previewUrl?.startsWith("blob:")) {
+    URL.revokeObjectURL(pending.previewUrl);
+  }
+}
+
 export function useSectionBlockBuilder(
   blocks: Ref<Block[]>,
   sectionType: Ref<ISectionType>,
 ) {
-  const sectionsStore = useSectionsStore();
-
   const editorOpen = ref(false);
   const editorMode = ref<SectionBlockEditorMode>("add");
   const editorIndex = ref<number | null>(null);
   const draftBlock = ref<Block | null>(null);
   const editorError = ref("");
-  const isUploadingImage = ref(false);
+  const draftImageFileList = ref<UploadFileInfo[]>([]);
+  const draftPendingImage = ref<SectionPendingImageState | null>(null);
+  const pendingSectionImages = ref<Map<number, SectionPendingImageState>>(
+    new Map(),
+  );
 
   const addableBlockKinds = computed(() =>
     getAddableBlockKinds(sectionType.value, blocks.value),
@@ -61,12 +115,144 @@ export function useSectionBlockBuilder(
 
   const hasMinimumBlocks = computed(() => blocks.value.length >= 1);
 
+  const blocksForPreview = computed(() =>
+    blocks.value.map((block, index) => {
+      if (block.kind !== BlockKind.IMAGE) {
+        return block;
+      }
+
+      const pending = pendingSectionImages.value.get(index);
+
+      if (!pending?.previewUrl) {
+        return block;
+      }
+
+      return {
+        ...block,
+        images: [
+          {
+            srcPath: pending.previewUrl,
+            altText: block.images[0]?.altText ?? pending.altText,
+          },
+        ],
+      };
+    }),
+  );
+
+  const clearDraftImageState = () => {
+    draftImageFileList.value = [];
+    draftPendingImage.value = null;
+  };
+
+  const hydrateDraftImageState = (block: Block, index: number) => {
+    if (block.kind !== BlockKind.IMAGE) {
+      return;
+    }
+
+    const pending = pendingSectionImages.value.get(index);
+    const image = block.images[0];
+
+    if (pending?.file) {
+      draftImageFileList.value = [
+        {
+          id: crypto.randomUUID(),
+          name: pending.file.name,
+          file: pending.file,
+          status: "pending",
+          percentage: null,
+          url: null,
+          thumbnailUrl: pending.previewUrl ?? URL.createObjectURL(pending.file),
+          type: pending.file.type || null,
+          errorMessage: null,
+          altText: pending.altText,
+        },
+      ];
+      draftPendingImage.value = {
+        file: pending.file,
+        altText: pending.altText,
+        previewUrl: pending.previewUrl,
+      };
+      return;
+    }
+
+    if (image?.srcPath) {
+      const resolvedSrc = resolveSectionImageSrc(image.srcPath);
+
+      draftImageFileList.value = [
+        {
+          id: crypto.randomUUID(),
+          name: image.altText || "image",
+          file: null,
+          status: "finished",
+          percentage: 100,
+          thumbnailUrl: resolvedSrc,
+          url: resolvedSrc,
+          srcPath: image.srcPath,
+          altText: image.altText,
+          type: null,
+          errorMessage: null,
+        },
+      ];
+      draftPendingImage.value = {
+        file: null,
+        altText: image.altText,
+        srcPath: image.srcPath,
+      };
+      return;
+    }
+
+    clearDraftImageState();
+  };
+
+  /**
+   * Persists image FileUpload state in controlled mode.
+   */
+  const handleDraftImageFileListUpdate = (files: UploadFileInfo[]) => {
+    draftImageFileList.value = files;
+  };
+
+  /**
+   * Syncs pending image selection from FileUpload @change.
+   */
+  const handleDraftImageChange = (files: UploadFileInfo[]) => {
+    const file = files[0];
+
+    if (!file || file.status === "removed") {
+      draftPendingImage.value = null;
+
+      if (draftBlock.value?.kind === BlockKind.IMAGE) {
+        draftBlock.value.images[0] = { srcPath: "", altText: "" };
+      }
+
+      return;
+    }
+
+    if (file.status === "error") {
+      draftPendingImage.value = null;
+      return;
+    }
+
+    draftPendingImage.value = {
+      file: file.file,
+      altText: file.altText.trim(),
+      ...(!file.file && file.srcPath ? { srcPath: file.srcPath } : {}),
+    };
+
+    if (draftBlock.value?.kind === BlockKind.IMAGE) {
+      draftBlock.value.images[0] = {
+        srcPath: file.file ? "" : (file.srcPath ?? ""),
+        altText: file.altText.trim(),
+      };
+    }
+  };
+
   /**
    * Opens the editor for a new block of the given kind.
    */
   const openAddEditor = (kind: BlockKind) => {
     editorMode.value = "add";
     editorIndex.value = null;
+    clearDraftImageState();
     draftBlock.value = createEmptySectionBlock(kind);
     editorError.value = "";
     editorOpen.value = true;
@@ -84,7 +270,9 @@ export function useSectionBlockBuilder(
 
     editorMode.value = "edit";
     editorIndex.value = index;
-    draftBlock.value = block;
+    clearDraftImageState();
+    draftBlock.value = structuredClone(toRaw(block));
+    hydrateDraftImageState(draftBlock.value, index);
     editorError.value = "";
     editorOpen.value = true;
   };
@@ -97,6 +285,7 @@ export function useSectionBlockBuilder(
     editorIndex.value = null;
     draftBlock.value = null;
     editorError.value = "";
+    clearDraftImageState();
   };
 
   /**
@@ -109,7 +298,13 @@ export function useSectionBlockBuilder(
       return false;
     }
 
-    const validationError = validateSectionBlockDraft(draftBlock.value);
+    const hasPendingImageFile =
+      draftBlock.value.kind === BlockKind.IMAGE &&
+      Boolean(draftPendingImage.value?.file);
+
+    const validationError = validateSectionBlockDraft(draftBlock.value, {
+      hasPendingImageFile,
+    });
 
     if (validationError) {
       editorError.value = validationError;
@@ -117,11 +312,42 @@ export function useSectionBlockBuilder(
     }
 
     const normalizedBlock = normalizeBlockDraft(draftBlock.value);
+    const targetIndex =
+      editorMode.value === "add" || editorIndex.value === null
+        ? blocks.value.length
+        : editorIndex.value;
 
     if (editorMode.value === "add" || editorIndex.value === null) {
       blocks.value.push(normalizedBlock);
     } else {
       blocks.value[editorIndex.value] = normalizedBlock;
+    }
+
+    if (normalizedBlock.kind === BlockKind.IMAGE) {
+      const pending = draftPendingImage.value;
+      const nextPending = new Map(pendingSectionImages.value);
+      const existingPending = nextPending.get(targetIndex);
+
+      if (pending?.file) {
+        revokePendingPreview(existingPending);
+        nextPending.set(targetIndex, {
+          file: pending.file,
+          altText: pending.altText,
+          previewUrl: URL.createObjectURL(pending.file),
+        });
+        blocks.value[targetIndex] = {
+          ...normalizedBlock,
+          images: [{ srcPath: "", altText: pending.altText }],
+        };
+      } else if (pending?.srcPath) {
+        revokePendingPreview(existingPending);
+        nextPending.delete(targetIndex);
+      } else {
+        revokePendingPreview(existingPending);
+        nextPending.delete(targetIndex);
+      }
+
+      pendingSectionImages.value = nextPending;
     }
 
     closeEditor();
@@ -132,6 +358,11 @@ export function useSectionBlockBuilder(
    * Removes a block from the list by index.
    */
   const removeBlock = (index: number) => {
+    revokePendingPreview(pendingSectionImages.value.get(index));
+    pendingSectionImages.value = reindexPendingImagesAfterRemoval(
+      pendingSectionImages.value,
+      index,
+    );
     blocks.value.splice(index, 1);
 
     if (editorIndex.value === index) {
@@ -158,36 +389,31 @@ export function useSectionBlockBuilder(
 
     updated.splice(targetIndex, 0, moved);
     blocks.value = updated;
-  };
-
-  /**
-   * Uploads a section image and stores the returned public URL in the draft.
-   */
-  const uploadDraftImage = async (file: File): Promise<string | null> => {
-    isUploadingImage.value = true;
-
-    try {
-      return await sectionsStore.uploadSectionImage(file);
-    } finally {
-      isUploadingImage.value = false;
-    }
+    pendingSectionImages.value = swapPendingImages(
+      pendingSectionImages.value,
+      index,
+      targetIndex,
+    );
   };
 
   return {
     addableBlockKinds,
     hasMinimumBlocks,
+    blocksForPreview,
+    pendingSectionImages,
     editorOpen,
     editorMode,
     editorIndex,
     draftBlock,
     editorError,
-    isUploadingImage,
+    draftImageFileList,
     openAddEditor,
     openEditEditor,
     closeEditor,
     saveEditor,
     removeBlock,
     moveBlock,
-    uploadDraftImage,
+    handleDraftImageFileListUpdate,
+    handleDraftImageChange,
   };
 }

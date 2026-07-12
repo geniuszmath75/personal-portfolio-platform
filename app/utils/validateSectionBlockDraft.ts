@@ -5,7 +5,10 @@ import { BlockKind } from "../../shared/types/enums";
  *
  * @returns error message when invalid, otherwise null
  */
-export function validateSectionBlockDraft(block: Block): string | null {
+export function validateSectionBlockDraft(
+  block: Block,
+  options?: { hasPendingImageFile?: boolean },
+): string | null {
   switch (block.kind) {
     case BlockKind.PARAGRAPH: {
       const hasContent = block.paragraphs.some((paragraph) => paragraph.trim());
@@ -13,10 +16,14 @@ export function validateSectionBlockDraft(block: Block): string | null {
     }
     case BlockKind.IMAGE: {
       const image = block.images[0];
-      if (!image?.srcPath.trim()) {
-        return "Image upload is required";
+      const hasImage = Boolean(
+        image?.srcPath.trim() || options?.hasPendingImageFile,
+      );
+
+      if (!hasImage) {
+        return "Image is required";
       }
-      if (!image.altText.trim()) {
+      if (!image?.altText.trim()) {
         return "Alt text is required";
       }
       return null;
