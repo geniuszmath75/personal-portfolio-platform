@@ -585,7 +585,9 @@ describe("projectsStore", () => {
     ];
 
     // Mock uploadProjectImage to fail for main image
-    vi.spyOn(store, "uploadProjectImage").mockResolvedValueOnce(null);
+    vi.spyOn(store, "uploadProjectImage")
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce("/uploads/projects/other.jpg");
 
     // Act: call createProject action
     const result = await store.createProject(

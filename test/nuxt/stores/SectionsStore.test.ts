@@ -275,9 +275,16 @@ describe("sectionsStore", () => {
         vi.fn().mockRejectedValue(new Error("Upload failed")),
       );
 
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+
       const result = await store.uploadSectionImage(mockFile);
 
       expect(result).toBeNull();
+      expect(consoleErrorSpy).toHaveBeenCalled();
+
+      consoleErrorSpy.mockRestore();
     });
   });
 });
