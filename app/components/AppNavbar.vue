@@ -35,6 +35,27 @@
           {{ link.label }}
         </NuxtLink>
 
+        <ClientOnly>
+          <NuxtLink
+            v-if="isAdmin"
+            to="/sections/create?placement=standalone"
+            class="w-40"
+          >
+            <BaseBtn
+              label="NEW PAGE"
+              btn-style="login--logout"
+              icon-name="mdi:plus"
+            >
+              <template #icon>
+                <Icon
+                  name="mdi:plus"
+                  class="absolute left-2 text-secondary-500 text-2xl"
+                />
+              </template>
+            </BaseBtn>
+          </NuxtLink>
+        </ClientOnly>
+
         <!-- Account/Login -->
         <div class="flex items-center px-12">
           <div
@@ -160,6 +181,26 @@
               @click="toggleMobileMenu"
               >{{ link.label }}</NuxtLink
             >
+
+            <NuxtLink
+              v-if="isAdmin"
+              to="/sections/create?placement=standalone"
+              class="flex items-center h-20 w-1/2"
+              @click="toggleMobileMenu"
+            >
+              <BaseBtn
+                label="NEW PAGE"
+                btn-style="login--logout"
+                icon-name="mdi:plus"
+              >
+                <template #icon>
+                  <Icon
+                    name="mdi:plus"
+                    class="absolute left-2 text-secondary-500 text-2xl"
+                  />
+                </template>
+              </BaseBtn>
+            </NuxtLink>
 
             <!-- Log In, Log Out and Dashboard -->
             <div class="w-full flex justify-center">

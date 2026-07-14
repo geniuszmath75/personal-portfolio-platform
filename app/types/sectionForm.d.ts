@@ -280,3 +280,20 @@ export interface SectionBlockEditorImageProps {
    */
   fileList: UploadFileInfo[];
 }
+
+/**
+ * SECTION INSERT MOBILE CONTROLS
+ *
+ * Props for the fixed mobile insert buttons on the home page.
+ */
+export interface SectionInsertMobileControlsProps {
+  /**
+   * Boundary shown at the top edge; null hides the top button.
+   */
+  topInsertAfter: number | null;
+
+  /**
+   * Boundary shown at the bottom edge; null hides the bottom button.
+   */
+  bottomInsertAfter: number | null;
+}
