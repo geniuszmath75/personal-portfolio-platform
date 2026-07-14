@@ -4,6 +4,7 @@ import type { NitroAppPlugin } from "nitropack";
 import { afterEach, vi } from "vitest";
 import { cleanup, render, type RenderOptions } from "@testing-library/vue";
 import type { Component } from "vue";
+import type { GlobalMountOptions } from "@vue/test-utils";
 import { createTestingPinia, type TestingOptions } from "@pinia/testing";
 import "@testing-library/jest-dom/vitest";
 
@@ -47,7 +48,7 @@ export function useH3TestUtils() {
 }
 
 // Global mounting options to the component
-const defaultGlobalOptions = {
+const defaultGlobalOptions: GlobalMountOptions = {
   stubs: {
     NuxtLink: {
       props: ["to"],
@@ -59,6 +60,9 @@ const defaultGlobalOptions = {
     },
     Teleport: {
       props: ["to"],
+      template: "<slot />",
+    },
+    ClientOnly: {
       template: "<slot />",
     },
   },
@@ -80,7 +84,19 @@ export function renderWithNuxt(
   component: Component,
   options: RenderOptions<unknown> = {},
 ) {
-  const mergedGlobalOptions = merge({}, defaultGlobalOptions, options.global);
+  const { provide: testProvide, ...restGlobal } = options.global ?? {};
+  const mergedGlobalOptions: GlobalMountOptions = merge(
+    {},
+    defaultGlobalOptions,
+    restGlobal,
+  );
+
+  if (testProvide) {
+    mergedGlobalOptions.provide = {
+      ...mergedGlobalOptions.provide,
+      ...testProvide,
+    };
+  }
 
   return render(component, {
     ...options,

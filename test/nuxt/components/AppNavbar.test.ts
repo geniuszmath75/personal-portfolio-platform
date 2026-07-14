@@ -162,6 +162,48 @@ describe("AppNavbar", () => {
     expect(screen.getByText("LOG OUT")).toBeTruthy();
   });
 
+  it("should not show NEW PAGE link for non-admin users", () => {
+    const pinia = createTestPinia();
+    const authStore = useAuthStore(pinia);
+    authStore.loggedIn = true;
+    authStore.user = {
+      user_id: "68a9d098b70e48772cd5ceab",
+      email: "guest@gmail.com",
+      role: UserSchemaRole.GUEST,
+    };
+
+    renderWithNuxt(AppNavbar, {
+      global: {
+        plugins: [pinia],
+      },
+    });
+
+    expect(screen.queryByText("NEW PAGE")).toBeNull();
+  });
+
+  it("should show NEW PAGE link for admin users on desktop", () => {
+    const pinia = createTestPinia();
+    const authStore = useAuthStore(pinia);
+    authStore.loggedIn = true;
+    authStore.user = {
+      user_id: "68a9d098b70e48772cd5ceaa",
+      email: "admin@gmail.com",
+      role: UserSchemaRole.ADMIN,
+    };
+
+    renderWithNuxt(AppNavbar, {
+      global: {
+        plugins: [pinia],
+      },
+    });
+
+    const newPageLink = screen.getByRole("link", { name: "NEW PAGE" });
+    expect(newPageLink).toHaveAttribute(
+      "href",
+      "/sections/create?placement=standalone",
+    );
+  });
+
   it("should call logout and close panels on LOG OUT click", async () => {
     // Arrange: set logged in user
     const pinia = createTestPinia();
