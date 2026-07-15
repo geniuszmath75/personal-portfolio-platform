@@ -1,5 +1,46 @@
 ## Changelog
 
+### [v0.9.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.8.0...v0.9.0) - 15 July 2026
+
+#### New Features
+
+-  add section create metadata step UI [`48d151e`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/48d151eed3917088b33e45afbdd2ddeae233e9d9)
+-  add section block builder components and hero button theme [`7eb1e2b`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/7eb1e2b155e15c021cc18a2ec72db57f6ecae867)
+-  wire section create submit flow and store action [`514cbf0`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/514cbf0b496410d1f58c5438f1c0e37910c2593f)
+-  add admin entry points for section create flow [`57b1ac5`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/57b1ac506aa8bbef0be505cd1ef26282082c305f)
+-  defer image upload in block builder until submit [`d74b8ed`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/d74b8ed8b8785f2b091a5b21bf8fba9584d5abb5)
+-  add shared section builder configuration [`eaa225d`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/eaa225dceec6ce1ee81ba3ffc6d074d42c32b2d2)
+-  add useSectionBlockBuilder composable [`287c640`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/287c640dbe62b96b3470549529d05eff99592d1c)
+-  add block builder utils and hero paragraph limit [`dad54a6`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/dad54a65dbee10fa0df5fdf2d3d158d24d70a052)
+-  add create section API and reorganize controllers [`69f49c7`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/69f49c7df039138f24de0696a93c5c6c3d543847)
+-  add section image upload via sections store [`bb99043`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/bb990439ca2f19d5fe6b41758e8061d84aa2b22a)
+-  wire block builder into section create wizard [`5997e5e`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/5997e5efd91d670996108369828c9f538b6cd490)
+-  add additional-transparent button style [`ab304e0`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/ab304e0c2e7b22e0328c185739446346ae9ca4f8)
+
+#### Fixes
+
+-  shift existing orders when inserting a section [`8454872`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/845487258a56fedf3ffc88df7a3387fc1864267a)
+
+#### Chores And Housekeeping
+
+-  refresh package-lock dependency tree [`e6c856d`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/e6c856d6482c50eda2b4172da20ef8bc071aa10a)
+-  replace validateSync with validate after mongoose 9.7 upgrade [`b8f2119`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/b8f2119c339bc5f16b291f1329efc49c7d066041)
+
+#### Refactoring and Updates
+
+-  extract section layouts and image source resolver [`3837199`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/383719934dc5c35ee67b9030907316ab03fdd14f)
+-  extract shared block validation and align section model [`61e3f3b`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/61e3f3bead0a9cd898ce38e324e03373fefc418e)
+-  extract section layout theme by order [`e048ca6`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/e048ca6f8a2d06c70a621653f5f7fa324acbce14)
+-  resolve absolute and blob section image paths [`1c354cf`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/1c354cf0ef47d0e9c23c1d9ae994bf4b1e5acc8b)
+
+#### Changes to Test Assests
+
+-  add block builder and composable coverage [`18f8eb0`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/18f8eb0372073c17bfcea2d07a06ce2643cce2a9)
+-  add validation and create section test coverage [`02b4035`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/02b4035e657de35b5d9caedbf696ca464a225363)
+-  cover section metadata form, stepper, and composables [`3699600`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/3699600b6e60f440cba3d108b9f7a4a8b76ec67f)
+-  add coverage for section insert entry points [`76c3c84`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/76c3c84914b7b30225279ca0eb85d7034f5f9efa)
+-  split SectionContent tests into layout component specs [`f5eb9c2`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/f5eb9c20a83c0bd4c22a29c509f5f703c2941850)
+
 ### [v0.8.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.7.0...v0.8.0) - 4 July 2026
 
 #### New Features
@@ -30,6 +71,10 @@
 #### Changes to Test Assests
 
 -  add and update tests for project edit flow, FileUpload controlled mode and update validation [`af55208`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/af5520805b1179838aac8e0250b857b3535480de)
+
+#### General Changes
+
+- release: 0.8.0 [`38bac80`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/38bac8075f9ae001c9dd176c2742c703e9e1d0f5)
 
 ### [v0.7.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.6.0...v0.7.0) - 6 May 2026
 
