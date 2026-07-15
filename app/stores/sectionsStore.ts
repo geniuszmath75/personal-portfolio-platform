@@ -1,5 +1,10 @@
 import type { SectionsResponse, SectionResponse } from "~~/shared/types";
-import { UploadCategory } from "~~/shared/types/enums";
+import { BlockKind, UploadCategory } from "~~/shared/types/enums";
+import type {
+  SectionMetadataFormState,
+  SectionPendingImageState,
+} from "~/types/sectionForm";
+import { showErrorToast } from "~/utils/toastNotification";
 
 export const useSectionsStore = defineStore("sections", {
   state: () => {
@@ -125,6 +130,91 @@ export const useSectionsStore = defineStore("sections", {
       } catch (error) {
         handleError(error, "Failed to upload section image");
         return null;
+      }
+    },
+
+    /**
+     * Uploads pending image blocks and creates a new section via POST /sections.
+     *
+     * @param metadata - validated section metadata from step 1
+     * @param blocks - draft blocks from the builder
+     * @param pendingImages - image files deferred until submit, keyed by block index
+     * @returns true on success, false otherwise
+     * @async
+     */
+    async createSection(
+      metadata: SectionMetadataFormState,
+      blocks: Block[],
+      pendingImages: Map<number, SectionPendingImageState>,
+    ): Promise<boolean> {
+      const { baseApiPath } = useRuntimeConfig().public;
+
+      try {
+        const resolvedBlocks = structuredClone(toRaw(blocks));
+
+        // Upload deferred image files in parallel; reuse existing srcPath when no file is pending.
+        const uploadTasks = Array.from(pendingImages.entries()).map(
+          async ([index, pending]) => {
+            if (!pending.file) {
+              return { index, url: pending.srcPath ?? null };
+            }
+
+            const url = await this.uploadSectionImage(pending.file);
+            return { index, url };
+          },
+        );
+
+        const uploadResults = await Promise.all(uploadTasks);
+
+        // Merge uploaded URLs back into image blocks at their original indices.
+        for (const { index, url } of uploadResults) {
+          if (!url) {
+            showErrorToast("Failed to upload section image");
+            return false;
+          }
+
+          const block = resolvedBlocks[index];
+
+          if (block?.kind === BlockKind.IMAGE) {
+            const pending = pendingImages.get(index);
+            block.images[0] = {
+              srcPath: url,
+              altText: pending?.altText ?? block.images[0]?.altText ?? "",
+            };
+          }
+        }
+
+        // Catch image blocks that still have no srcPath after upload (e.g. never selected in editor).
+        for (const block of resolvedBlocks) {
+          if (
+            block.kind === BlockKind.IMAGE &&
+            !block.images[0]?.srcPath?.trim()
+          ) {
+            showErrorToast("Image block requires an uploaded image");
+            return false;
+          }
+        }
+
+        const trimmedTitle = metadata.title.trim();
+        const payload = {
+          slug: metadata.slug.trim(),
+          type: metadata.type,
+          order: metadata.order,
+          blocks: resolvedBlocks,
+          ...(trimmedTitle ? { title: trimmedTitle } : {}),
+        };
+
+        await $fetch("/sections", {
+          baseURL: baseApiPath,
+          method: "POST",
+          credentials: "include",
+          body: payload,
+        });
+
+        return true;
+      } catch (error) {
+        handleError(error, "Failed to create section");
+        return false;
       }
     },
   },

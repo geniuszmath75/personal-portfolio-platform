@@ -8,6 +8,7 @@ import type {
 import { createEmptySectionBlock } from "~/utils/createEmptySectionBlock";
 import { resolveSectionImageSrc } from "~/utils/resolveSectionImageSrc";
 import { validateSectionBlockDraft } from "~/utils/validateSectionBlockDraft";
+import type { InjectionKey } from "vue";
 
 function normalizeBlockDraft(block: Block): Block {
   switch (block.kind) {
@@ -417,3 +418,13 @@ export function useSectionBlockBuilder(
     handleDraftImageChange,
   };
 }
+
+export type SectionBlockBuilderContext = ReturnType<
+  typeof useSectionBlockBuilder
+>;
+
+/**
+ * Injection key for sharing block builder state between the form and builder UI.
+ */
+export const sectionBlockBuilderKey: InjectionKey<SectionBlockBuilderContext> =
+  Symbol("sectionBlockBuilder");

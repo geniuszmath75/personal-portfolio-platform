@@ -10,6 +10,11 @@ import {
   parseSectionInsertAfter,
   parseSectionPlacement,
 } from "~/utils/parseSectionCreateQuery";
+import {
+  sectionBlockBuilderKey,
+  useSectionBlockBuilder,
+} from "~/composables/useSectionBlockBuilder";
+import { showErrorToast, showSuccessToast } from "~/utils/toastNotification";
 import type {
   SectionFormMode,
   SectionFormStep,
@@ -52,6 +57,12 @@ export function useSectionForm(options: { mode?: SectionFormMode } = {}) {
   });
 
   const blocks = ref<Block[]>([]);
+  const isSubmitting = ref(false);
+
+  const sectionType = computed(() => metadata.value.type);
+  const blockBuilder = useSectionBlockBuilder(blocks, sectionType);
+
+  provide(sectionBlockBuilderKey, blockBuilder);
 
   const orderedSections = computed(() => sectionsStore.orderedSections);
   const { suggestedOrder } = useSectionInsertOrder(
@@ -166,6 +177,49 @@ export function useSectionForm(options: { mode?: SectionFormMode } = {}) {
     orderManuallyEdited.value = true;
   };
 
+  /**
+   * Uploads pending images, creates the section, then redirects on success.
+   */
+  const submitCreateSection = async () => {
+    const isMetadataValid = await validateMetadataStep();
+
+    if (!isMetadataValid) {
+      step.value = 1;
+      return;
+    }
+
+    if (blockBuilder.editorOpen.value) {
+      showErrorToast("Close the block editor before submitting");
+      return;
+    }
+
+    if (!blockBuilder.hasMinimumBlocks.value) {
+      showErrorToast("Add at least one block before submitting");
+      return;
+    }
+
+    isSubmitting.value = true;
+
+    try {
+      const success = await sectionsStore.createSection(
+        metadata.value,
+        blocks.value,
+        blockBuilder.pendingSectionImages.value,
+      );
+
+      if (success) {
+        showSuccessToast("Section created successfully!");
+        await navigateTo(
+          placement.value === "home" ? "/" : `/${metadata.value.slug}`,
+        );
+      }
+    } catch (error) {
+      handleError(error, "Failed to create section");
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
+
   onMounted(async () => {
     // Fetch existing sections for duplicate type warning and order suggestion.
     await sectionsStore.fetchSections();
@@ -198,5 +252,9 @@ export function useSectionForm(options: { mode?: SectionFormMode } = {}) {
     isTitleInvalid,
     isSlugInvalid,
     isOrderInvalid,
+    hasMinimumBlocks: blockBuilder.hasMinimumBlocks,
+    editorOpen: blockBuilder.editorOpen,
+    isSubmitting,
+    submitCreateSection,
   };
 }

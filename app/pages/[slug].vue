@@ -11,5 +11,7 @@ const { sectionDetails } = storeToRefs(sectionsStore);
 
 const slug = useRouteParam("slug");
 
-await callOnce("section", () => sectionsStore.fetchSection(slug));
+await callOnce("section", () => sectionsStore.fetchSection(slug), {
+  mode: "navigation",
+});
 </script>

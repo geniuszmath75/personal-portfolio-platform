@@ -9,8 +9,14 @@ import { useSectionsStore } from "~/stores/sectionsStore";
 import { createTestPinia } from "~~/test/setup";
 import { BlockKind, ISectionType } from "~~/shared/types/enums";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
+import { showErrorToast, showSuccessToast } from "~/utils/toastNotification";
+import { handleError } from "~/utils/handleError";
 
 const createMockRoute = (query: LocationQuery) => ({ query });
+
+const { navigateToMock } = vi.hoisted(() => ({
+  navigateToMock: vi.fn(),
+}));
 
 const { useRouteMock } = vi.hoisted(() => ({
   useRouteMock: vi.fn(() =>
@@ -21,7 +27,17 @@ const { useRouteMock } = vi.hoisted(() => ({
   ),
 }));
 
+mockNuxtImport("navigateTo", () => navigateToMock);
 mockNuxtImport("useRoute", () => useRouteMock);
+
+vi.mock("~/utils/toastNotification", () => ({
+  showSuccessToast: vi.fn(),
+  showErrorToast: vi.fn(),
+}));
+
+vi.mock("~/utils/handleError", () => ({
+  handleError: vi.fn(),
+}));
 
 const createSection = (
   overrides: Partial<ValidatedSection> = {},
@@ -228,5 +244,152 @@ describe("useSectionForm composable", () => {
 
     expect(result.suggestedOrder.value).toBe(11);
     expect(result.metadata.value.order).toBe(7);
+  });
+
+  it("should submit section and redirect to home on success", async () => {
+    const { result } = mount(() => useSectionForm());
+
+    result.metadata.value = {
+      title: "Hero",
+      slug: "hero-copy",
+      type: ISectionType.HERO,
+      order: 2,
+    };
+    result.blocks.value = [
+      { kind: BlockKind.PARAGRAPH, paragraphs: ["Hello"] },
+    ];
+    result.step.value = 2;
+
+    vi.spyOn(sectionsStore, "createSection").mockResolvedValue(true);
+
+    await result.submitCreateSection();
+    await flushPromises();
+
+    expect(sectionsStore.createSection).toHaveBeenCalledWith(
+      result.metadata.value,
+      result.blocks.value,
+      expect.any(Map),
+    );
+    expect(showSuccessToast).toHaveBeenCalledWith(
+      "Section created successfully!",
+    );
+    expect(navigateToMock).toHaveBeenCalledWith("/");
+    expect(result.isSubmitting.value).toBe(false);
+  });
+
+  it("should redirect standalone sections to slug route on success", async () => {
+    useRouteMock.mockImplementation(() =>
+      createMockRoute({
+        placement: "standalone",
+      }),
+    );
+
+    const { result } = mount(() => useSectionForm());
+
+    result.metadata.value = {
+      title: "About",
+      slug: "about-copy",
+      type: ISectionType.ABOUT_ME,
+      order: 1,
+    };
+    result.blocks.value = [
+      { kind: BlockKind.PARAGRAPH, paragraphs: ["About me"] },
+    ];
+    result.step.value = 2;
+
+    vi.spyOn(sectionsStore, "createSection").mockResolvedValue(true);
+
+    await result.submitCreateSection();
+    await flushPromises();
+
+    expect(navigateToMock).toHaveBeenCalledWith("/about-copy");
+  });
+
+  it("should not submit when no blocks are present", async () => {
+    const { result } = mount(() => useSectionForm());
+
+    result.metadata.value = {
+      title: "Hero",
+      slug: "hero-copy",
+      type: ISectionType.HERO,
+      order: 2,
+    };
+    result.blocks.value = [];
+    result.step.value = 2;
+    vi.spyOn(sectionsStore, "createSection").mockResolvedValue(true);
+
+    await result.submitCreateSection();
+
+    expect(sectionsStore.createSection).not.toHaveBeenCalled();
+    expect(showErrorToast).toHaveBeenCalledWith(
+      "Add at least one block before submitting",
+    );
+  });
+
+  it("should not submit when block editor is open", async () => {
+    const { result } = mount(() => useSectionForm());
+
+    result.metadata.value = {
+      title: "Hero",
+      slug: "hero-copy",
+      type: ISectionType.HERO,
+      order: 2,
+    };
+    result.blocks.value = [
+      { kind: BlockKind.PARAGRAPH, paragraphs: ["Hello"] },
+    ];
+    result.step.value = 2;
+    result.editorOpen.value = true;
+    vi.spyOn(sectionsStore, "createSection").mockResolvedValue(true);
+
+    await result.submitCreateSection();
+
+    expect(sectionsStore.createSection).not.toHaveBeenCalled();
+    expect(showErrorToast).toHaveBeenCalledWith(
+      "Close the block editor before submitting",
+    );
+  });
+
+  it("should handle createSection errors via handleError", async () => {
+    const { result } = mount(() => useSectionForm());
+    const error = new Error("Create failed");
+
+    result.metadata.value = {
+      title: "Hero",
+      slug: "hero-copy",
+      type: ISectionType.HERO,
+      order: 2,
+    };
+    result.blocks.value = [
+      { kind: BlockKind.PARAGRAPH, paragraphs: ["Hello"] },
+    ];
+    result.step.value = 2;
+
+    vi.spyOn(sectionsStore, "createSection").mockRejectedValue(error);
+
+    await result.submitCreateSection();
+    await flushPromises();
+
+    expect(handleError).toHaveBeenCalledWith(error, "Failed to create section");
+    expect(showSuccessToast).not.toHaveBeenCalled();
+    expect(navigateToMock).not.toHaveBeenCalled();
+    expect(result.isSubmitting.value).toBe(false);
+  });
+
+  it("should not navigate when createSection returns false", async () => {
+    const { result } = mount(() => useSectionForm());
+
+    result.blocks.value = [
+      { kind: BlockKind.PARAGRAPH, paragraphs: ["Hello"] },
+    ];
+    result.step.value = 2;
+
+    vi.spyOn(sectionsStore, "createSection").mockResolvedValue(false);
+
+    await result.submitCreateSection();
+    await flushPromises();
+
+    expect(showSuccessToast).not.toHaveBeenCalled();
+    expect(navigateToMock).not.toHaveBeenCalled();
   });
 });

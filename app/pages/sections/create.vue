@@ -52,14 +52,26 @@
         leave-from-class="opacity-100 translate-y-0"
         leave-to-class="opacity-0 -translate-y-1"
       >
-        <BaseBtn
+        <div
           v-if="step === 2"
-          key="back-button"
-          type="button"
-          label="Back"
-          btn-style="secondary"
-          @click="goToMetadataStep"
-        />
+          key="submit-actions"
+          class="w-full flex flex-wrap md:flex-nowrap justify-center gap-4"
+        >
+          <BaseBtn
+            type="button"
+            label="Back"
+            btn-style="secondary"
+            :is-disabled="isSubmitting"
+            @click="goToMetadataStep"
+          />
+          <BaseBtn
+            type="button"
+            label="Create section"
+            :is-loading="isSubmitting"
+            :is-disabled="!hasMinimumBlocks || editorOpen"
+            @click="submitCreateSection"
+          />
+        </div>
 
         <BaseBtn
           v-else
@@ -87,6 +99,7 @@ const {
   showDuplicateTypeWarning,
   continueToBlockBuilder,
   goToMetadataStep,
+  submitCreateSection,
   touchField,
   markOrderAsEdited,
   titleErrors,
@@ -95,6 +108,9 @@ const {
   isTitleInvalid,
   isSlugInvalid,
   isOrderInvalid,
+  hasMinimumBlocks,
+  editorOpen,
+  isSubmitting,
 } = useSectionForm();
 
 const pageTitle = computed(() =>

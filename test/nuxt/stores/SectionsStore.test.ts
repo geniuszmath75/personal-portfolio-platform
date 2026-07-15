@@ -1,15 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { setActivePinia } from "pinia";
-import { createTestPinia } from "../../setup";
-import { useSectionsStore } from "../../../app/stores/sectionsStore";
-import type { ValidatedSection } from "../../../app/utils/validateSection";
-import {
-  BlockKind,
-  ISectionType,
-  UploadCategory,
-} from "../../../shared/types/enums";
+import { createTestPinia } from "~~/test/setup";
+import { useSectionsStore } from "~/stores/sectionsStore";
+import type { ValidatedSection } from "~/utils/validateSection";
+import { BlockKind, ISectionType, UploadCategory } from "~~/shared/types/enums";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
 import type { ParagraphBlock } from "~~/shared/types";
+import { showErrorToast } from "~/utils/toastNotification";
+
+vi.mock("~/utils/toastNotification", () => ({
+  showErrorToast: vi.fn(),
+  showSuccessToast: vi.fn(),
+}));
 
 // Mock 'useRuntimeConfig'
 mockNuxtImport("useRuntimeConfig", () => {
@@ -285,6 +287,242 @@ describe("sectionsStore", () => {
       expect(consoleErrorSpy).toHaveBeenCalled();
 
       consoleErrorSpy.mockRestore();
+    });
+
+    describe("createSection", () => {
+      const mockMetadata = {
+        title: "New Hero",
+        slug: "new-hero",
+        type: ISectionType.HERO,
+        order: 2,
+      };
+
+      const mockBlocks: Block[] = [
+        {
+          kind: BlockKind.PARAGRAPH,
+          paragraphs: ["Hello"],
+        },
+      ];
+
+      const mockCreatedSection: ValidatedSection = {
+        _id: "new-id",
+        slug: "new-hero",
+        title: "New Hero",
+        type: ISectionType.HERO,
+        order: 2,
+        blocks: mockBlocks,
+      };
+
+      it("should upload pending images and create section successfully", async () => {
+        const store = useSectionsStore();
+        const imageFile = new File(["content"], "hero.png", {
+          type: "image/png",
+        });
+        const blocks: Block[] = [
+          {
+            kind: BlockKind.IMAGE,
+            images: [{ srcPath: "", altText: "Hero image" }],
+          },
+        ];
+        const pendingImages = new Map([
+          [
+            0,
+            {
+              file: imageFile,
+              altText: "Hero image",
+            },
+          ],
+        ]);
+
+        vi.spyOn(store, "uploadSectionImage").mockResolvedValue(
+          "/uploads/sections/hero.png",
+        );
+        vi.stubGlobal(
+          "$fetch",
+          vi.fn().mockResolvedValue({ section: mockCreatedSection }),
+        );
+
+        const result = await store.createSection(
+          mockMetadata,
+          blocks,
+          pendingImages,
+        );
+
+        expect(result).toBe(true);
+        expect($fetch).toHaveBeenCalledWith(
+          "/sections",
+          expect.objectContaining({
+            baseURL: "/api/v1",
+            method: "POST",
+            credentials: "include",
+            body: {
+              title: "New Hero",
+              slug: "new-hero",
+              type: ISectionType.HERO,
+              order: 2,
+              blocks: [
+                {
+                  kind: BlockKind.IMAGE,
+                  images: [
+                    {
+                      srcPath: "/uploads/sections/hero.png",
+                      altText: "Hero image",
+                    },
+                  ],
+                },
+              ],
+            },
+          }),
+        );
+      });
+
+      it("should omit empty title from payload", async () => {
+        const store = useSectionsStore();
+
+        vi.stubGlobal(
+          "$fetch",
+          vi.fn().mockResolvedValue({ section: mockCreatedSection }),
+        );
+
+        await store.createSection(
+          { ...mockMetadata, title: "  " },
+          mockBlocks,
+          new Map(),
+        );
+
+        expect($fetch).toHaveBeenCalledWith(
+          "/sections",
+          expect.objectContaining({
+            body: expect.not.objectContaining({ title: expect.anything() }),
+          }),
+        );
+      });
+
+      it("should reuse existing srcPath when pending image has no file", async () => {
+        const store = useSectionsStore();
+        const blocks: Block[] = [
+          {
+            kind: BlockKind.IMAGE,
+            images: [{ srcPath: "", altText: "Existing image" }],
+          },
+        ];
+        const pendingImages = new Map([
+          [
+            0,
+            {
+              file: null,
+              altText: "Existing image",
+              srcPath: "/uploads/sections/existing.png",
+            },
+          ],
+        ]);
+
+        const uploadSpy = vi.spyOn(store, "uploadSectionImage");
+        vi.stubGlobal(
+          "$fetch",
+          vi.fn().mockResolvedValue({ section: mockCreatedSection }),
+        );
+
+        const result = await store.createSection(
+          mockMetadata,
+          blocks,
+          pendingImages,
+        );
+
+        expect(result).toBe(true);
+        expect(uploadSpy).not.toHaveBeenCalled();
+        expect($fetch).toHaveBeenCalledWith(
+          "/sections",
+          expect.objectContaining({
+            body: expect.objectContaining({
+              blocks: [
+                {
+                  kind: BlockKind.IMAGE,
+                  images: [
+                    {
+                      srcPath: "/uploads/sections/existing.png",
+                      altText: "Existing image",
+                    },
+                  ],
+                },
+              ],
+            }),
+          }),
+        );
+      });
+
+      it("should return false when image block has no srcPath after resolution", async () => {
+        const store = useSectionsStore();
+        const blocks: Block[] = [
+          {
+            kind: BlockKind.IMAGE,
+            images: [{ srcPath: "", altText: "Missing image" }],
+          },
+        ];
+
+        const result = await store.createSection(
+          mockMetadata,
+          blocks,
+          new Map(),
+        );
+
+        expect(result).toBe(false);
+        expect(showErrorToast).toHaveBeenCalledWith(
+          "Image block requires an uploaded image",
+        );
+      });
+
+      it("should return false when image upload fails", async () => {
+        const store = useSectionsStore();
+        const pendingImages = new Map([
+          [
+            0,
+            {
+              file: new File(["content"], "hero.png", { type: "image/png" }),
+              altText: "Hero image",
+            },
+          ],
+        ]);
+
+        vi.spyOn(store, "uploadSectionImage").mockResolvedValue(null);
+
+        const result = await store.createSection(
+          mockMetadata,
+          [
+            {
+              kind: BlockKind.IMAGE,
+              images: [{ srcPath: "", altText: "Hero image" }],
+            },
+          ],
+          pendingImages,
+        );
+
+        expect(result).toBe(false);
+      });
+
+      it("should handle API errors gracefully", async () => {
+        const store = useSectionsStore();
+
+        vi.stubGlobal(
+          "$fetch",
+          vi.fn().mockRejectedValue(new Error("Network error")),
+        );
+
+        const consoleErrorSpy = vi
+          .spyOn(console, "error")
+          .mockImplementation(() => {});
+
+        const result = await store.createSection(
+          mockMetadata,
+          mockBlocks,
+          new Map(),
+        );
+
+        expect(result).toBe(false);
+        expect(consoleErrorSpy).toHaveBeenCalled();
+
+        consoleErrorSpy.mockRestore();
+      });
     });
   });
 });

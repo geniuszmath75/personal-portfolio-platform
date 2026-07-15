@@ -126,6 +126,10 @@
 <script setup lang="ts">
 import type { SectionBlockBuilderProps } from "~/types/sectionForm";
 import {
+  sectionBlockBuilderKey,
+  useSectionBlockBuilder,
+} from "~/composables/useSectionBlockBuilder";
+import {
   getSectionBlockSummary,
   SECTION_BLOCK_KIND_LABELS,
 } from "~/utils/sectionBlockLabels";
@@ -135,6 +139,24 @@ const blocks = defineModel<Block[]>("blocks", { required: true });
 const props = defineProps<SectionBlockBuilderProps>();
 
 const sectionType = computed(() => props.metadata.type);
+
+/**
+ * Shared builder from useSectionForm (same editor state + pendingSectionImages
+ * for submit).
+ */
+const injectedBuilder = inject(sectionBlockBuilderKey, null);
+
+/**
+ * Standalone instance when no parent provides the key (e.g. BlockBuilder unit
+ * tests).
+ */
+const localBuilder = useSectionBlockBuilder(blocks, sectionType);
+
+/**
+ * One reference for destructuring: wizard path uses injected state, isolated
+ * mounts use local.
+ */
+const builder = injectedBuilder ?? localBuilder;
 
 const {
   addableBlockKinds,
@@ -153,5 +175,5 @@ const {
   moveBlock,
   handleDraftImageFileListUpdate,
   handleDraftImageChange,
-} = useSectionBlockBuilder(blocks, sectionType);
+} = builder;
 </script>
