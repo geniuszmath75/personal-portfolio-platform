@@ -13,6 +13,10 @@ const { mockCreate } = vi.hoisted(() => ({
   mockCreate: vi.fn(),
 }));
 
+const { mockUpdateMany } = vi.hoisted(() => ({
+  mockUpdateMany: vi.fn(),
+}));
+
 const { mockHandleDatabaseError } = vi.hoisted(() => ({
   mockHandleDatabaseError: vi.fn(),
 }));
@@ -24,6 +28,7 @@ vi.mock("~~/server/utils/auth", () => ({
 vi.mock("~~/server/models/Section", () => ({
   Section: {
     create: mockCreate,
+    updateMany: mockUpdateMany,
   },
 }));
 
@@ -53,6 +58,7 @@ describe("createSection controller", async () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
+    mockUpdateMany.mockResolvedValue({ modifiedCount: 0 });
   });
 
   const handler = await import("~~/server/api/v1/sections/index.post");
@@ -188,6 +194,26 @@ describe("createSection controller", async () => {
   });
 
   describe("Section creation", () => {
+    it("should shift existing sections at or after the new order before create", async () => {
+      const sectionToInsert = { ...mockSection, order: 2 };
+      const createdSection = { _id: "123", ...sectionToInsert };
+      mockCreate.mockResolvedValue(createdSection);
+
+      const event = createMockH3Event({
+        context: { user: mockAuthUser, isAuthenticated: true },
+        body: sectionToInsert,
+      });
+
+      await handler.default(event);
+
+      expect(mockUpdateMany).toHaveBeenCalledWith(
+        { order: { $gte: 2 } },
+        { $inc: { order: 1 } },
+      );
+      expect(mockUpdateMany).toHaveBeenCalledBefore(mockCreate);
+      expect(mockCreate).toHaveBeenCalledWith(sectionToInsert);
+    });
+
     it("should create section with validated data", async () => {
       const createdSection = { _id: "123", ...mockSection };
       mockCreate.mockResolvedValue(createdSection);

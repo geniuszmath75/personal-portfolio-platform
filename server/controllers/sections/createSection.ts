@@ -28,6 +28,12 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    // Update sections where 'order' is equal or greater than the new section's order
+    await Section.updateMany(
+      { order: { $gte: validatedBody.data.order } },
+      { $inc: { order: 1 } },
+    );
+
     // Create new section
     const newSection = await Section.create(validatedBody.data);
 
