@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Section } from "../../../../server/models/Section";
-import { useH3TestUtils } from "../../../setup";
-import { createMockH3Event } from "../../../mock/h3-event";
+import { Section } from "~~/server/models/Section";
+import { useH3TestUtils } from "~~/test/setup";
+import { createMockH3Event } from "~~/test/mock/h3-event";
 
-vi.mock("../../../../server/models/Section");
+vi.mock("~~/server/models/Section");
 
 useH3TestUtils();
 
@@ -35,7 +35,7 @@ describe("GetSingleSection controller", async () => {
     vi.spyOn(Section, "findOne");
   });
 
-  const handler = await import("../../../../server/api/v1/sections/[slug].get");
+  const handler = await import("~~/server/api/v1/sections/[slug].get");
 
   it("should return section when slug is valid and section exists", async () => {
     // Arrange: mock Section.findById, prepare event with valid slug

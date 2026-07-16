@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useH3TestUtils } from "../../../../setup";
-import { createMockH3Event } from "../../../../mock/h3-event";
+import { useH3TestUtils } from "~~/test/setup";
+import { createMockH3Event } from "~~/test/mock/h3-event";
 
-vi.mock("../../../../../server/controllers/getSingleSection");
+vi.mock("~~/server/controllers/sections/getSingleSection");
 
 useH3TestUtils();
 
@@ -13,14 +13,14 @@ describe("GET /api/v1/sections/:slug (slug.get)", async () => {
 
   // Arrange: import handlers
   const getSingleSectionHandler =
-    await import("../../../../../server/controllers/getSingleSection");
+    await import("~~/server/controllers/sections/getSingleSection");
 
   type GetSingleSectionHandlerType = Awaited<
     ReturnType<typeof getSingleSectionHandler.default>
   >;
 
   const sectionsSlugGetHandler =
-    await import("../../../../../server/api/v1/sections/[slug].get");
+    await import("~~/server/api/v1/sections/[slug].get");
 
   it("should call getSingleSection controller with event and returns result", async () => {
     const fakeResponse = {
