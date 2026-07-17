@@ -524,5 +524,202 @@ describe("sectionsStore", () => {
         consoleErrorSpy.mockRestore();
       });
     });
+
+    describe("updateSection", () => {
+      const mockMetadata = {
+        title: "Updated Hero",
+        slug: "updated-hero",
+        type: ISectionType.HERO,
+        order: 2,
+      };
+
+      const mockBlocks: Block[] = [
+        {
+          kind: BlockKind.PARAGRAPH,
+          paragraphs: ["Hello"],
+        },
+      ];
+
+      const mockUpdatedSection: ValidatedSection = {
+        _id: "section-id",
+        slug: "updated-hero",
+        title: "Updated Hero",
+        type: ISectionType.HERO,
+        order: 2,
+        blocks: mockBlocks,
+      };
+
+      it("should upload pending images and update section successfully", async () => {
+        const store = useSectionsStore();
+        const imageFile = new File(["content"], "hero.png", {
+          type: "image/png",
+        });
+        const blocks: Block[] = [
+          {
+            kind: BlockKind.IMAGE,
+            images: [{ srcPath: "", altText: "Hero image" }],
+          },
+        ];
+        const pendingImages = new Map([
+          [
+            0,
+            {
+              file: imageFile,
+              altText: "Hero image",
+            },
+          ],
+        ]);
+
+        vi.spyOn(store, "uploadSectionImage").mockResolvedValue(
+          "/uploads/sections/hero.png",
+        );
+        vi.stubGlobal(
+          "$fetch",
+          vi.fn().mockResolvedValue({ section: mockUpdatedSection }),
+        );
+
+        const result = await store.updateSection(
+          "section-id",
+          mockMetadata,
+          blocks,
+          pendingImages,
+        );
+
+        expect(result).toBe(true);
+        expect($fetch).toHaveBeenCalledWith(
+          "/sections/section-id",
+          expect.objectContaining({
+            baseURL: "/api/v1",
+            method: "PUT",
+            credentials: "include",
+            body: {
+              title: "Updated Hero",
+              slug: "updated-hero",
+              type: ISectionType.HERO,
+              order: 2,
+              blocks: [
+                {
+                  kind: BlockKind.IMAGE,
+                  images: [
+                    {
+                      srcPath: "/uploads/sections/hero.png",
+                      altText: "Hero image",
+                    },
+                  ],
+                },
+              ],
+            },
+          }),
+        );
+      });
+
+      it("should reuse existing srcPath when pending image has no file", async () => {
+        const store = useSectionsStore();
+        const blocks: Block[] = [
+          {
+            kind: BlockKind.IMAGE,
+            images: [{ srcPath: "", altText: "Existing image" }],
+          },
+        ];
+        const pendingImages = new Map([
+          [
+            0,
+            {
+              file: null,
+              altText: "Existing image",
+              srcPath: "/uploads/sections/existing.png",
+            },
+          ],
+        ]);
+
+        const uploadSpy = vi.spyOn(store, "uploadSectionImage");
+        vi.stubGlobal(
+          "$fetch",
+          vi.fn().mockResolvedValue({ section: mockUpdatedSection }),
+        );
+
+        const result = await store.updateSection(
+          "section-id",
+          mockMetadata,
+          blocks,
+          pendingImages,
+        );
+
+        expect(result).toBe(true);
+        expect(uploadSpy).not.toHaveBeenCalled();
+        expect($fetch).toHaveBeenCalledWith(
+          "/sections/section-id",
+          expect.objectContaining({
+            body: expect.objectContaining({
+              blocks: [
+                {
+                  kind: BlockKind.IMAGE,
+                  images: [
+                    {
+                      srcPath: "/uploads/sections/existing.png",
+                      altText: "Existing image",
+                    },
+                  ],
+                },
+              ],
+            }),
+          }),
+        );
+      });
+
+      it("should return false when image upload fails", async () => {
+        const store = useSectionsStore();
+        const pendingImages = new Map([
+          [
+            0,
+            {
+              file: new File(["content"], "hero.png", { type: "image/png" }),
+              altText: "Hero image",
+            },
+          ],
+        ]);
+
+        vi.spyOn(store, "uploadSectionImage").mockResolvedValue(null);
+
+        const result = await store.updateSection(
+          "section-id",
+          mockMetadata,
+          [
+            {
+              kind: BlockKind.IMAGE,
+              images: [{ srcPath: "", altText: "Hero image" }],
+            },
+          ],
+          pendingImages,
+        );
+
+        expect(result).toBe(false);
+      });
+
+      it("should handle API errors gracefully", async () => {
+        const store = useSectionsStore();
+
+        vi.stubGlobal(
+          "$fetch",
+          vi.fn().mockRejectedValue(new Error("Network error")),
+        );
+
+        const consoleErrorSpy = vi
+          .spyOn(console, "error")
+          .mockImplementation(() => {});
+
+        const result = await store.updateSection(
+          "section-id",
+          mockMetadata,
+          mockBlocks,
+          new Map(),
+        );
+
+        expect(result).toBe(false);
+        expect(consoleErrorSpy).toHaveBeenCalled();
+
+        consoleErrorSpy.mockRestore();
+      });
+    });
   });
 });

@@ -10,7 +10,7 @@ import type { UploadFileInfo } from "~/types/components";
 export type SectionFormStep = 1 | 2;
 
 /**
- * Form mode shared by create and future edit flows.
+ * Form mode shared by create and edit flows.
  */
 export type SectionFormMode = "create" | "edit";
 

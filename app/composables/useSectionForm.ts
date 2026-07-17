@@ -1,5 +1,6 @@
 import useVuelidate from "@vuelidate/core";
 import {
+  getSectionBuilderConfig,
   getSectionTypesByPlacement,
   shouldWarnDuplicateHomeSectionType,
   type SectionPlacement,
@@ -47,7 +48,9 @@ export function useSectionForm(options: { mode?: SectionFormMode } = {}) {
   const step = ref<SectionFormStep>(1);
   const placement = ref<SectionPlacement>(parseSectionPlacement(route.query));
   const insertAfter = ref<number | null>(parseSectionInsertAfter(route.query));
-  const orderManuallyEdited = ref(false);
+  // Edit mode always treats order as intentional (loaded from the section).
+  const orderManuallyEdited = ref(mode === "edit");
+  const sectionId = ref<string | null>(null);
 
   const metadata = ref<SectionMetadataFormState>({
     title: "",
@@ -81,7 +84,9 @@ export function useSectionForm(options: { mode?: SectionFormMode } = {}) {
   const showDuplicateTypeWarning = computed(() =>
     shouldWarnDuplicateHomeSectionType(
       placement.value,
-      orderedSections.value.map((section) => section.type),
+      orderedSections.value
+        .filter((section) => section._id !== sectionId.value)
+        .map((section) => section.type),
       metadata.value.type,
     ),
   );
@@ -164,7 +169,7 @@ export function useSectionForm(options: { mode?: SectionFormMode } = {}) {
   };
 
   /**
-   * Loads form state from an existing section (for future edit mode).
+   * Loads form state from an existing section (edit mode hydration).
    */
   const loadFromSection = (section: ValidatedSection) => {
     metadata.value = {
@@ -178,23 +183,36 @@ export function useSectionForm(options: { mode?: SectionFormMode } = {}) {
   };
 
   /**
-   * Uploads pending images, creates the section, then redirects on success.
+   * Shared pre-submit checks for create and update flows.
+   *
+   * @returns true when the form is ready to call the store action
    */
-  const submitCreateSection = async () => {
+  const assertReadyToSubmit = async (): Promise<boolean> => {
     const isMetadataValid = await validateMetadataStep();
 
     if (!isMetadataValid) {
       step.value = 1;
-      return;
+      return false;
     }
 
     if (blockBuilder.editorOpen.value) {
       showErrorToast("Close the block editor before submitting");
-      return;
+      return false;
     }
 
     if (!blockBuilder.hasMinimumBlocks.value) {
       showErrorToast("Add at least one block before submitting");
+      return false;
+    }
+
+    return true;
+  };
+
+  /**
+   * Uploads pending images, creates the section, then redirects on success.
+   */
+  const submitCreateSection = async () => {
+    if (!(await assertReadyToSubmit())) {
       return;
     }
 
@@ -220,9 +238,67 @@ export function useSectionForm(options: { mode?: SectionFormMode } = {}) {
     }
   };
 
+  /**
+   * Uploads pending images, updates the section, then redirects on success.
+   */
+  const submitUpdateSection = async () => {
+    if (!(await assertReadyToSubmit())) {
+      return;
+    }
+
+    if (!sectionId.value) {
+      showErrorToast("Section id is missing");
+      return;
+    }
+
+    isSubmitting.value = true;
+
+    try {
+      const success = await sectionsStore.updateSection(
+        sectionId.value,
+        metadata.value,
+        blocks.value,
+        blockBuilder.pendingSectionImages.value,
+      );
+
+      if (success) {
+        showSuccessToast("Section updated successfully!");
+        await navigateTo(
+          placement.value === "home" ? "/" : `/${metadata.value.slug}`,
+        );
+      }
+    } catch (error) {
+      handleError(error, "Failed to update section");
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
+
   onMounted(async () => {
     // Fetch existing sections for duplicate type warning and order suggestion.
     await sectionsStore.fetchSections();
+
+    if (mode === "edit") {
+      const slug = route.params.slug;
+
+      if (typeof slug !== "string") {
+        showErrorToast("Section slug is missing");
+        return;
+      }
+
+      await sectionsStore.fetchSection(slug);
+      const section = sectionsStore.sectionDetails;
+
+      if (!section) {
+        showErrorToast("Failed to load section");
+        return;
+      }
+
+      sectionId.value = section._id;
+      placement.value = getSectionBuilderConfig(section.type).placement;
+      loadFromSection(section);
+      return;
+    }
 
     // Apply latest suggested order only when it has not been overridden.
     if (!orderManuallyEdited.value) {
@@ -235,6 +311,7 @@ export function useSectionForm(options: { mode?: SectionFormMode } = {}) {
     step,
     placement,
     insertAfter,
+    sectionId,
     metadata,
     blocks,
     typeOptions,
@@ -256,5 +333,6 @@ export function useSectionForm(options: { mode?: SectionFormMode } = {}) {
     editorOpen: blockBuilder.editorOpen,
     isSubmitting,
     submitCreateSection,
+    submitUpdateSection,
   };
 }

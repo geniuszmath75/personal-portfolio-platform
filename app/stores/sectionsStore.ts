@@ -134,6 +134,82 @@ export const useSectionsStore = defineStore("sections", {
     },
 
     /**
+     * Uploads pending images and builds the create/update section request body.
+     *
+     * @param metadata - validated section metadata from step 1
+     * @param blocks - draft blocks from the builder
+     * @param pendingImages - image files deferred until submit, keyed by block index
+     * @returns request payload, or null when image resolution fails
+     * @async
+     */
+    async buildSectionWritePayload(
+      metadata: SectionMetadataFormState,
+      blocks: Block[],
+      pendingImages: Map<number, SectionPendingImageState>,
+    ): Promise<{
+      slug: string;
+      type: SectionMetadataFormState["type"];
+      order: number;
+      blocks: Block[];
+      title?: string;
+    } | null> {
+      const resolvedBlocks = structuredClone(toRaw(blocks));
+
+      // Upload deferred image files in parallel; reuse existing srcPath when no file is pending.
+      const uploadTasks = Array.from(pendingImages.entries()).map(
+        async ([index, pending]) => {
+          if (!pending.file) {
+            return { index, url: pending.srcPath ?? null };
+          }
+
+          const url = await this.uploadSectionImage(pending.file);
+          return { index, url };
+        },
+      );
+
+      const uploadResults = await Promise.all(uploadTasks);
+
+      // Merge uploaded URLs back into image blocks at their original indices.
+      for (const { index, url } of uploadResults) {
+        if (!url) {
+          showErrorToast("Failed to upload section image");
+          return null;
+        }
+
+        const block = resolvedBlocks[index];
+
+        if (block?.kind === BlockKind.IMAGE) {
+          const pending = pendingImages.get(index);
+          block.images[0] = {
+            srcPath: url,
+            altText: pending?.altText ?? block.images[0]?.altText ?? "",
+          };
+        }
+      }
+
+      // Catch image blocks that still have no srcPath after upload (e.g. never selected in editor).
+      for (const block of resolvedBlocks) {
+        if (
+          block.kind === BlockKind.IMAGE &&
+          !block.images[0]?.srcPath?.trim()
+        ) {
+          showErrorToast("Image block requires an uploaded image");
+          return null;
+        }
+      }
+
+      const trimmedTitle = metadata.title.trim();
+
+      return {
+        slug: metadata.slug.trim(),
+        type: metadata.type,
+        order: metadata.order,
+        blocks: resolvedBlocks,
+        ...(trimmedTitle ? { title: trimmedTitle } : {}),
+      };
+    },
+
+    /**
      * Uploads pending image blocks and creates a new section via POST /sections.
      *
      * @param metadata - validated section metadata from step 1
@@ -150,59 +226,15 @@ export const useSectionsStore = defineStore("sections", {
       const { baseApiPath } = useRuntimeConfig().public;
 
       try {
-        const resolvedBlocks = structuredClone(toRaw(blocks));
-
-        // Upload deferred image files in parallel; reuse existing srcPath when no file is pending.
-        const uploadTasks = Array.from(pendingImages.entries()).map(
-          async ([index, pending]) => {
-            if (!pending.file) {
-              return { index, url: pending.srcPath ?? null };
-            }
-
-            const url = await this.uploadSectionImage(pending.file);
-            return { index, url };
-          },
+        const payload = await this.buildSectionWritePayload(
+          metadata,
+          blocks,
+          pendingImages,
         );
 
-        const uploadResults = await Promise.all(uploadTasks);
-
-        // Merge uploaded URLs back into image blocks at their original indices.
-        for (const { index, url } of uploadResults) {
-          if (!url) {
-            showErrorToast("Failed to upload section image");
-            return false;
-          }
-
-          const block = resolvedBlocks[index];
-
-          if (block?.kind === BlockKind.IMAGE) {
-            const pending = pendingImages.get(index);
-            block.images[0] = {
-              srcPath: url,
-              altText: pending?.altText ?? block.images[0]?.altText ?? "",
-            };
-          }
+        if (!payload) {
+          return false;
         }
-
-        // Catch image blocks that still have no srcPath after upload (e.g. never selected in editor).
-        for (const block of resolvedBlocks) {
-          if (
-            block.kind === BlockKind.IMAGE &&
-            !block.images[0]?.srcPath?.trim()
-          ) {
-            showErrorToast("Image block requires an uploaded image");
-            return false;
-          }
-        }
-
-        const trimmedTitle = metadata.title.trim();
-        const payload = {
-          slug: metadata.slug.trim(),
-          type: metadata.type,
-          order: metadata.order,
-          blocks: resolvedBlocks,
-          ...(trimmedTitle ? { title: trimmedTitle } : {}),
-        };
 
         await $fetch("/sections", {
           baseURL: baseApiPath,
@@ -214,6 +246,49 @@ export const useSectionsStore = defineStore("sections", {
         return true;
       } catch (error) {
         handleError(error, "Failed to create section");
+        return false;
+      }
+    },
+
+    /**
+     * Uploads pending image blocks and updates an existing section via PUT /sections/:id.
+     *
+     * @param sectionId - Mongo `_id` of the section to update
+     * @param metadata - validated section metadata from step 1
+     * @param blocks - draft blocks from the builder
+     * @param pendingImages - image files deferred until submit, keyed by block index
+     * @returns true on success, false otherwise
+     * @async
+     */
+    async updateSection(
+      sectionId: string,
+      metadata: SectionMetadataFormState,
+      blocks: Block[],
+      pendingImages: Map<number, SectionPendingImageState>,
+    ): Promise<boolean> {
+      const { baseApiPath } = useRuntimeConfig().public;
+
+      try {
+        const payload = await this.buildSectionWritePayload(
+          metadata,
+          blocks,
+          pendingImages,
+        );
+
+        if (!payload) {
+          return false;
+        }
+
+        await $fetch(`/sections/${sectionId}`, {
+          baseURL: baseApiPath,
+          method: "PUT",
+          credentials: "include",
+          body: payload,
+        });
+
+        return true;
+      } catch (error) {
+        handleError(error, "Failed to update section");
         return false;
       }
     },

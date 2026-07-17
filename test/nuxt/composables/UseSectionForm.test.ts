@@ -12,7 +12,10 @@ import { mockNuxtImport } from "@nuxt/test-utils/runtime";
 import { showErrorToast, showSuccessToast } from "~/utils/toastNotification";
 import { handleError } from "~/utils/handleError";
 
-const createMockRoute = (query: LocationQuery) => ({ query });
+const createMockRoute = (
+  query: LocationQuery,
+  params: Record<string, string> = {},
+) => ({ query, params });
 
 const { navigateToMock } = vi.hoisted(() => ({
   navigateToMock: vi.fn(),
@@ -391,5 +394,197 @@ describe("useSectionForm composable", () => {
 
     expect(showSuccessToast).not.toHaveBeenCalled();
     expect(navigateToMock).not.toHaveBeenCalled();
+  });
+
+  describe("edit mode", () => {
+    const existingSection = createSection({
+      _id: "section-id",
+      title: "Hero",
+      slug: "hero",
+      type: ISectionType.HERO,
+      order: 3,
+      blocks: [{ kind: BlockKind.PARAGRAPH, paragraphs: ["Hello"] }],
+    });
+
+    beforeEach(() => {
+      useRouteMock.mockImplementation(() =>
+        createMockRoute({}, { slug: "hero" }),
+      );
+      vi.spyOn(sectionsStore, "fetchSection").mockImplementation(async () => {
+        sectionsStore.setSectionDetails(existingSection);
+      });
+    });
+
+    it("should hydrate form from fetched section on mount", async () => {
+      const { result } = mount(() => useSectionForm({ mode: "edit" }));
+      await flushPromises();
+
+      expect(sectionsStore.fetchSection).toHaveBeenCalledWith("hero");
+      expect(result.sectionId.value).toBe("section-id");
+      expect(result.placement.value).toBe("home");
+      expect(result.metadata.value).toEqual({
+        title: "Hero",
+        slug: "hero",
+        type: ISectionType.HERO,
+        order: 3,
+      });
+      expect(result.blocks.value).toEqual(existingSection.blocks);
+    });
+
+    it("should set standalone placement when editing an about-me section", async () => {
+      const aboutSection = createSection({
+        _id: "about-id",
+        slug: "about",
+        type: ISectionType.ABOUT_ME,
+        order: 1,
+        blocks: [{ kind: BlockKind.PARAGRAPH, paragraphs: ["About"] }],
+      });
+
+      useRouteMock.mockImplementation(() =>
+        createMockRoute({}, { slug: "about" }),
+      );
+      vi.spyOn(sectionsStore, "fetchSection").mockImplementation(async () => {
+        sectionsStore.setSectionDetails(aboutSection);
+      });
+
+      const { result } = mount(() => useSectionForm({ mode: "edit" }));
+      await flushPromises();
+
+      expect(result.placement.value).toBe("standalone");
+      expect(result.metadata.value.type).toBe(ISectionType.ABOUT_ME);
+    });
+
+    it("should not warn about duplicate type for the section being edited", async () => {
+      sectionsStore.setSections([existingSection]);
+
+      const { result } = mount(() => useSectionForm({ mode: "edit" }));
+      await flushPromises();
+
+      expect(result.showDuplicateTypeWarning.value).toBe(false);
+    });
+
+    it("should still warn when another home section already has the selected type", async () => {
+      sectionsStore.setSections([
+        existingSection,
+        createSection({
+          _id: "other-hero",
+          slug: "hero-2",
+          type: ISectionType.HERO,
+          order: 4,
+        }),
+      ]);
+
+      const { result } = mount(() => useSectionForm({ mode: "edit" }));
+      await flushPromises();
+
+      expect(result.showDuplicateTypeWarning.value).toBe(true);
+    });
+
+    it("should not overwrite loaded order with suggested order", async () => {
+      sectionsStore.setSections([createSection({ order: 10 })]);
+
+      const { result } = mount(() => useSectionForm({ mode: "edit" }));
+      await flushPromises();
+
+      expect(result.suggestedOrder.value).toBe(11);
+      expect(result.metadata.value.order).toBe(3);
+    });
+
+    it("should submit update and redirect to home on success", async () => {
+      const { result } = mount(() => useSectionForm({ mode: "edit" }));
+      await flushPromises();
+
+      result.step.value = 2;
+      vi.spyOn(sectionsStore, "updateSection").mockResolvedValue(true);
+
+      await result.submitUpdateSection();
+      await flushPromises();
+
+      expect(sectionsStore.updateSection).toHaveBeenCalledWith(
+        "section-id",
+        result.metadata.value,
+        result.blocks.value,
+        expect.any(Map),
+      );
+      expect(showSuccessToast).toHaveBeenCalledWith(
+        "Section updated successfully!",
+      );
+      expect(navigateToMock).toHaveBeenCalledWith("/");
+      expect(result.isSubmitting.value).toBe(false);
+    });
+
+    it("should redirect standalone sections to slug route on update success", async () => {
+      const aboutSection = createSection({
+        _id: "about-id",
+        slug: "about",
+        type: ISectionType.ABOUT_ME,
+        order: 1,
+        blocks: [{ kind: BlockKind.PARAGRAPH, paragraphs: ["About"] }],
+      });
+
+      useRouteMock.mockImplementation(() =>
+        createMockRoute({}, { slug: "about" }),
+      );
+      vi.spyOn(sectionsStore, "fetchSection").mockImplementation(async () => {
+        sectionsStore.setSectionDetails(aboutSection);
+      });
+
+      const { result } = mount(() => useSectionForm({ mode: "edit" }));
+      await flushPromises();
+
+      result.metadata.value.slug = "about-updated";
+      result.step.value = 2;
+      vi.spyOn(sectionsStore, "updateSection").mockResolvedValue(true);
+
+      await result.submitUpdateSection();
+      await flushPromises();
+
+      expect(navigateToMock).toHaveBeenCalledWith("/about-updated");
+    });
+
+    it("should not submit update when section id is missing", async () => {
+      const { result } = mount(() => useSectionForm({ mode: "edit" }));
+      await flushPromises();
+
+      result.sectionId.value = null;
+      result.step.value = 2;
+      vi.spyOn(sectionsStore, "updateSection").mockResolvedValue(true);
+
+      await result.submitUpdateSection();
+
+      expect(sectionsStore.updateSection).not.toHaveBeenCalled();
+      expect(showErrorToast).toHaveBeenCalledWith("Section id is missing");
+    });
+
+    it("should handle updateSection errors via handleError", async () => {
+      const { result } = mount(() => useSectionForm({ mode: "edit" }));
+      await flushPromises();
+
+      const error = new Error("Update failed");
+      result.step.value = 2;
+      vi.spyOn(sectionsStore, "updateSection").mockRejectedValue(error);
+
+      await result.submitUpdateSection();
+      await flushPromises();
+
+      expect(handleError).toHaveBeenCalledWith(
+        error,
+        "Failed to update section",
+      );
+      expect(showSuccessToast).not.toHaveBeenCalled();
+      expect(navigateToMock).not.toHaveBeenCalled();
+      expect(result.isSubmitting.value).toBe(false);
+    });
+
+    it("should toast when section fails to load", async () => {
+      vi.spyOn(sectionsStore, "fetchSection").mockResolvedValue();
+      sectionsStore.sectionDetails = null;
+
+      const { result } = mount(() => useSectionForm({ mode: "edit" }));
+      await flushPromises();
+
+      expect(showErrorToast).toHaveBeenCalledWith("Failed to load section");
+      expect(result.sectionId.value).toBeNull();
+    });
   });
 });
