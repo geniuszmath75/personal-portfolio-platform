@@ -24,7 +24,17 @@
     </ClientOnly>
 
     <template v-for="section in orderedSections" :key="section._id">
-      <SectionContent :section="section" />
+      <div class="relative">
+        <ClientOnly>
+          <div
+            v-if="isAdmin"
+            class="absolute right-4 bottom-4 z-20 md:right-8 md:bottom-8"
+          >
+            <SectionEditControl :slug="section.slug" />
+          </div>
+        </ClientOnly>
+        <SectionContent :section="section" />
+      </div>
       <ClientOnly>
         <SectionInsertBoundary v-if="isAdmin" :insert-after="section.order" />
       </ClientOnly>
