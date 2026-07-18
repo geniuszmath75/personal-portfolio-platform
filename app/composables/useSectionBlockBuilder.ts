@@ -272,7 +272,7 @@ export function useSectionBlockBuilder(
     editorMode.value = "edit";
     editorIndex.value = index;
     clearDraftImageState();
-    draftBlock.value = structuredClone(toRaw(block));
+    draftBlock.value = JSON.parse(JSON.stringify(toRaw(block))) as Block;
     hydrateDraftImageState(draftBlock.value, index);
     editorError.value = "";
     editorOpen.value = true;

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { reactive } from "vue";
 import { setActivePinia } from "pinia";
 import { createTestPinia } from "~~/test/setup";
 import { useSectionsStore } from "~/stores/sectionsStore";
@@ -312,6 +313,42 @@ describe("sectionsStore", () => {
         order: 2,
         blocks: mockBlocks,
       };
+
+      it("should clone deeply reactive blocks when building the write payload", async () => {
+        const store = useSectionsStore();
+        const reactiveBlocks = reactive([
+          {
+            kind: BlockKind.PARAGRAPH,
+            paragraphs: ["Hello from reactive state"],
+          },
+        ]) as Block[];
+
+        vi.stubGlobal(
+          "$fetch",
+          vi.fn().mockResolvedValue({ section: mockCreatedSection }),
+        );
+
+        const result = await store.createSection(
+          mockMetadata,
+          reactiveBlocks,
+          new Map(),
+        );
+
+        expect(result).toBe(true);
+        expect($fetch).toHaveBeenCalledWith(
+          "/sections",
+          expect.objectContaining({
+            body: expect.objectContaining({
+              blocks: [
+                {
+                  kind: BlockKind.PARAGRAPH,
+                  paragraphs: ["Hello from reactive state"],
+                },
+              ],
+            }),
+          }),
+        );
+      });
 
       it("should upload pending images and create section successfully", async () => {
         const store = useSectionsStore();

@@ -153,7 +153,11 @@ export const useSectionsStore = defineStore("sections", {
       blocks: Block[];
       title?: string;
     } | null> {
-      const resolvedBlocks = structuredClone(toRaw(blocks));
+      // Deep-copy via JSON: toRaw() only unwraps the outer array, while nested
+      // block objects stay as Vue proxies that structuredClone cannot clone.
+      const resolvedBlocks = JSON.parse(
+        JSON.stringify(toRaw(blocks)),
+      ) as Block[];
 
       // Upload deferred image files in parallel; reuse existing srcPath when no file is pending.
       const uploadTasks = Array.from(pendingImages.entries()).map(
