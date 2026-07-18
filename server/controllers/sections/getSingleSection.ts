@@ -1,7 +1,9 @@
 import { Section } from "~~/server/models/Section";
 
 export default defineEventHandler(async (event) => {
-  const { slug } = getRouterParams(event);
+  // Nitro requires the same dynamic param name for sibling routes in one folder
+  // (see [id].put.ts). The segment value is the section slug for GET requests.
+  const { id: slug } = getRouterParams(event);
 
   // Validate slug param
   const isValidSlug = typeof slug === "string" && slug.trim().length > 0;

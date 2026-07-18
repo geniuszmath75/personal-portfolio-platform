@@ -35,14 +35,14 @@ describe("GetSingleSection controller", async () => {
     vi.spyOn(Section, "findOne");
   });
 
-  const handler = await import("~~/server/api/v1/sections/[slug].get");
+  const handler = await import("~~/server/api/v1/sections/[id].get");
 
   it("should return section when slug is valid and section exists", async () => {
     // Arrange: mock Section.findById, prepare event with valid slug
     const validSlug = "about-me";
     vi.mocked(Section.findOne).mockResolvedValue(mockSection);
 
-    const event = createMockH3Event({ params: { slug: validSlug } });
+    const event = createMockH3Event({ params: { id: validSlug } });
 
     // Act: call handler
     const result = await handler.default(event);
@@ -57,7 +57,7 @@ describe("GetSingleSection controller", async () => {
   it("should throw 400 when slug is invalid", async () => {
     // Arrange: prepare event with invalid slug
     const invalidSlug = "   ";
-    const event = createMockH3Event({ params: { slug: invalidSlug } });
+    const event = createMockH3Event({ params: { id: invalidSlug } });
 
     // Act + Assert - handler should throw 400
     await expect(handler.default(event)).rejects.toMatchObject({
@@ -67,12 +67,24 @@ describe("GetSingleSection controller", async () => {
     });
   });
 
+  it("should throw 400 when route param id is missing (Nitro sibling-route param name)", async () => {
+    const event = createMockH3Event({ params: { slug: "about-me" } });
+
+    await expect(handler.default(event)).rejects.toMatchObject({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Invalid section slug",
+    });
+
+    expect(Section.findOne).not.toHaveBeenCalled();
+  });
+
   it("should throw 404 when section not found", async () => {
     // Arrange: valid slug, but section doesn't exist in DB
     const validSlug = "non-existent-slug";
     vi.mocked(Section.findOne).mockResolvedValue(null);
 
-    const event = createMockH3Event({ params: { slug: validSlug } });
+    const event = createMockH3Event({ params: { id: validSlug } });
 
     // Act + Assert: handler should throw 404
     await expect(handler.default(event)).rejects.toMatchObject({
