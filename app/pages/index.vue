@@ -30,7 +30,8 @@
             v-if="isAdmin"
             class="absolute right-4 bottom-4 z-20 md:right-8 md:bottom-8"
           >
-            <SectionEditControl :slug="section.slug" />
+            <SectionEditControl class="hidden md:block" :slug="section.slug" />
+            <SectionEditMobileControl class="md:hidden" :slug="section.slug" />
           </div>
         </ClientOnly>
         <SectionContent :section="section" />

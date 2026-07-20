@@ -4,7 +4,7 @@ import { renderWithNuxt } from "~~/test/setup";
 import SectionEditControl from "~/components/Section/EditControl.vue";
 
 describe("SectionEditControl", () => {
-  it("should render edit link for the given section slug", () => {
+  it("should render desktop edit link with BaseBtn for the given section slug", () => {
     renderWithNuxt(SectionEditControl, {
       props: { slug: "hero" },
     });
@@ -12,5 +12,8 @@ describe("SectionEditControl", () => {
     const link = screen.getByRole("link", { name: "Edit hero section" });
 
     expect(link).toHaveAttribute("href", "/sections/hero/edit");
+    expect(
+      screen.getByRole("button", { name: "Edit Section" }),
+    ).toBeInTheDocument();
   });
 });

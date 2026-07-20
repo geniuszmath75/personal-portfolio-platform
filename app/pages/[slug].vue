@@ -3,9 +3,16 @@
     <ClientOnly>
       <div
         v-if="isAdmin && sectionDetails"
-        class="absolute right-4 top-4 z-20 md:right-8 md:top-8"
+        class="absolute right-4 bottom-4 z-20"
       >
-        <SectionEditControl :slug="sectionDetails.slug" />
+        <SectionEditControl
+          class="hidden md:block"
+          :slug="sectionDetails.slug"
+        />
+        <SectionEditMobileControl
+          class="fixed right-4 bottom-4 md:hidden"
+          :slug="sectionDetails.slug"
+        />
       </div>
     </ClientOnly>
 

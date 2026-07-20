@@ -1,6 +1,13 @@
 <template>
-  <NuxtLink :to="editUrl" :class="linkClasses" :aria-label="ariaLabel">
-    <Icon name="mdi:pencil" class="text-2xl" />
+  <NuxtLink :to="editUrl" :aria-label="ariaLabel">
+    <BaseBtn label="Edit Section" btn-size="large">
+      <template #icon>
+        <Icon
+          name="mdi:pencil"
+          class="absolute left-2 text-secondary-500 text-2xl"
+        />
+      </template>
+    </BaseBtn>
   </NuxtLink>
 </template>
 
@@ -12,7 +19,4 @@ const props = defineProps<{
 const editUrl = computed(() => `/sections/${props.slug}/edit`);
 
 const ariaLabel = computed(() => `Edit ${props.slug} section`);
-
-const linkClasses =
-  "flex h-12 w-12 items-center justify-center rounded-full bg-additional-500 text-primary-500 shadow-primary transition-all duration-200 ease-out hover:bg-additional-600";
 </script>

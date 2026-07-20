@@ -26,6 +26,21 @@
           </NuxtLink>
         </ClientOnly>
       </div>
+
+      <!-- Create btn as FAB - only for mobile -->
+      <ClientOnly>
+        <NuxtLink
+          v-if="isAdmin"
+          :to="`/projects/${projectId}/edit`"
+          class="fixed bottom-6 right-6 md:hidden z-10"
+        >
+          <BaseBtn label="Edit project">
+            <template #icon>
+              <Icon name="mdi:pencil" class="text-secondary-500 text-2xl" />
+            </template>
+          </BaseBtn>
+        </NuxtLink>
+      </ClientOnly>
     </div>
 
     <!-- Image carousel -->
