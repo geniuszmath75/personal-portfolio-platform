@@ -30,6 +30,20 @@ export default defineNuxtConfig({
     "/sections/*/edit": { ssr: false },
   },
   vite: {
+    plugins: [
+      // Temporary workaround for Vite 8 + vite-plugin-checker@0.14.4:
+      // checker emits a base-prefixed runtime import
+      // (`/_nuxt/@vite-plugin-checker-runtime`) that its own resolveId no
+      // longer matches. See nuxt/nuxt#35765 / fi3ework/vite-plugin-checker#661.
+      {
+        name: "vite-plugin-checker-runtime-base-fix",
+        resolveId(id: string) {
+          if (id.endsWith("/@vite-plugin-checker-runtime")) {
+            return "virtual:@vite-plugin-checker-runtime";
+          }
+        },
+      },
+    ],
     optimizeDeps: {
       include: [
         "@vue/devtools-core",
