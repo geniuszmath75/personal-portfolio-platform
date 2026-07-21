@@ -135,124 +135,124 @@
         </Transition>
       </div>
 
-      <!-- Mobile trigger -->
-      <div class="flex items-center px-2 mr-6 md:hidden">
+      <!-- Mobile menu toggle (stays in navbar layer above the overlay) -->
+      <div class="relative z-10 flex items-center px-2 mr-6 md:hidden">
         <Icon
           v-if="!isMobileMenuOpen"
           name="mdi:menu"
-          class="text-secondary-500"
+          class="cursor-pointer text-secondary-500"
+          size="1.5em"
+          @click="toggleMobileMenu"
+        />
+        <Icon
+          v-else
+          name="mdi:close"
+          class="cursor-pointer text-secondary-500"
           size="1.5em"
           @click="toggleMobileMenu"
         />
       </div>
+    </div>
 
-      <!-- Mobile menu -->
-      <Teleport to="body">
-        <Transition
-          enter-active-class="transition duration-150 ease-out"
-          enter-from-class="opacity-0"
-          enter-to-class="opacity-100"
-          leave-active-class="transition duration-150 ease-in"
-          leave-from-class="opacity-100"
-          leave-to-class="opacity-0"
+    <!-- Mobile menu panel -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition duration-150 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition duration-150 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="isMobileMenuOpen"
+          class="fixed inset-x-0 top-16 bottom-0 z-40 flex flex-col items-center justify-center bg-primary-500 md:hidden"
         >
-          <div
-            v-if="isMobileMenuOpen"
-            class="fixed inset-0 bg-primary-500 flex flex-col items-center justify-center w-full z-50"
+          <!-- Links -->
+          <NuxtLink
+            v-for="link in navLinks"
+            :key="link.to"
+            :to="link.to"
+            :class="
+              'h-20 w-full flex items-center justify-center text-secondary-500 font-semibold text-xl ' +
+              (currentPath === link.to
+                ? 'bg-primary-400'
+                : 'hover:bg-primary-400')
+            "
+            @click="toggleMobileMenu"
+            >{{ link.label }}</NuxtLink
           >
-            <Icon
-              name="mdi:close"
-              class="absolute top-6 right-2 text-secondary-500 cursor-pointer"
-              size="1.5em"
-              @click="toggleMobileMenu"
-            />
 
-            <!-- Links -->
-            <NuxtLink
-              v-for="link in navLinks"
-              :key="link.to"
-              :to="link.to"
-              :class="
-                'h-20 w-full flex items-center justify-center text-secondary-500 font-semibold text-xl ' +
-                (currentPath === link.to
-                  ? 'bg-primary-400'
-                  : 'hover:bg-primary-400')
-              "
-              @click="toggleMobileMenu"
-              >{{ link.label }}</NuxtLink
+          <NuxtLink
+            v-if="isAdmin"
+            to="/sections/create?placement=standalone"
+            class="flex h-20 w-1/2 items-center"
+            @click="toggleMobileMenu"
+          >
+            <BaseBtn
+              label="NEW PAGE"
+              btn-style="login--logout"
+              icon-name="mdi:plus"
             >
+              <template #icon>
+                <Icon
+                  name="mdi:plus"
+                  class="absolute left-2 text-secondary-500 text-2xl"
+                />
+              </template>
+            </BaseBtn>
+          </NuxtLink>
 
-            <NuxtLink
-              v-if="isAdmin"
-              to="/sections/create?placement=standalone"
-              class="flex items-center h-20 w-1/2"
-              @click="toggleMobileMenu"
-            >
+          <!-- Log In, Log Out and Dashboard -->
+          <div class="flex w-full justify-center">
+            <NuxtLink v-if="!loggedIn" to="/auth/login" class="w-full">
               <BaseBtn
-                label="NEW PAGE"
-                btn-style="login--logout"
-                icon-name="mdi:plus"
+                label="LOG IN"
+                btn-style="mobile--login--logout"
+                btn-size="mobile--menu"
+                @click="toggleMobileMenu"
               >
                 <template #icon>
                   <Icon
-                    name="mdi:plus"
+                    name="mdi:login"
                     class="absolute left-2 text-secondary-500 text-2xl"
                   />
                 </template>
               </BaseBtn>
             </NuxtLink>
-
-            <!-- Log In, Log Out and Dashboard -->
-            <div class="w-full flex justify-center">
-              <NuxtLink v-if="!loggedIn" to="/auth/login" class="w-full">
-                <BaseBtn
-                  label="LOG IN"
-                  btn-style="mobile--login--logout"
-                  btn-size="mobile--menu"
-                  @click="toggleMobileMenu"
-                >
-                  <template #icon>
-                    <Icon
-                      name="mdi:login"
-                      class="absolute left-2 text-secondary-500 text-2xl"
-                    />
-                  </template>
-                </BaseBtn>
-              </NuxtLink>
-              <NuxtLink v-if="isAdmin" to="/admin/dashboard" class="w-full">
-                <BaseBtn
-                  label="DASHBOARD"
-                  btn-style="mobile--secondary"
-                  btn-size="mobile--menu"
-                  @click="toggleMobileMenu"
-                >
-                  <template #icon>
-                    <Icon
-                      name="material-symbols:dashboard"
-                      class="absolute left-2 text-additional-500 text-2xl"
-                    />
-                  </template>
-                </BaseBtn>
-              </NuxtLink>
+            <NuxtLink v-if="isAdmin" to="/admin/dashboard" class="w-full">
               <BaseBtn
-                v-if="loggedIn"
-                label="LOG OUT"
-                btn-style="mobile--login--logout"
+                label="DASHBOARD"
+                btn-style="mobile--secondary"
                 btn-size="mobile--menu"
-                @click="handleLogout"
+                @click="toggleMobileMenu"
               >
                 <template #icon>
                   <Icon
-                    name="mdi:logout"
-                    class="absolute left-2 text-secondary-500 text-2xl"
+                    name="material-symbols:dashboard"
+                    class="absolute left-2 text-additional-500 text-2xl"
                   />
                 </template>
               </BaseBtn>
-            </div>
+            </NuxtLink>
+            <BaseBtn
+              v-if="loggedIn"
+              label="LOG OUT"
+              btn-style="mobile--login--logout"
+              btn-size="mobile--menu"
+              @click="handleLogout"
+            >
+              <template #icon>
+                <Icon
+                  name="mdi:logout"
+                  class="absolute left-2 text-secondary-500 text-2xl"
+                />
+              </template>
+            </BaseBtn>
           </div>
-        </Transition>
-      </Teleport>
-    </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
