@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { beforeEach, describe, it, expect, vi } from "vitest";
 import { fireEvent, screen } from "@testing-library/vue";
 import { renderWithNuxt } from "~~/test/setup";
 import FileUpload from "~/components/FileUpload.vue";
@@ -41,6 +41,17 @@ function makeFileInfo(overrides: Partial<UploadFileInfo> = {}): UploadFileInfo {
 const defaultProps = {
   accept: [] as string[],
 };
+
+// Node's URL.createObjectURL rejects happy-dom File (not instanceof Node Blob).
+beforeEach(() => {
+  vi.stubGlobal(
+    "URL",
+    Object.assign(URL, {
+      createObjectURL: vi.fn(() => "blob:mock-url"),
+      revokeObjectURL: vi.fn(),
+    }),
+  );
+});
 
 describe("FileUpload.vue", () => {
   // -------------------------------------------------------------------------

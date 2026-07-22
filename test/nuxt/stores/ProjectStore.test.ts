@@ -7,15 +7,26 @@ import { setActivePinia } from "pinia";
 import { createTestPinia } from "~~/test/setup";
 import { useProjectsStore } from "~/stores/projectsStore";
 
-mockNuxtImport("useRuntimeConfig", () => {
+mockNuxtImport("useRuntimeConfig", (original) => {
   return () => {
+    const config = original();
     return {
+      ...config,
       public: {
+        ...config.public,
         baseApiPath: "/api/v1",
       },
     };
   };
 });
+
+// Auto-imported `$fetch` is not the same binding as `globalThis.$fetch`,
+// so vi.stubGlobal no longer works under Vitest / test-utils v4.
+const { $fetchMock } = vi.hoisted(() => ({
+  $fetchMock: vi.fn(),
+}));
+
+mockNuxtImport("$fetch", () => $fetchMock);
 
 vi.mock("~/utils/validateProject", () => ({
   projectSchema: {
@@ -152,14 +163,11 @@ describe("projectsStore", () => {
     // Arrange: mock $fetch to resolve with mockProjects
     const store = useProjectsStore();
 
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn().mockResolvedValue({
-        projects: mockProjects,
-        count: 2,
-        pagination: mockPagination,
-      }),
-    );
+    $fetchMock.mockResolvedValue({
+      projects: mockProjects,
+      count: 2,
+      pagination: mockPagination,
+    });
 
     // Act: call fetchProjects action
     await store.fetchProjects(1, 5);
@@ -167,7 +175,7 @@ describe("projectsStore", () => {
     // Assert:
     // - $fetch called with correct endpoint and correct params
     // - store updated with API response
-    expect($fetch).toHaveBeenCalledWith("/api/v1/projects", {
+    expect($fetchMock).toHaveBeenCalledWith("/api/v1/projects", {
       query: { page: 1, limit: 5 },
     });
     expect(store.projects).toEqual(mockProjects);
@@ -181,10 +189,7 @@ describe("projectsStore", () => {
     const store = useProjectsStore();
 
     // Mock $fetch
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn().mockRejectedValue(new Error("Network error")),
-    );
+    $fetchMock.mockRejectedValue(new Error("Network error"));
 
     const consoleErrorSpy = vi
       .spyOn(console, "error")
@@ -196,7 +201,7 @@ describe("projectsStore", () => {
     // Assert:
     // - error logged to console
     // - store remains unchanged (empty array)
-    expect($fetch).toHaveBeenCalledWith("/api/v1/projects", {
+    expect($fetchMock).toHaveBeenCalledWith("/api/v1/projects", {
       query: { page: 1, limit: 5 },
     });
     expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -239,7 +244,7 @@ describe("projectsStore", () => {
     const store = useProjectsStore();
     const mockProjectResponse = { project: mockProjects[0] };
 
-    vi.stubGlobal("$fetch", vi.fn().mockResolvedValue(mockProjectResponse));
+    $fetchMock.mockResolvedValue(mockProjectResponse);
 
     // Act: call fetchProject
     await store.fetchProject("1");
@@ -247,7 +252,7 @@ describe("projectsStore", () => {
     // Assert:
     // - $fetch called with correct endpoint and correct params
     // - store updated with API response
-    expect($fetch).toHaveBeenCalledWith("/api/v1/projects/1");
+    expect($fetchMock).toHaveBeenCalledWith("/api/v1/projects/1");
     expect(store.projectDetails).toEqual(mockProjects[0]);
     expect(store.loading).toBe(false);
   });
@@ -256,10 +261,7 @@ describe("projectsStore", () => {
     // Arrange: create store and mock $fetch
     const store = useProjectsStore();
 
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn().mockRejectedValue(new Error("Network error")),
-    );
+    $fetchMock.mockRejectedValue(new Error("Network error"));
     const consoleErrorSpy = vi
       .spyOn(console, "error")
       .mockImplementation(() => {});
@@ -270,7 +272,7 @@ describe("projectsStore", () => {
     // Assert:
     // - error logged to console
     // - store remains unchanged (null)
-    expect($fetch).toHaveBeenCalledWith("/api/v1/projects/1");
+    expect($fetchMock).toHaveBeenCalledWith("/api/v1/projects/1");
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       "Failed to fetch project details:",
       expect.any(Error),
@@ -481,7 +483,7 @@ describe("projectsStore", () => {
       data: { url: "/uploads/projects/test.jpg" },
     };
 
-    vi.stubGlobal("$fetch", vi.fn().mockResolvedValue(mockResponse));
+    $fetchMock.mockResolvedValue(mockResponse);
 
     // Act: call uploadProjectImage action
     const result = await store.uploadProjectImage(mockFile);
@@ -489,7 +491,7 @@ describe("projectsStore", () => {
     // Assert:
     // - $fetch called with correct endpoint and FormData
     // - returns uploaded image URL
-    expect($fetch).toHaveBeenCalledWith("/upload/image", {
+    expect($fetchMock).toHaveBeenCalledWith("/upload/image", {
       baseURL: "/api/v1",
       method: "POST",
       credentials: "include",
@@ -506,10 +508,7 @@ describe("projectsStore", () => {
       type: "image/jpeg",
     });
 
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn().mockRejectedValue(new Error("Upload failed")),
-    );
+    $fetchMock.mockRejectedValue(new Error("Upload failed"));
     const consoleErrorSpy = vi
       .spyOn(console, "error")
       .mockImplementation(() => {});
@@ -545,7 +544,7 @@ describe("projectsStore", () => {
       .mockResolvedValueOnce("/uploads/projects/main.jpg")
       .mockResolvedValueOnce("/uploads/projects/other.jpg");
 
-    vi.stubGlobal("$fetch", vi.fn().mockResolvedValue({}));
+    $fetchMock.mockResolvedValue({});
 
     // Act: call createProject action
     const result = await store.createProject(
@@ -560,7 +559,7 @@ describe("projectsStore", () => {
     // - $fetch called with correct endpoint and payload
     expect(result).toBe(true);
     expect(store.loading).toBe(false);
-    expect($fetch).toHaveBeenCalledWith(
+    expect($fetchMock).toHaveBeenCalledWith(
       "/projects",
       expect.objectContaining({
         baseURL: "/api/v1",
@@ -654,7 +653,7 @@ describe("projectsStore", () => {
       "/uploads/projects/main.jpg",
     );
 
-    vi.stubGlobal("$fetch", vi.fn().mockRejectedValue(new Error("API error")));
+    $fetchMock.mockRejectedValue(new Error("API error"));
     const consoleErrorSpy = vi
       .spyOn(console, "error")
       .mockImplementation(() => {});
@@ -703,8 +702,7 @@ describe("projectsStore", () => {
         .mockResolvedValueOnce("/uploads/projects/new-main.jpg")
         .mockResolvedValueOnce("/uploads/projects/new-other.jpg");
 
-      const fetchMock = vi.fn().mockResolvedValue({});
-      vi.stubGlobal("$fetch", fetchMock);
+      $fetchMock.mockResolvedValue({});
 
       const result = await store.updateProject(
         projectId,
@@ -723,7 +721,7 @@ describe("projectsStore", () => {
         otherImageFiles[1]!.file,
         "projects",
       );
-      expect(fetchMock).toHaveBeenCalledWith(`/projects/${projectId}`, {
+      expect($fetchMock).toHaveBeenCalledWith(`/projects/${projectId}`, {
         baseURL: "/api/v1",
         method: "PUT",
         credentials: "include",
@@ -761,7 +759,7 @@ describe("projectsStore", () => {
       ];
 
       const uploadSpy = vi.spyOn(store, "uploadProjectImage");
-      vi.stubGlobal("$fetch", vi.fn().mockResolvedValue({}));
+      $fetchMock.mockResolvedValue({});
 
       const result = await store.updateProject(
         projectId,
@@ -773,7 +771,7 @@ describe("projectsStore", () => {
 
       expect(result).toBe(true);
       expect(uploadSpy).not.toHaveBeenCalled();
-      expect($fetch).toHaveBeenCalledWith(
+      expect($fetchMock).toHaveBeenCalledWith(
         `/projects/${projectId}`,
         expect.objectContaining({
           method: "PUT",
@@ -840,10 +838,7 @@ describe("projectsStore", () => {
     it("should handle API errors gracefully", async () => {
       const store = useProjectsStore();
 
-      vi.stubGlobal(
-        "$fetch",
-        vi.fn().mockRejectedValue(new Error("API error")),
-      );
+      $fetchMock.mockRejectedValue(new Error("API error"));
       const consoleErrorSpy = vi
         .spyOn(console, "error")
         .mockImplementation(() => {});

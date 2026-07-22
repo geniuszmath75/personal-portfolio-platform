@@ -1,14 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
-import ProjectCard from "../../../app/components/ProjectCard.vue";
-import type { BasicProjectInformation } from "../../../shared/types/index";
-import { renderWithNuxt } from "../../setup";
+import ProjectCard from "~/components/ProjectCard.vue";
+import type { BasicProjectInformation } from "~~/shared/types/index";
+import { renderWithNuxt } from "~~/test/setup";
 import { fireEvent, screen } from "@testing-library/vue";
 
-// Mock useRouter
-const pushMock = vi.fn();
-mockNuxtImport("useRouter", () => {
+const { pushMock } = vi.hoisted(() => ({ pushMock: vi.fn() }));
+
+// Keep real router methods (e.g. afterEach) required by setupNuxt in test-utils v4.
+mockNuxtImport("useRouter", (original) => {
   return () => ({
+    ...original(),
     push: pushMock,
   });
 });

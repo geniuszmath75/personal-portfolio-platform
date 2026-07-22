@@ -14,7 +14,7 @@ type TestH3Event = H3Event & {
 };
 
 export function useH3TestUtils() {
-  const h3 = vi.hoisted(() => ({
+  const h3 = {
     defineNitroPlugin: vi.fn((def: NitroAppPlugin) => def),
     defineEventHandler: vi.fn((handler: Handler) => handler),
     readBody: vi.fn(async (event: H3Event) => {
@@ -31,7 +31,7 @@ export function useH3TestUtils() {
     readMultipartFormData: vi.fn(async (event: TestH3Event) => {
       return event._multipartFormData || [];
     }),
-  }));
+  };
 
   // Stub the global functions to support auto-imports in tests
   vi.stubGlobal("defineEventHandler", h3.defineEventHandler);

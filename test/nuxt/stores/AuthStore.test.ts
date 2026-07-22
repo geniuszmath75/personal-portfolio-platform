@@ -1,19 +1,25 @@
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { setActivePinia } from "pinia";
-import { createTestPinia } from "../../setup";
-import { useAuthStore } from "../../../app/stores/authStore";
-import type { AuthUser } from "../../../shared/types";
-import { UserSchemaRole } from "../../../shared/types/enums";
-import { handleError } from "../../../app/utils/handleError";
-import { showSuccessToast } from "../../../app/utils/toastNotification";
+import { createTestPinia } from "~~/test/setup";
+import { useAuthStore } from "~/stores/authStore";
+import type { AuthUser } from "~~/shared/types";
+import { UserSchemaRole } from "~~/shared/types/enums";
+import { handleError } from "~/utils/handleError";
+import { showSuccessToast } from "~/utils/toastNotification";
 
-const { navigateToMock } = vi.hoisted(() => ({ navigateToMock: vi.fn() }));
+const { navigateToMock, $fetchMock } = vi.hoisted(() => ({
+  navigateToMock: vi.fn(),
+  $fetchMock: vi.fn(),
+}));
 
-mockNuxtImport("useRuntimeConfig", () => {
+mockNuxtImport("useRuntimeConfig", (original) => {
   return () => {
+    const config = original();
     return {
+      ...config,
       public: {
+        ...config.public,
         baseApiPath: "/api/v1",
       },
     };
@@ -21,6 +27,7 @@ mockNuxtImport("useRuntimeConfig", () => {
 });
 
 mockNuxtImport("navigateTo", () => navigateToMock);
+mockNuxtImport("$fetch", () => $fetchMock);
 
 vi.mock("~/utils/toastNotification", () => ({
   showSuccessToast: vi.fn(),
@@ -125,13 +132,10 @@ describe("authStore", () => {
 
   it("should 'login' perform successful login and update state", async () => {
     // Arrange: mock API response
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn().mockResolvedValue({
-        user: mockAuthUser,
-        token: "JWT_TOKEN",
-      }),
-    );
+    $fetchMock.mockResolvedValue({
+      user: mockAuthUser,
+      token: "JWT_TOKEN",
+    });
 
     const store = useAuthStore();
 
@@ -150,7 +154,7 @@ describe("authStore", () => {
 
   it("should 'login' handle error and not update auth state", async () => {
     // Arrange: mock API error
-    vi.stubGlobal("$fetch", vi.fn().mockRejectedValue(new Error("API error")));
+    $fetchMock.mockRejectedValue(new Error("API error"));
 
     const store = useAuthStore();
 
@@ -170,7 +174,7 @@ describe("authStore", () => {
 
   it("should 'logout' handle user logout, clear auth state and redirect", async () => {
     // Arrange
-    vi.stubGlobal("$fetch", vi.fn().mockResolvedValue({ success: true }));
+    $fetchMock.mockResolvedValue({ success: true });
 
     const store = useAuthStore();
     store.setAuthUser(mockAuthUser);
@@ -189,7 +193,7 @@ describe("authStore", () => {
 
   it("should 'logout' handle error but still clear auth state", async () => {
     // Arrange
-    vi.stubGlobal("$fetch", vi.fn().mockRejectedValue(new Error("API error")));
+    $fetchMock.mockRejectedValue(new Error("API error"));
 
     const store = useAuthStore();
     store.setAuthUser(mockAuthUser);
@@ -209,12 +213,9 @@ describe("authStore", () => {
 
   it("should set auth user when 'checkAuth' succeeds", async () => {
     // Arrange
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn().mockResolvedValue({
-        user: mockAuthUser,
-      }),
-    );
+    $fetchMock.mockResolvedValue({
+      user: mockAuthUser,
+    });
 
     const store = useAuthStore();
 
@@ -229,10 +230,7 @@ describe("authStore", () => {
 
   it("should clear auth state when 'checkAuth' fails", async () => {
     // Arrange
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn().mockRejectedValue(new Error("Unauthorized")),
-    );
+    $fetchMock.mockRejectedValue(new Error("Unauthorized"));
 
     const store = useAuthStore();
     store.setAuthUser(mockAuthUser);

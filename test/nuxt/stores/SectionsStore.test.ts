@@ -14,16 +14,26 @@ vi.mock("~/utils/toastNotification", () => ({
   showSuccessToast: vi.fn(),
 }));
 
-// Mock 'useRuntimeConfig'
-mockNuxtImport("useRuntimeConfig", () => {
+mockNuxtImport("useRuntimeConfig", (original) => {
   return () => {
+    const config = original();
     return {
+      ...config,
       public: {
+        ...config.public,
         baseApiPath: "/api/v1",
       },
     };
   };
 });
+
+// Auto-imported `$fetch` is not the same binding as `globalThis.$fetch`,
+// so vi.stubGlobal no longer works under Vitest / test-utils v4.
+const { $fetchMock } = vi.hoisted(() => ({
+  $fetchMock: vi.fn(),
+}));
+
+mockNuxtImport("$fetch", () => $fetchMock);
 
 describe("sectionsStore", () => {
   const mockParagraphBlock: ParagraphBlock = {
@@ -85,6 +95,7 @@ describe("sectionsStore", () => {
 
   beforeEach(() => {
     setActivePinia(createTestPinia());
+    $fetchMock.mockReset();
   });
 
   it("should have default state", () => {
@@ -120,14 +131,11 @@ describe("sectionsStore", () => {
     const store = useSectionsStore();
 
     // Mock $fetch
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn().mockResolvedValue({ sections: mockSections }),
-    );
+    $fetchMock.mockResolvedValue({ sections: mockSections });
 
     await store.fetchSections();
 
-    expect($fetch).toHaveBeenCalledWith("/api/v1/sections");
+    expect($fetchMock).toHaveBeenCalledWith("/api/v1/sections");
     expect(store.sections).toEqual(mockSections);
   });
 
@@ -135,10 +143,7 @@ describe("sectionsStore", () => {
     const store = useSectionsStore();
 
     // Mock $fetch
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn().mockRejectedValue(new Error("Network error")),
-    );
+    $fetchMock.mockRejectedValue(new Error("Network error"));
     const consoleErrorSpy = vi
       .spyOn(console, "error")
       .mockImplementation(() => {});
@@ -158,14 +163,11 @@ describe("sectionsStore", () => {
     const store = useSectionsStore();
 
     // Mock $fetch
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn().mockResolvedValue({ section: mockAboutSection }),
-    );
+    $fetchMock.mockResolvedValue({ section: mockAboutSection });
 
     await store.fetchSection("about-me");
 
-    expect($fetch).toHaveBeenCalledWith("/api/v1/sections/about-me");
+    expect($fetchMock).toHaveBeenCalledWith("/api/v1/sections/about-me");
     expect(store.sectionDetails).toEqual(mockAboutSection);
   });
 
@@ -173,10 +175,7 @@ describe("sectionsStore", () => {
     const store = useSectionsStore();
 
     // Mock $fetch
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn().mockRejectedValue(new Error("Network error")),
-    );
+    $fetchMock.mockRejectedValue(new Error("Network error"));
     const consoleErrorSpy = vi
       .spyOn(console, "error")
       .mockImplementation(() => {});
@@ -256,11 +255,11 @@ describe("sectionsStore", () => {
     it("should upload file and return URL on success", async () => {
       const store = useSectionsStore();
 
-      vi.stubGlobal("$fetch", vi.fn().mockResolvedValue(mockResponse));
+      $fetchMock.mockResolvedValue(mockResponse);
 
       const result = await store.uploadSectionImage(mockFile);
 
-      expect($fetch).toHaveBeenCalledWith("/upload/image", {
+      expect($fetchMock).toHaveBeenCalledWith("/upload/image", {
         baseURL: "/api/v1",
         method: "POST",
         credentials: "include",
@@ -273,10 +272,7 @@ describe("sectionsStore", () => {
     it("should return null on failure", async () => {
       const store = useSectionsStore();
 
-      vi.stubGlobal(
-        "$fetch",
-        vi.fn().mockRejectedValue(new Error("Upload failed")),
-      );
+      $fetchMock.mockRejectedValue(new Error("Upload failed"));
 
       const consoleErrorSpy = vi
         .spyOn(console, "error")
@@ -323,10 +319,7 @@ describe("sectionsStore", () => {
           },
         ]) as Block[];
 
-        vi.stubGlobal(
-          "$fetch",
-          vi.fn().mockResolvedValue({ section: mockCreatedSection }),
-        );
+        $fetchMock.mockResolvedValue({ section: mockCreatedSection });
 
         const result = await store.createSection(
           mockMetadata,
@@ -335,7 +328,7 @@ describe("sectionsStore", () => {
         );
 
         expect(result).toBe(true);
-        expect($fetch).toHaveBeenCalledWith(
+        expect($fetchMock).toHaveBeenCalledWith(
           "/sections",
           expect.objectContaining({
             body: expect.objectContaining({
@@ -374,10 +367,7 @@ describe("sectionsStore", () => {
         vi.spyOn(store, "uploadSectionImage").mockResolvedValue(
           "/uploads/sections/hero.png",
         );
-        vi.stubGlobal(
-          "$fetch",
-          vi.fn().mockResolvedValue({ section: mockCreatedSection }),
-        );
+        $fetchMock.mockResolvedValue({ section: mockCreatedSection });
 
         const result = await store.createSection(
           mockMetadata,
@@ -386,7 +376,7 @@ describe("sectionsStore", () => {
         );
 
         expect(result).toBe(true);
-        expect($fetch).toHaveBeenCalledWith(
+        expect($fetchMock).toHaveBeenCalledWith(
           "/sections",
           expect.objectContaining({
             baseURL: "/api/v1",
@@ -416,10 +406,7 @@ describe("sectionsStore", () => {
       it("should omit empty title from payload", async () => {
         const store = useSectionsStore();
 
-        vi.stubGlobal(
-          "$fetch",
-          vi.fn().mockResolvedValue({ section: mockCreatedSection }),
-        );
+        $fetchMock.mockResolvedValue({ section: mockCreatedSection });
 
         await store.createSection(
           { ...mockMetadata, title: "  " },
@@ -427,7 +414,7 @@ describe("sectionsStore", () => {
           new Map(),
         );
 
-        expect($fetch).toHaveBeenCalledWith(
+        expect($fetchMock).toHaveBeenCalledWith(
           "/sections",
           expect.objectContaining({
             body: expect.not.objectContaining({ title: expect.anything() }),
@@ -455,10 +442,7 @@ describe("sectionsStore", () => {
         ]);
 
         const uploadSpy = vi.spyOn(store, "uploadSectionImage");
-        vi.stubGlobal(
-          "$fetch",
-          vi.fn().mockResolvedValue({ section: mockCreatedSection }),
-        );
+        $fetchMock.mockResolvedValue({ section: mockCreatedSection });
 
         const result = await store.createSection(
           mockMetadata,
@@ -468,7 +452,7 @@ describe("sectionsStore", () => {
 
         expect(result).toBe(true);
         expect(uploadSpy).not.toHaveBeenCalled();
-        expect($fetch).toHaveBeenCalledWith(
+        expect($fetchMock).toHaveBeenCalledWith(
           "/sections",
           expect.objectContaining({
             body: expect.objectContaining({
@@ -540,10 +524,7 @@ describe("sectionsStore", () => {
       it("should handle API errors gracefully", async () => {
         const store = useSectionsStore();
 
-        vi.stubGlobal(
-          "$fetch",
-          vi.fn().mockRejectedValue(new Error("Network error")),
-        );
+        $fetchMock.mockRejectedValue(new Error("Network error"));
 
         const consoleErrorSpy = vi
           .spyOn(console, "error")
@@ -610,10 +591,7 @@ describe("sectionsStore", () => {
         vi.spyOn(store, "uploadSectionImage").mockResolvedValue(
           "/uploads/sections/hero.png",
         );
-        vi.stubGlobal(
-          "$fetch",
-          vi.fn().mockResolvedValue({ section: mockUpdatedSection }),
-        );
+        $fetchMock.mockResolvedValue({ section: mockUpdatedSection });
 
         const result = await store.updateSection(
           "section-id",
@@ -623,7 +601,7 @@ describe("sectionsStore", () => {
         );
 
         expect(result).toBe(true);
-        expect($fetch).toHaveBeenCalledWith(
+        expect($fetchMock).toHaveBeenCalledWith(
           "/sections/section-id",
           expect.objectContaining({
             baseURL: "/api/v1",
@@ -670,10 +648,7 @@ describe("sectionsStore", () => {
         ]);
 
         const uploadSpy = vi.spyOn(store, "uploadSectionImage");
-        vi.stubGlobal(
-          "$fetch",
-          vi.fn().mockResolvedValue({ section: mockUpdatedSection }),
-        );
+        $fetchMock.mockResolvedValue({ section: mockUpdatedSection });
 
         const result = await store.updateSection(
           "section-id",
@@ -684,7 +659,7 @@ describe("sectionsStore", () => {
 
         expect(result).toBe(true);
         expect(uploadSpy).not.toHaveBeenCalled();
-        expect($fetch).toHaveBeenCalledWith(
+        expect($fetchMock).toHaveBeenCalledWith(
           "/sections/section-id",
           expect.objectContaining({
             body: expect.objectContaining({
@@ -736,10 +711,7 @@ describe("sectionsStore", () => {
       it("should handle API errors gracefully", async () => {
         const store = useSectionsStore();
 
-        vi.stubGlobal(
-          "$fetch",
-          vi.fn().mockRejectedValue(new Error("Network error")),
-        );
+        $fetchMock.mockRejectedValue(new Error("Network error"));
 
         const consoleErrorSpy = vi
           .spyOn(console, "error")

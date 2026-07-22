@@ -1,4 +1,3 @@
-// tests/mongodb.test.ts
 import {
   describe,
   it,
@@ -12,38 +11,41 @@ import {
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
-import { useH3TestUtils } from "../../../setup";
-import { connectDB } from "../../../../server/db/connect";
+import { useH3TestUtils } from "~~/test/setup";
+import { connectDB } from "~~/server/db/connect";
 import type { NitroApp } from "nitropack";
 
 useH3TestUtils();
 
-vi.mock("../../../../server/db/connect", () => ({
+vi.mock("~~/server/db/connect", () => ({
   connectDB: vi.fn(),
 }));
 
-type MongodbPlugin = typeof import("../../../../server/plugins/mongodb");
+const { mongoDbUriRef } = vi.hoisted(() => ({
+  mongoDbUriRef: { value: "" },
+}));
+
+// Must stay top-level: mockNuxtImport is an AST transform. Preserve the real
+// config so setupNuxt can initialize `$router` (test-utils v4).
+mockNuxtImport("useRuntimeConfig", (original) => {
+  return () => ({
+    ...original(),
+    mongoDbUri: mongoDbUriRef.value,
+  });
+});
+
+type MongodbPlugin = typeof import("~~/server/plugins/mongodb");
 
 let mongoServer: MongoMemoryServer;
 let mongodbPlugin: MongodbPlugin;
 let consoleLogSpy: ReturnType<typeof vi.spyOn>;
 let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
 
-describe("mongodb plugin", async () => {
+describe("mongodb plugin", () => {
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
-
-    // mocked useRuntimeConfig
-    const { useRuntimeConfigMock } = vi.hoisted(() => ({
-      useRuntimeConfigMock: vi.fn(() => ({
-        mongoDbUri: mongoServer.getUri(),
-      })),
-    }));
-
-    mockNuxtImport("useRuntimeConfig", () => useRuntimeConfigMock);
-
-    // Import plugin after mocking
-    mongodbPlugin = await import("../../../../server/plugins/mongodb");
+    mongoDbUriRef.value = mongoServer.getUri();
+    mongodbPlugin = await import("~~/server/plugins/mongodb");
   });
 
   afterAll(async () => {
@@ -62,10 +64,8 @@ describe("mongodb plugin", async () => {
   });
 
   it("should connect successfully", async () => {
-    // Call the plugin
     mongodbPlugin.default({} as NitroApp);
 
-    // Wait for the next tick to allow async operations to complete
     await new Promise(process.nextTick);
 
     expect(consoleLogSpy).toHaveBeenCalledWith(
@@ -75,14 +75,11 @@ describe("mongodb plugin", async () => {
   });
 
   it("should handle connection failure", async () => {
-    // Mock connectDB to throw an error
     const error = new Error("Failed");
     vi.mocked(connectDB).mockRejectedValue(error);
 
-    // Call the plugin
     mongodbPlugin.default({} as NitroApp);
 
-    // Wait for the next tick to allow async operations to complete
     await new Promise(process.nextTick);
 
     expect(consoleLogSpy).not.toHaveBeenCalled();

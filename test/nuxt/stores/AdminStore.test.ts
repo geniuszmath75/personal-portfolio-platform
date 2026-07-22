@@ -1,20 +1,29 @@
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { setActivePinia } from "pinia";
-import { createTestPinia } from "../../setup";
-import { useAdminStore } from "../../../app/stores/adminStore";
-import { UserSchemaRole } from "../../../shared/types/enums";
-import { handleError } from "../../../app/utils/handleError";
+import { createTestPinia } from "~~/test/setup";
+import { useAdminStore } from "~/stores/adminStore";
+import { UserSchemaRole } from "~~/shared/types/enums";
+import { handleError } from "~/utils/handleError";
 
-mockNuxtImport("useRuntimeConfig", () => {
+const { $fetchMock } = vi.hoisted(() => ({
+  $fetchMock: vi.fn(),
+}));
+
+mockNuxtImport("useRuntimeConfig", (original) => {
   return () => {
+    const config = original();
     return {
+      ...config,
       public: {
+        ...config.public,
         baseApiPath: "/api/v1",
       },
     };
   };
 });
+
+mockNuxtImport("$fetch", () => $fetchMock);
 
 vi.mock("~/utils/handleError", () => ({
   handleError: vi.fn(),
@@ -100,7 +109,7 @@ describe("adminStore", () => {
       const store = useAdminStore();
       const fetchResponse = { admin: mockAdminDetails };
 
-      vi.stubGlobal("$fetch", vi.fn().mockResolvedValue(fetchResponse));
+      $fetchMock.mockResolvedValue(fetchResponse);
 
       await store.fetchAdminProfile();
 
@@ -109,12 +118,11 @@ describe("adminStore", () => {
 
     it("should call $fetch with correct arguments", async () => {
       const store = useAdminStore();
-      const mockFetch = vi.fn().mockResolvedValue({ admin: mockAdminDetails });
-      vi.stubGlobal("$fetch", mockFetch);
+      $fetchMock.mockResolvedValue({ admin: mockAdminDetails });
 
       await store.fetchAdminProfile();
 
-      expect(mockFetch).toHaveBeenCalledWith("/admin/profile", {
+      expect($fetchMock).toHaveBeenCalledWith("/admin/profile", {
         baseURL: "/api/v1",
         credentials: "include",
       });
@@ -122,10 +130,7 @@ describe("adminStore", () => {
 
     it("should set loading to false after successful fetch", async () => {
       const store = useAdminStore();
-      vi.stubGlobal(
-        "$fetch",
-        vi.fn().mockResolvedValue({ admin: mockAdminDetails }),
-      );
+      $fetchMock.mockResolvedValue({ admin: mockAdminDetails });
 
       await store.fetchAdminProfile();
 
@@ -135,7 +140,7 @@ describe("adminStore", () => {
     it("should call handleError and set loading to false on fetch failure", async () => {
       const store = useAdminStore();
       const fetchError = new Error("Network error");
-      vi.stubGlobal("$fetch", vi.fn().mockRejectedValue(fetchError));
+      $fetchMock.mockRejectedValue(fetchError);
 
       await store.fetchAdminProfile();
 
@@ -148,7 +153,7 @@ describe("adminStore", () => {
 
     it("should not update adminDetails on fetch failure", async () => {
       const store = useAdminStore();
-      vi.stubGlobal("$fetch", vi.fn().mockRejectedValue(new Error()));
+      $fetchMock.mockRejectedValue(new Error());
 
       await store.fetchAdminProfile();
 
@@ -164,12 +169,11 @@ describe("adminStore", () => {
 
     it("should call $fetch with correct arguments", async () => {
       const store = useAdminStore();
-      const mockFetch = vi.fn().mockResolvedValue({ admin: mockAdminDetails });
-      vi.stubGlobal("$fetch", mockFetch);
+      $fetchMock.mockResolvedValue({ admin: mockAdminDetails });
 
       await store.updateAdminProfile(updatedProfile);
 
-      expect(mockFetch).toHaveBeenCalledWith("/admin/profile", {
+      expect($fetchMock).toHaveBeenCalledWith("/admin/profile", {
         baseURL: "/api/v1",
         method: "PATCH",
         credentials: "include",
@@ -184,10 +188,7 @@ describe("adminStore", () => {
         username: "UpdatedAdmin",
       };
 
-      vi.stubGlobal(
-        "$fetch",
-        vi.fn().mockResolvedValue({ admin: updatedAdmin }),
-      );
+      $fetchMock.mockResolvedValue({ admin: updatedAdmin });
 
       const result = await store.updateAdminProfile(updatedProfile);
 
@@ -197,10 +198,7 @@ describe("adminStore", () => {
 
     it("should set loading to false after successful update", async () => {
       const store = useAdminStore();
-      vi.stubGlobal(
-        "$fetch",
-        vi.fn().mockResolvedValue({ admin: mockAdminDetails }),
-      );
+      $fetchMock.mockResolvedValue({ admin: mockAdminDetails });
 
       await store.updateAdminProfile(updatedProfile);
 
@@ -210,7 +208,7 @@ describe("adminStore", () => {
     it("should call handleError and return false on failure", async () => {
       const store = useAdminStore();
       const fetchError = new Error("Update failed");
-      vi.stubGlobal("$fetch", vi.fn().mockRejectedValue(fetchError));
+      $fetchMock.mockRejectedValue(fetchError);
 
       const result = await store.updateAdminProfile(updatedProfile);
 
@@ -223,7 +221,7 @@ describe("adminStore", () => {
 
     it("should set loading to false after failed update", async () => {
       const store = useAdminStore();
-      vi.stubGlobal("$fetch", vi.fn().mockRejectedValue(new Error()));
+      $fetchMock.mockRejectedValue(new Error());
 
       await store.updateAdminProfile(updatedProfile);
 
@@ -239,14 +237,14 @@ describe("adminStore", () => {
 
     it("should call $fetch with correct arguments including FormData", async () => {
       const store = useAdminStore();
-      const mockFetch = vi
-        .fn()
-        .mockResolvedValue({ success: true, data: { url: mockUrl } });
-      vi.stubGlobal("$fetch", mockFetch);
+      $fetchMock.mockResolvedValue({
+        success: true,
+        data: { url: mockUrl },
+      });
 
       await store.uploadAvatar(mockFile);
 
-      const [path, options] = mockFetch.mock.calls[0]!;
+      const [path, options] = $fetchMock.mock.calls[0]!;
       expect(path).toBe("/upload/image");
       expect(options.baseURL).toBe("/api/v1");
       expect(options.method).toBe("POST");
@@ -257,13 +255,10 @@ describe("adminStore", () => {
 
     it("should return the uploaded avatar URL on success", async () => {
       const store = useAdminStore();
-      vi.stubGlobal(
-        "$fetch",
-        vi.fn().mockResolvedValue({
-          success: true,
-          data: { url: mockUrl },
-        }),
-      );
+      $fetchMock.mockResolvedValue({
+        success: true,
+        data: { url: mockUrl },
+      });
 
       const result = await store.uploadAvatar(mockFile);
 
@@ -272,41 +267,38 @@ describe("adminStore", () => {
 
     it("should use default AVATARS category when none is provided", async () => {
       const store = useAdminStore();
-      const mockFetch = vi
-        .fn()
-        .mockResolvedValue({ success: true, data: { url: mockUrl } });
-      vi.stubGlobal("$fetch", mockFetch);
+      $fetchMock.mockResolvedValue({
+        success: true,
+        data: { url: mockUrl },
+      });
 
       await store.uploadAvatar(mockFile);
 
-      expect(mockFetch.mock.calls[0]![1].query.category).toBe(
+      expect($fetchMock.mock.calls[0]![1].query.category).toBe(
         UploadCategory.AVATARS,
       );
     });
 
     it("should pass custom category when provided", async () => {
       const store = useAdminStore();
-      const mockFetch = vi
-        .fn()
-        .mockResolvedValue({ success: true, data: { url: mockUrl } });
-      vi.stubGlobal("$fetch", mockFetch);
+      $fetchMock.mockResolvedValue({
+        success: true,
+        data: { url: mockUrl },
+      });
 
       await store.uploadAvatar(mockFile, UploadCategory.PROJECTS);
 
-      expect(mockFetch.mock.calls[0]![1].query.category).toBe(
+      expect($fetchMock.mock.calls[0]![1].query.category).toBe(
         UploadCategory.PROJECTS,
       );
     });
 
     it("should set loading to false after successful upload", async () => {
       const store = useAdminStore();
-      vi.stubGlobal(
-        "$fetch",
-        vi.fn().mockResolvedValue({
-          success: true,
-          data: { url: mockUrl },
-        }),
-      );
+      $fetchMock.mockResolvedValue({
+        success: true,
+        data: { url: mockUrl },
+      });
 
       await store.uploadAvatar(mockFile);
 
@@ -316,7 +308,7 @@ describe("adminStore", () => {
     it("should call handleError and return null on failure", async () => {
       const store = useAdminStore();
       const fetchError = new Error("Upload failed");
-      vi.stubGlobal("$fetch", vi.fn().mockRejectedValue(fetchError));
+      $fetchMock.mockRejectedValue(fetchError);
 
       const result = await store.uploadAvatar(mockFile);
 
@@ -329,7 +321,7 @@ describe("adminStore", () => {
 
     it("should set loading to false after failed upload", async () => {
       const store = useAdminStore();
-      vi.stubGlobal("$fetch", vi.fn().mockRejectedValue(new Error()));
+      $fetchMock.mockRejectedValue(new Error());
 
       await store.uploadAvatar(mockFile);
 

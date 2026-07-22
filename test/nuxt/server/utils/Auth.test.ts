@@ -1,17 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
-import { createMockH3Event } from "../../../mock/h3-event";
-import { useH3TestUtils } from "../../../setup";
-import { UserSchemaRole } from "../../../../shared/types/enums";
+import { createMockH3Event } from "~~/test/mock/h3-event";
+import { useH3TestUtils } from "~~/test/setup";
+import { UserSchemaRole } from "~~/shared/types/enums";
 import jwt from "jsonwebtoken";
-import { requireAdmin, requireAuth } from "../../../../server/utils/auth";
+import { requireAdmin, requireAuth } from "~~/server/utils/auth";
 
-mockNuxtImport("useRuntimeConfig", () => {
-  return () => {
-    return {
-      jwtSecret: "secretvalue",
-    };
-  };
+mockNuxtImport("useRuntimeConfig", (original) => {
+  return () => ({
+    ...original(),
+    jwtSecret: "secretvalue",
+  });
 });
 
 vi.mock("jsonwebtoken", () => ({

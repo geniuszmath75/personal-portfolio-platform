@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
 import { mount } from "vue-composable-tester";
 import { useSectionBlockBuilder } from "~/composables/useSectionBlockBuilder";
@@ -7,6 +7,17 @@ import { BlockKind, ISectionType } from "~~/shared/types/enums";
 import type { UploadFileInfo } from "~/types/components";
 
 const mockImageFile = new File(["img"], "hero.jpg", { type: "image/jpeg" });
+
+// Node's URL.createObjectURL rejects happy-dom File (not instanceof Node Blob).
+beforeEach(() => {
+  vi.stubGlobal(
+    "URL",
+    Object.assign(URL, {
+      createObjectURL: vi.fn(() => "blob:mock-preview"),
+      revokeObjectURL: vi.fn(),
+    }),
+  );
+});
 
 function mockUploadInfo(
   overrides: Partial<UploadFileInfo> = {},

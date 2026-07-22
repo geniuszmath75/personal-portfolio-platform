@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { useH3TestUtils } from "../../../../setup";
-import { createMockH3Event } from "../../../../mock/h3-event";
-import { uploadImage } from "../../../../../server/controllers/upload/uploadImage";
-import { UploadCategory } from "../../../../../shared/types/enums";
+import { useH3TestUtils } from "~~/test/setup";
+import { createMockH3Event } from "~~/test/mock/h3-event";
+import { uploadImage } from "~~/server/controllers/upload/uploadImage";
+import { UploadCategory } from "~~/shared/types/enums";
 import { vol } from "memfs";
 
 vi.mock("fs/promises", async () => {
@@ -12,10 +12,18 @@ vi.mock("fs/promises", async () => {
   };
 });
 
-vi.mock("node:crypto", () => {
+const { randomUUIDMock } = vi.hoisted(() => ({
+  randomUUIDMock: vi.fn(() => "mocked-UUID"),
+}));
+
+// Vite interop often reads named Node builtins via `default.<export>`
+// (same pattern as the fs/promises mock above). Override both.
+vi.mock("crypto", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("crypto")>();
   return {
     default: {
-      randomUUID: vi.fn(() => "mocked-UUID"),
+      ...actual,
+      randomUUID: randomUUIDMock,
     },
   };
 });
@@ -33,6 +41,7 @@ const createMockFileData = (overrides = {}) => ({
 describe("uploadImage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    randomUUIDMock.mockReturnValue("mocked-UUID");
     vol.reset();
   });
 

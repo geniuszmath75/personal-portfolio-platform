@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { mount } from "vue-composable-tester";
-import { useFileUpload } from "../../../app/composables/useFileUpload";
+import { useFileUpload } from "~/composables/useFileUpload";
 import type {
   CustomRequestHandler,
   FileUploadComposableProps,
   UploadFileInfo,
 } from "~/types/components";
-import { makeXhrMock } from "../../mock/xhr";
+import { makeXhrMock } from "~~/test/mock/xhr";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -602,9 +602,13 @@ describe("useFileUpload", () => {
 
     beforeEach(() => {
       xhrMock = makeXhrMock();
+      // Vitest 4 treats `new` as a real constructor call — arrow implementations
+      // throw "is not a constructor". A function that returns the mock instance works.
       vi.stubGlobal(
         "XMLHttpRequest",
-        vi.fn(() => xhrMock),
+        vi.fn(function XMLHttpRequest() {
+          return xhrMock;
+        }),
       );
     });
 

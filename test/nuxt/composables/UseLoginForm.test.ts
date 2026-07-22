@@ -1,23 +1,28 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { useLoginForm } from "../../../app/composables/useLoginForm";
+import { useLoginForm } from "~/composables/useLoginForm";
 import { mount } from "vue-composable-tester";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
-import { UserSchemaRole } from "../../../shared/types/enums";
-import { showSuccessToast } from "../../../app/utils/toastNotification";
-import { handleError } from "../../../app/utils/handleError";
-import type { AuthUser } from "../../../shared/types";
-import { createTestPinia } from "../../setup";
+import { UserSchemaRole } from "~~/shared/types/enums";
+import { showSuccessToast } from "~/utils/toastNotification";
+import { handleError } from "~/utils/handleError";
+import type { AuthUser } from "~~/shared/types";
+import { createTestPinia } from "~~/test/setup";
 import { setActivePinia } from "pinia";
-import { useAuthStore } from "../../../app/stores/authStore";
+import { useAuthStore } from "~/stores/authStore";
 
 const { navigateToMock } = vi.hoisted(() => ({ navigateToMock: vi.fn() }));
 
 mockNuxtImport("navigateTo", () => navigateToMock);
 
-mockNuxtImport("useRuntimeConfig", () => {
+// Preserve the real config; a stub-only mock can leave `$router` uninitialized
+// so `@nuxt/test-utils` v4 `setupNuxt` fails on `useRouter().afterEach`.
+mockNuxtImport("useRuntimeConfig", (original) => {
   return () => {
+    const config = original();
     return {
+      ...config,
       public: {
+        ...config.public,
         baseApiPath: "/api/v1",
       },
     };
