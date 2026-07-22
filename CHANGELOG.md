@@ -1,5 +1,34 @@
 ## Changelog
 
+### [v0.10.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.9.0...v0.10.0) - 22 July 2026
+
+#### New Features
+
+-  wire section update flow for edit mode [`2ef60dd`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/2ef60dd986591a59f138ce993903cb53f53d5338)
+-  add PUT endpoint to update an existing section [`7becf92`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/7becf92d94570a90ec99e3768732328e8d426364)
+-  add section edit page and admin entry points [`ebfb09d`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/ebfb09db459ae7004a2df60967e82caad2252d78)
+-  add responsive admin edit entry points [`8f94940`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/8f94940b82f132539bbf9cc4f6335abe5f2d4168)
+
+#### Fixes
+
+-  keep mobile menu toggle in navbar layer [`6d66dc5`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/6d66dc52d026fc78b9416410a96254d504cf1b48)
+-  align section GET route param with PUT sibling route [`85a5013`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/85a50130746c1fd40983d1ba09ac04039f36bffd)
+-  clone reactive section blocks via JSON [`54230d5`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/54230d50e85daa486b0c6b157b2b9a66b389bdbb)
+
+#### Chores And Housekeeping
+
+-  upgrade Nuxt to 4.5 and Vitest test stack to v4 [`b8fba49`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/b8fba4971f36791d0cfea06daa4cf577b482a24d)
+-  bump iconify collections, mongoose, prettier and happy-dom [`5d3c9b0`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/5d3c9b02fa7eca35a59b75c34cb394212641cd79)
+-  bump vite-tsconfig-paths to v6 [`87d6adb`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/87d6adb195fe9b2197b15e1a2305bf990b5fa561)
+
+#### Refactoring and Updates
+
+-  colocate getSingleSection under sections controllers [`20f168e`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/20f168ea4568b9ef2a2727b0fb688fd12c820cc0)
+
+#### Changes to Test Assests
+
+-  adapt Nuxt tests for Vitest and test-utils v4 [`f29b3b2`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/f29b3b2f5aca33b8b81ca3e49d77c021df76e1c0)
+
 ### [v0.9.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.8.0...v0.9.0) - 15 July 2026
 
 #### New Features
@@ -40,6 +69,10 @@
 -  cover section metadata form, stepper, and composables [`3699600`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/3699600b6e60f440cba3d108b9f7a4a8b76ec67f)
 -  add coverage for section insert entry points [`76c3c84`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/76c3c84914b7b30225279ca0eb85d7034f5f9efa)
 -  split SectionContent tests into layout component specs [`f5eb9c2`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/f5eb9c20a83c0bd4c22a29c509f5f703c2941850)
+
+#### General Changes
+
+- release: 0.9.0 [`f5e57b2`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/f5e57b254f2212279015a8e5e6839277e6eae892)
 
 ### [v0.8.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.7.0...v0.8.0) - 4 July 2026
 
