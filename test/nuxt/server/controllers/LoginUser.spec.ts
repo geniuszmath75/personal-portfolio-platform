@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useH3TestUtils } from "../../../setup";
-import { createMockH3Event } from "../../../mock/h3-event";
-import { UserSchemaRole } from "../../../../shared/types/enums";
-import { User } from "../../../../server/models/User";
+import { useH3TestUtils } from "~~/test/setup";
+import { createMockH3Event } from "~~/test/mock/h3-event";
+import { UserSchemaRole } from "~~/shared/types/enums";
+import { User } from "~~/server/models/User";
 
 useH3TestUtils();
 
@@ -12,8 +12,6 @@ describe("loginUser controller", async () => {
     role: UserSchemaRole.ADMIN,
     username: "User1",
     password: "Pass123!",
-    // comparePassword: vi.fn(),
-    // createJWT: vi.fn(),
   });
 
   beforeEach(() => {
@@ -23,7 +21,7 @@ describe("loginUser controller", async () => {
     vi.spyOn(mockUser, "createJWT");
   });
 
-  const handler = await import("../../../../server/api/v1/auth/login.post");
+  const handler = await import("~~/server/api/v1/auth/login.post");
 
   it("should throw 400 if email or password missing", async () => {
     // Arrange: create mock event without password
@@ -32,7 +30,8 @@ describe("loginUser controller", async () => {
     // Act & Assert: calling handler should throw validation error
     await expect(handler.default(event)).rejects.toMatchObject({
       statusCode: 400,
-      statusMessage: "Email and password are required",
+      statusMessage: "Bad Request",
+      message: "Email and password are required",
     });
   });
 
@@ -47,7 +46,8 @@ describe("loginUser controller", async () => {
     // Act & Assert: calling handler should throw 'user not found' error
     await expect(handler.default(event)).rejects.toMatchObject({
       statusCode: 401,
-      statusMessage: "Invalid credentials: User not found",
+      statusMessage: "Unauthorized",
+      message: "Invalid credentials: User not found",
     });
   });
 
@@ -64,7 +64,8 @@ describe("loginUser controller", async () => {
     // Act & Assert: calling handler should throw 'incorrect password' error
     await expect(handler.default(event)).rejects.toMatchObject({
       statusCode: 401,
-      statusMessage: "Incorrect password",
+      statusMessage: "Unauthorized",
+      message: "Incorrect password",
     });
   });
 

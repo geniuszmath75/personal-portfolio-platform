@@ -5,6 +5,7 @@ import type {
   SectionPendingImageState,
 } from "~/types/sectionForm";
 import { showErrorToast } from "~/utils/toastNotification";
+import { handleError } from "~/utils/handleError";
 
 export const useSectionsStore = defineStore("sections", {
   state: () => {
@@ -79,7 +80,7 @@ export const useSectionsStore = defineStore("sections", {
 
         this.setSections(validatedSections);
       } catch (error) {
-        console.error("Failed to fetch sections:", error);
+        handleError(error, "Failed to fetch sections");
       }
     },
 
@@ -99,7 +100,7 @@ export const useSectionsStore = defineStore("sections", {
 
         this.setSectionDetails(validatedSection);
       } catch (error) {
-        console.error("Failed to fetch section details:", error);
+        handleError(error, "Failed to fetch section details");
       }
     },
 

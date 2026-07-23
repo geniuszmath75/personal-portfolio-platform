@@ -8,10 +8,15 @@ import { BlockKind, ISectionType, UploadCategory } from "~~/shared/types/enums";
 import { mockNuxtImport } from "@nuxt/test-utils/runtime";
 import type { ParagraphBlock } from "~~/shared/types";
 import { showErrorToast } from "~/utils/toastNotification";
+import { handleError } from "~/utils/handleError";
 
 vi.mock("~/utils/toastNotification", () => ({
   showErrorToast: vi.fn(),
   showSuccessToast: vi.fn(),
+}));
+
+vi.mock("~/utils/handleError", () => ({
+  handleError: vi.fn(),
 }));
 
 mockNuxtImport("useRuntimeConfig", (original) => {
@@ -144,19 +149,14 @@ describe("sectionsStore", () => {
 
     // Mock $fetch
     $fetchMock.mockRejectedValue(new Error("Network error"));
-    const consoleErrorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
 
     await store.fetchSections();
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "Failed to fetch sections:",
+    expect(handleError).toHaveBeenCalledWith(
       expect.any(Error),
+      "Failed to fetch sections",
     );
     expect(store.sections).toEqual([]);
-
-    consoleErrorSpy.mockRestore();
   });
 
   it("should 'fetchSection' set sectionDetails from API response", async () => {
@@ -176,19 +176,14 @@ describe("sectionsStore", () => {
 
     // Mock $fetch
     $fetchMock.mockRejectedValue(new Error("Network error"));
-    const consoleErrorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
 
     await store.fetchSection("about-me");
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "Failed to fetch section details:",
+    expect(handleError).toHaveBeenCalledWith(
       expect.any(Error),
+      "Failed to fetch section details",
     );
     expect(store.sectionDetails).toBeNull();
-
-    consoleErrorSpy.mockRestore();
   });
 
   describe("getBlockElementsByKind", () => {
@@ -274,16 +269,13 @@ describe("sectionsStore", () => {
 
       $fetchMock.mockRejectedValue(new Error("Upload failed"));
 
-      const consoleErrorSpy = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
-
       const result = await store.uploadSectionImage(mockFile);
 
       expect(result).toBeNull();
-      expect(consoleErrorSpy).toHaveBeenCalled();
-
-      consoleErrorSpy.mockRestore();
+      expect(handleError).toHaveBeenCalledWith(
+        expect.any(Error),
+        "Failed to upload section image",
+      );
     });
 
     describe("createSection", () => {
@@ -526,10 +518,6 @@ describe("sectionsStore", () => {
 
         $fetchMock.mockRejectedValue(new Error("Network error"));
 
-        const consoleErrorSpy = vi
-          .spyOn(console, "error")
-          .mockImplementation(() => {});
-
         const result = await store.createSection(
           mockMetadata,
           mockBlocks,
@@ -537,9 +525,10 @@ describe("sectionsStore", () => {
         );
 
         expect(result).toBe(false);
-        expect(consoleErrorSpy).toHaveBeenCalled();
-
-        consoleErrorSpy.mockRestore();
+        expect(handleError).toHaveBeenCalledWith(
+          expect.any(Error),
+          "Failed to create section",
+        );
       });
     });
 
@@ -713,10 +702,6 @@ describe("sectionsStore", () => {
 
         $fetchMock.mockRejectedValue(new Error("Network error"));
 
-        const consoleErrorSpy = vi
-          .spyOn(console, "error")
-          .mockImplementation(() => {});
-
         const result = await store.updateSection(
           "section-id",
           mockMetadata,
@@ -725,9 +710,10 @@ describe("sectionsStore", () => {
         );
 
         expect(result).toBe(false);
-        expect(consoleErrorSpy).toHaveBeenCalled();
-
-        consoleErrorSpy.mockRestore();
+        expect(handleError).toHaveBeenCalledWith(
+          expect.any(Error),
+          "Failed to update section",
+        );
       });
     });
   });

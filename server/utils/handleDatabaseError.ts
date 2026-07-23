@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { createError, H3Error } from "h3";
 
 /**
  * Represents a custom error object
@@ -63,3 +64,21 @@ export const handleDatabaseError = (error: unknown): CustomError => {
 
   return customError;
 };
+
+/**
+ * Re-throws H3 errors as-is; maps unknown/DB errors to a consistent createError shape
+ * (`statusCode`, `statusMessage`, `message`) for client `handleError`.
+ */
+export function rethrowAsHttpError(error: unknown): never {
+  if (error instanceof H3Error) {
+    throw error;
+  }
+
+  const customError = handleDatabaseError(error);
+
+  throw createError({
+    statusCode: customError.code,
+    statusMessage: customError.statusMessage,
+    message: customError.message,
+  });
+}

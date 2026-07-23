@@ -1,5 +1,6 @@
 import { camelCase, startCase, unionBy } from "lodash";
 import type { CreateProjectForm } from "~~/shared/types";
+import { handleError } from "~/utils/handleError";
 
 export const useProjectsStore = defineStore("projects", {
   state: () => {
@@ -232,9 +233,9 @@ export const useProjectsStore = defineStore("projects", {
         this.setPagination(res.pagination);
 
         this.loading = false;
-      } catch (e) {
+      } catch (error) {
         this.loading = false;
-        console.error("Failed to fetch projects:", e);
+        handleError(error, "Failed to fetch projects");
       }
     },
 
@@ -258,9 +259,9 @@ export const useProjectsStore = defineStore("projects", {
 
         this.setProjectDetails(validatedProject);
         this.loading = false;
-      } catch (e) {
+      } catch (error) {
         this.loading = false;
-        console.error("Failed to fetch project details:", e);
+        handleError(error, "Failed to fetch project details");
       }
     },
 

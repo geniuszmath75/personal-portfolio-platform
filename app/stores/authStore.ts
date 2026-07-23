@@ -1,5 +1,6 @@
 import { UserSchemaRole } from "~~/shared/types/enums";
 import type { AuthUser } from "~~/shared/types";
+import { getErrorStatusCode, handleError } from "~/utils/handleError";
 
 export const useAuthStore = defineStore("auth", {
   state: () => {
@@ -75,7 +76,7 @@ export const useAuthStore = defineStore("auth", {
         this.setLoggedIn(true);
         return true;
       } catch (error) {
-        handleError(error);
+        handleError(error, "Login failed");
         return false;
       } finally {
         this.loading = false;
@@ -87,6 +88,8 @@ export const useAuthStore = defineStore("auth", {
      */
     async logout() {
       const { baseApiPath } = useRuntimeConfig().public;
+      let logoutSucceeded = false;
+
       try {
         this.loading = true;
 
@@ -94,13 +97,16 @@ export const useAuthStore = defineStore("auth", {
           baseURL: baseApiPath,
           method: "POST",
         });
+        logoutSucceeded = true;
       } catch (error) {
-        handleError(error);
+        handleError(error, "Failed to log out");
       } finally {
         this.clearAuth();
         this.loading = false;
         await navigateTo("/");
-        showSuccessToast("Successfully logged out");
+        if (logoutSucceeded) {
+          showSuccessToast("Successfully logged out");
+        }
       }
     },
     /**
@@ -121,9 +127,18 @@ export const useAuthStore = defineStore("auth", {
 
         this.setAuthUser(validatedAuthUser.user);
         this.setLoggedIn(true);
-      } catch {
-        // Not logged in user or session expired
+      } catch (error) {
         this.clearAuth();
+
+        // Auth probe failures (guest, expired session, missing route) stay silent.
+        // Only surface network / server failures.
+        const statusCode = getErrorStatusCode(error);
+        const isClientAuthFailure =
+          statusCode !== undefined && statusCode >= 400 && statusCode < 500;
+
+        if (!isClientAuthFailure) {
+          handleError(error, "Failed to verify authentication");
+        }
       } finally {
         this.loading = false;
       }

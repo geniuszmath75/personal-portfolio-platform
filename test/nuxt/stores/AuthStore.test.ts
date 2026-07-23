@@ -33,9 +33,13 @@ vi.mock("~/utils/toastNotification", () => ({
   showSuccessToast: vi.fn(),
 }));
 
-vi.mock("~/utils/handleError", () => ({
-  handleError: vi.fn(),
-}));
+vi.mock("~/utils/handleError", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("~/utils/handleError")>();
+  return {
+    ...actual,
+    handleError: vi.fn(),
+  };
+});
 
 vi.mock("~/utils/validateLoginResponse", () => ({
   authUserSchema: {
@@ -206,9 +210,12 @@ describe("authStore", () => {
     expect(store.user).toBeNull();
     expect(store.loggedIn).toBe(false);
     expect(store.loading).toBe(false);
-    expect(handleError).toHaveBeenCalled();
+    expect(handleError).toHaveBeenCalledWith(
+      expect.any(Error),
+      "Failed to log out",
+    );
     expect(navigateToMock).toHaveBeenCalledWith("/");
-    expect(showSuccessToast).toHaveBeenCalledWith("Successfully logged out");
+    expect(showSuccessToast).not.toHaveBeenCalled();
   });
 
   it("should set auth user when 'checkAuth' succeeds", async () => {
@@ -228,9 +235,12 @@ describe("authStore", () => {
     expect(store.loading).toBe(false);
   });
 
-  it("should clear auth state when 'checkAuth' fails", async () => {
+  it("should clear auth state silently when 'checkAuth' gets 401", async () => {
     // Arrange
-    $fetchMock.mockRejectedValue(new Error("Unauthorized"));
+    $fetchMock.mockRejectedValue({
+      statusCode: 401,
+      data: { message: "Unauthorized" },
+    });
 
     const store = useAuthStore();
     store.setAuthUser(mockAuthUser);
@@ -243,5 +253,43 @@ describe("authStore", () => {
     expect(store.user).toBeNull();
     expect(store.loggedIn).toBe(false);
     expect(store.loading).toBe(false);
+    expect(handleError).not.toHaveBeenCalled();
+  });
+
+  it("should clear auth state silently when 'checkAuth' gets 404", async () => {
+    $fetchMock.mockRejectedValue({
+      statusCode: 404,
+      data: { message: "Cannot find any path matching /auth/me" },
+    });
+
+    const store = useAuthStore();
+    store.setAuthUser(mockAuthUser);
+    store.setLoggedIn(true);
+
+    await store.checkAuth();
+
+    expect(store.user).toBeNull();
+    expect(store.loggedIn).toBe(false);
+    expect(handleError).not.toHaveBeenCalled();
+  });
+
+  it("should call handleError when 'checkAuth' fails unexpectedly", async () => {
+    // Arrange
+    $fetchMock.mockRejectedValue(new Error("Network error"));
+
+    const store = useAuthStore();
+    store.setAuthUser(mockAuthUser);
+    store.setLoggedIn(true);
+
+    // Act
+    await store.checkAuth();
+
+    // Assert
+    expect(store.user).toBeNull();
+    expect(store.loggedIn).toBe(false);
+    expect(handleError).toHaveBeenCalledWith(
+      expect.any(Error),
+      "Failed to verify authentication",
+    );
   });
 });

@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ZodError } from "zod";
-import { handleError } from "../../../app/utils/handleError";
+import {
+  getErrorStatusCode,
+  handleError,
+} from "../../../app/utils/handleError";
 import { showErrorToast } from "../../../app/utils/toastNotification";
 
 vi.mock("../../../app/utils/toastNotification", () => ({
@@ -15,6 +18,21 @@ describe("handleError util", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+  });
+
+  describe("getErrorStatusCode", () => {
+    it("should read statusCode from fetch-like errors", () => {
+      expect(getErrorStatusCode({ statusCode: 401 })).toBe(401);
+    });
+
+    it("should fall back to status when statusCode is missing", () => {
+      expect(getErrorStatusCode({ status: 403 })).toBe(403);
+    });
+
+    it("should return undefined for non-HTTP errors", () => {
+      expect(getErrorStatusCode(new Error("fail"))).toBeUndefined();
+      expect(getErrorStatusCode(null)).toBeUndefined();
+    });
   });
 
   describe("Zod validation errors", () => {

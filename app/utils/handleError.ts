@@ -11,6 +11,25 @@ type AppErrorResponse = {
 };
 
 /**
+ * Reads HTTP status from a `$fetch` / ofetch error when present.
+ */
+export function getErrorStatusCode(error: unknown): number | undefined {
+  if (!error || typeof error !== "object") {
+    return undefined;
+  }
+
+  if ("statusCode" in error && typeof error.statusCode === "number") {
+    return error.statusCode;
+  }
+
+  if ("status" in error && typeof error.status === "number") {
+    return error.status;
+  }
+
+  return undefined;
+}
+
+/**
  * Function to handle different types of errors and display appropriate error
  * messages.
  *

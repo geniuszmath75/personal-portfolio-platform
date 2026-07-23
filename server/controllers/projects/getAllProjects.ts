@@ -1,27 +1,32 @@
-import { Project } from "../../models/Project";
+import { Project } from "~~/server/models/Project";
 import {
   getPaginationObject,
   getPaginationParams,
-} from "../../utils/pagination";
+} from "~~/server/utils/pagination";
+import { rethrowAsHttpError } from "~~/server/utils/handleDatabaseError";
 
 export default defineEventHandler(async (event) => {
-  const query = getQuery(event);
+  try {
+    const query = getQuery(event);
 
-  const { page, limit, skip } = getPaginationParams(query);
+    const { page, limit, skip } = getPaginationParams(query);
 
-  const projects = await Project.find().skip(skip).limit(limit);
+    const projects = await Project.find().skip(skip).limit(limit);
 
-  // Create pagination metadata
-  const pagination = await getPaginationObject(Project, page, limit);
+    // Create pagination metadata
+    const pagination = await getPaginationObject(Project, page, limit);
 
-  // Transform documents to JSON
-  const transformedProjects = projects.map((project) => {
-    return project.toJSON();
-  });
+    // Transform documents to JSON
+    const transformedProjects = projects.map((project) => {
+      return project.toJSON();
+    });
 
-  return {
-    projects: transformedProjects,
-    count: projects.length,
-    pagination,
-  };
+    return {
+      projects: transformedProjects,
+      count: projects.length,
+      pagination,
+    };
+  } catch (error) {
+    rethrowAsHttpError(error);
+  }
 });

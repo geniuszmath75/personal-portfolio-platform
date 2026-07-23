@@ -6,6 +6,7 @@ import { ProjectSourceType, ProjectStatusType } from "~~/shared/types/enums";
 import { setActivePinia } from "pinia";
 import { createTestPinia } from "~~/test/setup";
 import { useProjectsStore } from "~/stores/projectsStore";
+import { handleError } from "~/utils/handleError";
 
 mockNuxtImport("useRuntimeConfig", (original) => {
   return () => {
@@ -27,6 +28,10 @@ const { $fetchMock } = vi.hoisted(() => ({
 }));
 
 mockNuxtImport("$fetch", () => $fetchMock);
+
+vi.mock("~/utils/handleError", () => ({
+  handleError: vi.fn(),
+}));
 
 vi.mock("~/utils/validateProject", () => ({
   projectSchema: {
@@ -191,29 +196,23 @@ describe("projectsStore", () => {
     // Mock $fetch
     $fetchMock.mockRejectedValue(new Error("Network error"));
 
-    const consoleErrorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
-
     // Act: call fetchProjects action
     await store.fetchProjects();
 
     // Assert:
-    // - error logged to console
+    // - user-facing error handler called
     // - store remains unchanged (empty array)
     expect($fetchMock).toHaveBeenCalledWith("/api/v1/projects", {
       query: { page: 1, limit: 5 },
     });
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "Failed to fetch projects:",
+    expect(handleError).toHaveBeenCalledWith(
       expect.any(Error),
+      "Failed to fetch projects",
     );
     expect(store.projects).toEqual([]);
     expect(store.projectCount).toBe(0);
     expect(store.pagination).toBeNull();
     expect(store.loading).toBe(false);
-
-    consoleErrorSpy.mockRestore();
   });
 
   it("should 'setPagination' update pagination state", () => {
@@ -262,25 +261,20 @@ describe("projectsStore", () => {
     const store = useProjectsStore();
 
     $fetchMock.mockRejectedValue(new Error("Network error"));
-    const consoleErrorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
 
     // Act: call fetchProject action
     await store.fetchProject("1");
 
     // Assert:
-    // - error logged to console
+    // - user-facing error handler called
     // - store remains unchanged (null)
     expect($fetchMock).toHaveBeenCalledWith("/api/v1/projects/1");
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "Failed to fetch project details:",
+    expect(handleError).toHaveBeenCalledWith(
       expect.any(Error),
+      "Failed to fetch project details",
     );
     expect(store.projectDetails).toBeNull();
     expect(store.loading).toBe(false);
-
-    consoleErrorSpy.mockRestore();
   });
 
   it("should 'imageList' merge main and other images without duplicates", () => {
@@ -509,9 +503,6 @@ describe("projectsStore", () => {
     });
 
     $fetchMock.mockRejectedValue(new Error("Upload failed"));
-    const consoleErrorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
 
     // Act: call uploadProjectImage action
     const result = await store.uploadProjectImage(mockFile);
@@ -520,9 +511,10 @@ describe("projectsStore", () => {
     // - returns null on error
     // - error is handled
     expect(result).toBeNull();
-    expect(consoleErrorSpy).toHaveBeenCalled();
-
-    consoleErrorSpy.mockRestore();
+    expect(handleError).toHaveBeenCalledWith(
+      expect.any(Error),
+      "Failed to upload project image",
+    );
   });
 
   it("should 'createProject' upload images and create project successfully", async () => {
@@ -654,9 +646,6 @@ describe("projectsStore", () => {
     );
 
     $fetchMock.mockRejectedValue(new Error("API error"));
-    const consoleErrorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
 
     // Act: call createProject action
     const result = await store.createProject(mockFormData, mainImageFile, []);
@@ -664,12 +653,13 @@ describe("projectsStore", () => {
     // Assert:
     // - returns false on API error
     // - loading state is false
-    // - error is logged
+    // - error is handled
     expect(result).toBe(false);
     expect(store.loading).toBe(false);
-    expect(consoleErrorSpy).toHaveBeenCalled();
-
-    consoleErrorSpy.mockRestore();
+    expect(handleError).toHaveBeenCalledWith(
+      expect.any(Error),
+      "Failed to create project",
+    );
   });
 
   describe("updateProject", () => {
@@ -839,9 +829,6 @@ describe("projectsStore", () => {
       const store = useProjectsStore();
 
       $fetchMock.mockRejectedValue(new Error("API error"));
-      const consoleErrorSpy = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
 
       const result = await store.updateProject(
         projectId,
@@ -853,9 +840,10 @@ describe("projectsStore", () => {
 
       expect(result).toBe(false);
       expect(store.loading).toBe(false);
-      expect(consoleErrorSpy).toHaveBeenCalled();
-
-      consoleErrorSpy.mockRestore();
+      expect(handleError).toHaveBeenCalledWith(
+        expect.any(Error),
+        "Failed to update project",
+      );
     });
   });
 });

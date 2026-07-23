@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 import mongoose from "mongoose";
-import { handleDatabaseError } from "../../../../server/utils/handleDatabaseError";
+import { createError, H3Error } from "h3";
+import {
+  handleDatabaseError,
+  rethrowAsHttpError,
+} from "../../../../server/utils/handleDatabaseError";
 
 describe("handleDatabaseError util", () => {
   /**
@@ -257,6 +261,42 @@ describe("handleDatabaseError util", () => {
         errorMessage,
         serverError.stack,
       );
+
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe("rethrowAsHttpError", () => {
+    it("should rethrow H3Error unchanged", () => {
+      const h3Error = createError({
+        statusCode: 404,
+        statusMessage: "Not Found",
+        message: "Missing",
+      });
+
+      expect(() => rethrowAsHttpError(h3Error)).toThrow(H3Error);
+      try {
+        rethrowAsHttpError(h3Error);
+      } catch (error) {
+        expect(error).toBe(h3Error);
+      }
+    });
+
+    it("should map unknown errors to a 500 createError", () => {
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+
+      try {
+        rethrowAsHttpError(new Error("boom"));
+        expect.unreachable();
+      } catch (error) {
+        expect(error).toMatchObject({
+          statusCode: 500,
+          statusMessage: "Internal Server Error",
+          message: "Something went wrong, please try again later.",
+        });
+      }
 
       consoleErrorSpy.mockRestore();
     });
