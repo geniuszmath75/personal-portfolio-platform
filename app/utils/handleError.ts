@@ -30,6 +30,67 @@ export function getErrorStatusCode(error: unknown): number | undefined {
 }
 
 /**
+ * Best-effort user-facing message from a `$fetch` / app error.
+ */
+export function getErrorMessage(
+  error: unknown,
+  fallbackMessage = "Unexpected error",
+): string {
+  if (error instanceof ZodError) {
+    return error.issues?.[0]?.message || "Invalid data format";
+  }
+
+  if (error && typeof error === "object" && "data" in error) {
+    const data = error.data as AppErrorResponse;
+    if (data?.message) {
+      return data.message;
+    }
+    if (data?.error) {
+      return data.error;
+    }
+  }
+
+  if (error instanceof TypeError && error.message === "Failed to fetch") {
+    return "Network error. Please try again later.";
+  }
+
+  return fallbackMessage;
+}
+
+function statusMessageForCode(statusCode: number): string {
+  switch (statusCode) {
+    case 401:
+      return "Unauthorized";
+    case 403:
+      return "Forbidden";
+    case 404:
+      return "Not Found";
+    default:
+      return "Error";
+  }
+}
+
+/**
+ * Re-throws an HTTP-aware Nuxt fatal error so `error.vue` can render.
+ * Call this from route-driving fetches (single section / project).
+ *
+ * @throws always
+ */
+export function rethrowAsFatalPageError(
+  error: unknown,
+  fallbackMessage: string,
+): never {
+  const statusCode = getErrorStatusCode(error) ?? 500;
+
+  throw createError({
+    statusCode,
+    statusMessage: statusMessageForCode(statusCode),
+    message: getErrorMessage(error, fallbackMessage),
+    fatal: true,
+  });
+}
+
+/**
  * Function to handle different types of errors and display appropriate error
  * messages.
  *

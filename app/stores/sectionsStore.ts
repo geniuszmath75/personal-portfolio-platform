@@ -5,7 +5,11 @@ import type {
   SectionPendingImageState,
 } from "~/types/sectionForm";
 import { showErrorToast } from "~/utils/toastNotification";
-import { handleError } from "~/utils/handleError";
+import {
+  getErrorStatusCode,
+  handleError,
+  rethrowAsFatalPageError,
+} from "~/utils/handleError";
 
 export const useSectionsStore = defineStore("sections", {
   state: () => {
@@ -100,6 +104,10 @@ export const useSectionsStore = defineStore("sections", {
 
         this.setSectionDetails(validatedSection);
       } catch (error) {
+        // Route-driving fetch: show error.vue for HTTP failures (incl. 404).
+        if (getErrorStatusCode(error)) {
+          rethrowAsFatalPageError(error, "Failed to fetch section details");
+        }
         handleError(error, "Failed to fetch section details");
       }
     },

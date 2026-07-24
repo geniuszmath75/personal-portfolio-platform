@@ -1,6 +1,10 @@
 import { camelCase, startCase, unionBy } from "lodash";
 import type { CreateProjectForm } from "~~/shared/types";
-import { handleError } from "~/utils/handleError";
+import {
+  getErrorStatusCode,
+  handleError,
+  rethrowAsFatalPageError,
+} from "~/utils/handleError";
 
 export const useProjectsStore = defineStore("projects", {
   state: () => {
@@ -261,6 +265,10 @@ export const useProjectsStore = defineStore("projects", {
         this.loading = false;
       } catch (error) {
         this.loading = false;
+        // Route-driving fetch: show error.vue for HTTP failures (incl. 404).
+        if (getErrorStatusCode(error)) {
+          rethrowAsFatalPageError(error, "Failed to fetch project details");
+        }
         handleError(error, "Failed to fetch project details");
       }
     },

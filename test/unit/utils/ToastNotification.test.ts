@@ -19,6 +19,8 @@ describe("toastNotification util", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Unit project runs in node; simulate a browser DOM for client toasts.
+    vi.stubGlobal("document", { body: {} });
 
     (useToast as Mock).mockReturnValue({
       error: mockError,
@@ -55,5 +57,18 @@ describe("toastNotification util", () => {
 
     expect(mockWarning).toHaveBeenCalledTimes(1);
     expect(mockWarning).toHaveBeenCalledWith("Test warning", expectedOptions);
+  });
+
+  it("should no-op on SSR when document is unavailable", () => {
+    vi.stubGlobal("document", undefined);
+
+    showErrorToast("SSR error");
+    showSuccessToast("SSR success");
+    showWarningToast("SSR warning");
+
+    expect(useToast).not.toHaveBeenCalled();
+    expect(mockError).not.toHaveBeenCalled();
+    expect(mockSuccess).not.toHaveBeenCalled();
+    expect(mockWarning).not.toHaveBeenCalled();
   });
 });

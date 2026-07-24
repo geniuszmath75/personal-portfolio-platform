@@ -29,9 +29,13 @@ const { $fetchMock } = vi.hoisted(() => ({
 
 mockNuxtImport("$fetch", () => $fetchMock);
 
-vi.mock("~/utils/handleError", () => ({
-  handleError: vi.fn(),
-}));
+vi.mock("~/utils/handleError", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("~/utils/handleError")>();
+  return {
+    ...actual,
+    handleError: vi.fn(),
+  };
+});
 
 vi.mock("~/utils/validateProject", () => ({
   projectSchema: {
@@ -256,7 +260,7 @@ describe("projectsStore", () => {
     expect(store.loading).toBe(false);
   });
 
-  it("should 'fetchProject' handle fetch errors gracefully", async () => {
+  it("should 'fetchProject' handle network errors gracefully", async () => {
     // Arrange: create store and mock $fetch
     const store = useProjectsStore();
 
@@ -273,6 +277,23 @@ describe("projectsStore", () => {
       expect.any(Error),
       "Failed to fetch project details",
     );
+    expect(store.projectDetails).toBeNull();
+    expect(store.loading).toBe(false);
+  });
+
+  it("should 'fetchProject' rethrow HTTP errors as fatal page errors", async () => {
+    const store = useProjectsStore();
+    const httpError = {
+      statusCode: 404,
+      data: { message: "Project with id 1 not found." },
+    };
+
+    $fetchMock.mockRejectedValue(httpError);
+
+    await expect(store.fetchProject("1")).rejects.toMatchObject({
+      statusCode: 404,
+    });
+    expect(handleError).not.toHaveBeenCalled();
     expect(store.projectDetails).toBeNull();
     expect(store.loading).toBe(false);
   });

@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ZodError } from "zod";
 import {
   getErrorStatusCode,
+  getErrorMessage,
   handleError,
 } from "../../../app/utils/handleError";
 import { showErrorToast } from "../../../app/utils/toastNotification";
@@ -32,6 +33,18 @@ describe("handleError util", () => {
     it("should return undefined for non-HTTP errors", () => {
       expect(getErrorStatusCode(new Error("fail"))).toBeUndefined();
       expect(getErrorStatusCode(null)).toBeUndefined();
+    });
+  });
+
+  describe("getErrorMessage", () => {
+    it("should read message from fetch error data", () => {
+      expect(
+        getErrorMessage({ data: { message: "Section not found" } }, "fallback"),
+      ).toBe("Section not found");
+    });
+
+    it("should fall back when no message is present", () => {
+      expect(getErrorMessage(new Error("x"), "fallback")).toBe("fallback");
     });
   });
 

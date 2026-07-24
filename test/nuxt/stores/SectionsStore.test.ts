@@ -15,9 +15,13 @@ vi.mock("~/utils/toastNotification", () => ({
   showSuccessToast: vi.fn(),
 }));
 
-vi.mock("~/utils/handleError", () => ({
-  handleError: vi.fn(),
-}));
+vi.mock("~/utils/handleError", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("~/utils/handleError")>();
+  return {
+    ...actual,
+    handleError: vi.fn(),
+  };
+});
 
 mockNuxtImport("useRuntimeConfig", (original) => {
   return () => {
@@ -101,6 +105,7 @@ describe("sectionsStore", () => {
   beforeEach(() => {
     setActivePinia(createTestPinia());
     $fetchMock.mockReset();
+    vi.mocked(handleError).mockClear();
   });
 
   it("should have default state", () => {
@@ -171,7 +176,7 @@ describe("sectionsStore", () => {
     expect(store.sectionDetails).toEqual(mockAboutSection);
   });
 
-  it("should 'fetchSection' handles errors gracefully", async () => {
+  it("should 'fetchSection' handles network errors gracefully", async () => {
     const store = useSectionsStore();
 
     // Mock $fetch
@@ -183,6 +188,22 @@ describe("sectionsStore", () => {
       expect.any(Error),
       "Failed to fetch section details",
     );
+    expect(store.sectionDetails).toBeNull();
+  });
+
+  it("should 'fetchSection' rethrow HTTP errors as fatal page errors", async () => {
+    const store = useSectionsStore();
+    const httpError = {
+      statusCode: 404,
+      data: { message: "Section with slug 'missing' not found." },
+    };
+
+    $fetchMock.mockRejectedValue(httpError);
+
+    await expect(store.fetchSection("missing")).rejects.toMatchObject({
+      statusCode: 404,
+    });
+    expect(handleError).not.toHaveBeenCalled();
     expect(store.sectionDetails).toBeNull();
   });
 
