@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Project } from "~~/server/models/Project";
-import { useH3TestUtils } from "../../../../setup";
-import { createMockH3Event } from "../../../../mock/h3-event";
+import { useH3TestUtils } from "~~/test/setup";
+import { createMockH3Event } from "~~/test/mock/h3-event";
 import mongoose, { Types } from "mongoose";
 
 vi.mock("~~/server/models/Project");
@@ -46,17 +46,18 @@ describe("GetSingleProject controller", async () => {
     });
   });
 
-  it("should throw 400 when id is invalid", async () => {
-    // Arrange: prepare event with invalid id
+  it("should throw 404 when id is invalid", async () => {
+    // Arrange: prepare event with invalid id (e.g. /projects/404)
     const invalidId = "not-a-valid-id";
     const event = createMockH3Event({ params: { id: invalidId } });
 
-    // Act + Assert - handler should throw 400
+    // Act + Assert - handler should throw 404 (same as missing project)
     await expect(handler.default(event)).rejects.toMatchObject({
-      statusCode: 400,
-      statusMessage: "Bad Request",
-      message: "Invalid project id",
+      statusCode: 404,
+      statusMessage: "Not Found",
+      message: "Project not found",
     });
+    expect(Project.findById).not.toHaveBeenCalled();
   });
 
   it("should throw 404 when project not found", async () => {
@@ -70,7 +71,7 @@ describe("GetSingleProject controller", async () => {
     await expect(handler.default(event)).rejects.toMatchObject({
       statusCode: 404,
       statusMessage: "Not Found",
-      message: `Project with id ${validId} not found.`,
+      message: "Project not found",
     });
   });
 });

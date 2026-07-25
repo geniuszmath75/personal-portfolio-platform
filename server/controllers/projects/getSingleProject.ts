@@ -11,9 +11,9 @@ export default defineEventHandler(async (event) => {
 
     if (!isValidId) {
       throw createError({
-        statusCode: 400,
-        statusMessage: "Bad Request",
-        message: "Invalid project id",
+        statusCode: 404,
+        statusMessage: "Not Found",
+        message: "Project not found",
       });
     }
 
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 404,
         statusMessage: "Not Found",
-        message: `Project with id ${id} not found.`,
+        message: "Project not found",
       });
     }
 

@@ -116,7 +116,7 @@ describe("updateProject controller", async () => {
   });
 
   describe("Route param validation", () => {
-    it("should throw 400 for invalid project id", async () => {
+    it("should throw 404 for invalid project id", async () => {
       const event = createMockH3Event({
         context: { user: mockAuthUser, isAuthenticated: true },
         params: { id: "not-a-valid-id" },
@@ -124,9 +124,9 @@ describe("updateProject controller", async () => {
       });
 
       await expect(handler.default(event)).rejects.toMatchObject({
-        statusCode: 400,
-        statusMessage: "Bad Request",
-        message: "Invalid project id",
+        statusCode: 404,
+        statusMessage: "Not Found",
+        message: "Project not found",
       });
 
       expect(mockFindByIdAndUpdate).not.toHaveBeenCalled();

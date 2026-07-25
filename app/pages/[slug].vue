@@ -22,6 +22,10 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  name: "section-by-slug",
+});
+
 const sectionsStore = useSectionsStore();
 const authStore = useAuthStore();
 const { sectionDetails } = storeToRefs(sectionsStore);
