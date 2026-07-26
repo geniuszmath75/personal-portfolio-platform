@@ -16,11 +16,21 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       environment: process.env.ENV || "development",
-      baseApiPath: process.env.BASE_API_PATH,
+      baseApiPath: process.env.BASE_API_PATH || "/api/v1",
+      /** Public CDN/base URL for uploaded assets*/
+      uploadPublicBaseUrl: process.env.UPLOAD_PUBLIC_BASE_URL || "",
     },
     mongoDbUri: process.env.MONGODB_URI,
+
     jwtSecret: process.env.JWT_SECRET,
     jwtLifetime: process.env.JWT_LIFETIME,
+
+    uploadDriver: process.env.UPLOAD_DRIVER || "local",
+    s3Endpoint: process.env.S3_ENDPOINT || "",
+    s3Region: process.env.S3_REGION || "",
+    s3Bucket: process.env.S3_BUCKET || "",
+    s3AccessKeyId: process.env.S3_ACCESS_KEY_ID || "",
+    s3SecretAccessKey: process.env.S3_SECRET_ACCESS_KEY || "",
   },
   routeRules: {
     "/admin/**": { ssr: false },

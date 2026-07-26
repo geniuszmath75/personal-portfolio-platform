@@ -1,20 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useH3TestUtils } from "../../../../setup";
-import { createMockH3Event } from "../../../../mock/h3-event";
+import { useH3TestUtils } from "~~/test/setup";
+import { createMockH3Event } from "~~/test/mock/h3-event";
 
 useH3TestUtils();
 
-const { mockRequireAuth } = vi.hoisted(() => ({
-  mockRequireAuth: vi.fn(),
+const { mockRequireAdmin } = vi.hoisted(() => ({
+  mockRequireAdmin: vi.fn(),
 }));
 
 vi.mock("~~/server/utils/auth", () => ({
-  requireAuth: mockRequireAuth,
+  requireAdmin: mockRequireAdmin,
 }));
 
 const mockUploadImage = vi.fn();
 
-vi.mock("../../../../../server/controllers/upload/uploadImage", () => ({
+vi.mock("~~/server/controllers/upload/uploadImage", () => ({
   uploadImage: mockUploadImage,
 }));
 
@@ -37,11 +37,10 @@ describe("CreateImage controller", async () => {
     mockUploadImage.mockResolvedValue(mockUploadResult);
   });
 
-  const handler =
-    await import("../../../../../server/api/v1/upload/image.post");
+  const handler = await import("~~/server/api/v1/upload/image.post");
 
-  describe("authentication", () => {
-    it("should call requireAuth with event", async () => {
+  describe("authorization", () => {
+    it("should call requireAdmin with event", async () => {
       // Arrange: prepare event with query params
       const event = createMockH3Event({
         context: { user: mockAuthUser, isAuthenticated: true },
@@ -52,13 +51,13 @@ describe("CreateImage controller", async () => {
       await handler.default(event);
 
       // Assert: requireAuth was called with event
-      expect(mockRequireAuth).toHaveBeenCalledTimes(1);
-      expect(mockRequireAuth).toHaveBeenCalledWith(event);
+      expect(mockRequireAdmin).toHaveBeenCalledTimes(1);
+      expect(mockRequireAdmin).toHaveBeenCalledWith(event);
     });
 
     it("should throw 401 when user is not authenticated", async () => {
       // Arrange: make requireAuth throw 401
-      mockRequireAuth.mockImplementationOnce(() => {
+      mockRequireAdmin.mockImplementationOnce(() => {
         throw createError({
           statusCode: 401,
           statusMessage: "Unauthorized",
@@ -68,15 +67,38 @@ describe("CreateImage controller", async () => {
 
       const event = createMockH3Event({});
 
-      // Act: call handler
-      const result = handler.default(event);
-
-      // Assert: 401 error is thrown
-      await expect(result).rejects.toMatchObject({
+      // Act & assert: 401 error is thrown
+      await expect(handler.default(event)).rejects.toMatchObject({
         statusCode: 401,
         statusMessage: "Unauthorized",
         message: "Authentication invalid",
       });
+      expect(mockUploadImage).not.toHaveBeenCalled();
+    });
+
+    it("should throw 403 when authenticated user is not Admin", async () => {
+      mockRequireAdmin.mockImplementationOnce(() => {
+        throw createError({
+          statusCode: 403,
+          statusMessage: "Forbidden",
+          message: "Admin access required",
+        });
+      });
+
+      const event = createMockH3Event({
+        context: {
+          user: { ...mockAuthUser, role: UserSchemaRole.GUEST },
+          isAuthenticated: true,
+        },
+        query: { category: UploadCategory.AVATARS },
+      });
+
+      await expect(handler.default(event)).rejects.toMatchObject({
+        statusCode: 403,
+        statusMessage: "Forbidden",
+        message: "Admin access required",
+      });
+      expect(mockUploadImage).not.toHaveBeenCalled();
     });
   });
 
@@ -119,11 +141,8 @@ describe("CreateImage controller", async () => {
         query: { category: "invalid-category" },
       });
 
-      // Act: call handler
-      const result = handler.default(event);
-
-      // Assert: 400 error is thrown with message about allowed categories
-      await expect(result).rejects.toMatchObject({
+      // Act & assert: 400 error is thrown with message about allowed categories
+      await expect(handler.default(event)).rejects.toMatchObject({
         statusCode: 400,
         statusMessage: "Bad Request",
         message: expect.stringContaining("Invalid category parameter"),
@@ -136,11 +155,8 @@ describe("CreateImage controller", async () => {
         query: { category: "invalid-category" },
       });
 
-      // Act: call handler
-      const result = handler.default(event);
-
-      // Assert: error message contains all valid categories
-      await expect(result).rejects.toMatchObject({
+      // Act & assert: error message contains all valid categories
+      await expect(handler.default(event)).rejects.toMatchObject({
         message: expect.stringContaining(
           Object.values(UploadCategory).join(", "),
         ),
