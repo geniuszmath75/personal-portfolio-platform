@@ -22,6 +22,12 @@ describe("resolveSectionImageSrc util", () => {
     ).toBe("blob:http://localhost:3000/preview-id");
   });
 
+  it("should return remote CDN URLs unchanged", () => {
+    expect(
+      resolveSectionImageSrc("https://cdn.example.com/projects/photo.jpg"),
+    ).toBe("https://cdn.example.com/projects/photo.jpg");
+  });
+
   it("should still resolve bare filenames that contain a slash later", () => {
     expect(resolveSectionImageSrc("subdir/hero.png")).toBe(
       "/images/subdir/hero.png",

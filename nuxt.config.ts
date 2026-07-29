@@ -1,3 +1,5 @@
+import { UploadDriver } from "./shared/types/enums";
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
@@ -25,7 +27,7 @@ export default defineNuxtConfig({
     jwtSecret: process.env.JWT_SECRET,
     jwtLifetime: process.env.JWT_LIFETIME,
 
-    uploadDriver: process.env.UPLOAD_DRIVER || "local",
+    uploadDriver: process.env.UPLOAD_DRIVER || UploadDriver.LOCAL,
     s3Endpoint: process.env.S3_ENDPOINT || "",
     s3Region: process.env.S3_REGION || "",
     s3Bucket: process.env.S3_BUCKET || "",

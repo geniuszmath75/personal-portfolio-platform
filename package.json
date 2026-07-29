@@ -16,6 +16,7 @@
     "version": "auto-changelog -p && git add CHANGELOG.md"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1095.0",
     "@nuxt/eslint": "^1.16.0",
     "@nuxt/fonts": "^0.14.0",
     "@nuxt/icon": "^2.3.1",

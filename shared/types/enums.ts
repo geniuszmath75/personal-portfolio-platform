@@ -62,3 +62,11 @@ export enum UploadCategory {
   PROJECTS = "projects",
   SECTIONS = "sections",
 }
+
+/**
+ * Represents the drivers that can be used for file uploads
+ */
+export enum UploadDriver {
+  LOCAL = "local",
+  S3_COMPATIBLE = "s3",
+}

@@ -1,10 +1,10 @@
 import type { H3Event } from "h3";
 import { H3Error } from "h3";
 import type { UploadImageResponse } from "~~/shared/types";
-import { extname, join } from "path";
+import { extname } from "path";
 import { randomUUID } from "crypto";
-import { mkdir, writeFile } from "fs/promises";
 import { UploadCategory } from "~~/shared/types/enums";
+import { getStorageProvider } from "~~/server/utils/storage";
 
 const ALLOWED_MIME_TYPES = [
   "image/jpeg",
@@ -106,22 +106,18 @@ export async function uploadImage(
     const extension =
       extname(sanitizedFilename) || getExtensionFromMime(mimeType);
     const uniqueFilename = `${randomUUID()}${extension}`;
+    const key = `${category}/${uniqueFilename}`;
 
-    // Determine upload path
-    const uploadDir = join(process.cwd(), "public", "uploads", category);
-    const filePath = join(uploadDir, uniqueFilename);
-
-    // Ensure upload directory exists
-    await mkdir(uploadDir, { recursive: true });
-
-    // Write file to disk
-    await writeFile(filePath, fileData.data);
-
-    // Generate public URL
-    const publicUrl = `/uploads/${category}/${uniqueFilename}`;
+    // Delegate persistence to the configured storage driver (local / S3-compatible).
+    const storage = getStorageProvider();
+    const result = await storage.putObject({
+      key,
+      body: fileData.data,
+      contentType: mimeType,
+    });
 
     return {
-      url: publicUrl,
+      url: result.publicUrl,
       filename: uniqueFilename,
       size: fileSize,
       mimetype: mimeType,
