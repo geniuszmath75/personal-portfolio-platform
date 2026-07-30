@@ -49,10 +49,12 @@
       :total-elements="imageList.length"
     >
       <!-- Project images -->
-      <img
+      <AppImage
         v-for="(image, i) in imageList"
         :key="'img-' + i"
-        class="w-full h-96 shrink-0 object-cover"
+        preset="projectCarousel"
+        root-class="h-96 w-full shrink-0"
+        img-class="h-full w-full object-cover"
         :src="image.srcPath"
         :alt="image.altText"
       />

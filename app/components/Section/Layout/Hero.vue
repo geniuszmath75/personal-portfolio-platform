@@ -41,12 +41,14 @@
 
     <div class="flex-1 flex justify-center">
       <template v-for="(block, i) in imageBlocks" :key="'img-' + i">
-        <img
+        <AppImage
           v-for="(img, j) in block.images"
           :key="'img-' + i + '-' + j"
           :src="resolveSectionImageSrc(img.srcPath)"
           :alt="img.altText"
-          class="max-w-[70%] md:max-w-80 lg:max-w-lg rounded-2xl shadow-lg shadow-primary-400"
+          root-class="max-w-[70%] md:max-w-80 lg:max-w-md rounded-2xl shadow-lg shadow-primary-400"
+          img-class="md:max-w-80 lg:max-w-md rounded-2xl"
+          :width="448"
         />
       </template>
     </div>

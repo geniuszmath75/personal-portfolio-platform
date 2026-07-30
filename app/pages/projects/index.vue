@@ -31,7 +31,7 @@
         <NuxtLink
           v-if="isAdmin"
           to="/projects/create"
-          class="fixed bottom-6 right-6 md:hidden"
+          class="fixed z-10 bottom-6 right-6 md:hidden"
         >
           <BaseBtn label="New project">
             <template #icon>

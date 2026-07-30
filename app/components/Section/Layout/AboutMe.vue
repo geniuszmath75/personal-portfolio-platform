@@ -50,12 +50,13 @@
           <div
             class="w-64 h-64 rounded-full overflow-hidden border-4 border-secondary-500 lg:w-full lg:h-auto lg:rounded-none lg:border-none"
           >
-            <img
+            <AppImage
               :src="
                 resolveSectionImageSrc(imagesBlock.images[0]?.srcPath ?? '')
               "
               :alt="imagesBlock.images[0]?.altText"
-              class="w-full h-full object-cover"
+              root-class="h-full w-full"
+              img-class="h-full w-full object-cover"
             />
           </div>
         </div>

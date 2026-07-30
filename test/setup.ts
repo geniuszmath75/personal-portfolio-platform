@@ -58,6 +58,27 @@ const defaultGlobalOptions: GlobalMountOptions = {
       props: ["name", "size"],
       template: `<span :data-icon="name"><slot /></span>`,
     },
+    NuxtImg: {
+      props: [
+        "src",
+        "alt",
+        "preset",
+        "sizes",
+        "loading",
+        "width",
+        "height",
+        "custom",
+      ],
+      template: `
+        <slot
+          :src="src"
+          :isLoaded="true"
+          :imgAttrs="{ alt }"
+        >
+          <img :src="src" :alt="alt" />
+        </slot>
+      `,
+    },
     Teleport: {
       props: ["to"],
       template: "<slot />",
@@ -84,12 +105,24 @@ export function renderWithNuxt(
   component: Component,
   options: RenderOptions<unknown> = {},
 ) {
-  const { provide: testProvide, ...restGlobal } = options.global ?? {};
+  const {
+    provide: testProvide,
+    stubs: testStubs,
+    ...restGlobal
+  } = options.global ?? {};
   const mergedGlobalOptions: GlobalMountOptions = merge(
     {},
     defaultGlobalOptions,
     restGlobal,
   );
+
+  // Shallow-merge stubs — lodash merge corrupts Vue component stubs.
+  if (testStubs) {
+    mergedGlobalOptions.stubs = {
+      ...defaultGlobalOptions.stubs,
+      ...testStubs,
+    };
+  }
 
   if (testProvide) {
     mergedGlobalOptions.provide = {

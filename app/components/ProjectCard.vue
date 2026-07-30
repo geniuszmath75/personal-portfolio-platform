@@ -4,10 +4,12 @@
   >
     <!-- Project main image -->
     <div class="flex-shrink-0 h-1/2 w-full">
-      <img
+      <AppImage
+        preset="projectCard"
         :src="project.mainImage.srcPath"
         :alt="project.mainImage.altText"
-        class="w-full h-full object-cover rounded-tl-2xl rounded-tr-2xl"
+        root-class="h-full w-full rounded-tl-2xl rounded-tr-2xl"
+        img-class="h-full w-full object-cover rounded-tl-2xl rounded-tr-2xl"
       />
     </div>
 

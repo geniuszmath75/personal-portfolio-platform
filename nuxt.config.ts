@@ -1,4 +1,5 @@
 import { UploadDriver } from "./shared/types/enums";
+import { uploadCdnDomains } from "./shared/utils/uploadCdnDomains";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -11,9 +12,42 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@nuxt/test-utils/module",
     "@nuxt/fonts",
+    "@nuxt/image",
   ],
   typescript: {
     typeCheck: true,
+  },
+  /**
+   * Default IPX provider optimizes local `/uploads` and `/images` from `public/`.
+   * R2/CDN hosts must be listed in `domains` (from UPLOAD_PUBLIC_BASE_URL).
+   */
+  image: {
+    quality: 80,
+    format: ["webp"],
+    domains: uploadCdnDomains(),
+    presets: {
+      avatar: {
+        modifiers: {
+          width: 256,
+          height: 256,
+          fit: "cover",
+        },
+      },
+      projectCard: {
+        modifiers: {
+          width: 800,
+          height: 450,
+          fit: "cover",
+        },
+      },
+      projectCarousel: {
+        modifiers: {
+          width: 1280,
+          height: 720,
+          fit: "cover",
+        },
+      },
+    },
   },
   runtimeConfig: {
     public: {

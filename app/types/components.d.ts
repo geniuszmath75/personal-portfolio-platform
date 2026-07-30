@@ -793,3 +793,55 @@ export interface ProjectFormProps {
    */
   isWebsiteLinkInvalid: boolean;
 }
+
+/**
+ * APP IMAGE
+ *
+ * Props for the AppImage component
+ */
+export interface AppImageProps {
+  /**
+   * Image source URL or path (local `/uploads`, `/images`, or remote CDN).
+   */
+  src: string;
+
+  /**
+   * Accessible alternative text for the image.
+   */
+  alt?: string;
+
+  /**
+   * Tailwind / layout classes applied to the sizing wrapper around the image.
+   */
+  rootClass?: string;
+
+  /**
+   * Classes applied to the underlying `<img>` (e.g. object-cover).
+   */
+  imgClass?: string;
+
+  /**
+   * Nuxt Image preset name from `nuxt.config` (e.g. avatar, projectCard, projectCarousel).
+   */
+  preset?: string;
+
+  /**
+   * Target width passed to Nuxt Image for optimization (not CSS sizing).
+   */
+  width?: string | number;
+
+  /**
+   * Target height passed to Nuxt Image for optimization (not CSS sizing).
+   */
+  height?: string | number;
+
+  /**
+   * Responsive `sizes` hint passed to Nuxt Image for srcset generation.
+   */
+  sizes?: string;
+
+  /**
+   * Native image loading strategy (`lazy` by default).
+   */
+  loading?: "lazy" | "eager";
+}

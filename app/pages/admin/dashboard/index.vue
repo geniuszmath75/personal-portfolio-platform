@@ -48,11 +48,13 @@
               v-if="!isEditing"
               class="relative p-0.5 bg-secondary-500 rounded-full"
             >
-              <img
+              <AppImage
                 v-if="editedData.avatar"
+                preset="avatar"
                 :src="editedData.avatar"
                 alt="User avatar"
-                class="h-32 w-32 min-h-32 min-w-32 object-cover rounded-full"
+                root-class="h-32 w-32 min-h-32 min-w-32 rounded-full"
+                img-class="h-full w-full object-cover rounded-full"
               />
               <Icon v-else name="mdi:user" class="text-primary-500 text-8xl" />
             </div>
@@ -64,11 +66,13 @@
             >
               <!-- Current avatar preview -->
               <div class="relative p-0.5 bg-secondary-500 rounded-full group">
-                <img
+                <AppImage
                   v-if="editedData.avatar"
+                  preset="avatar"
                   :src="editedData.avatar"
                   alt="Avatar preview"
-                  class="h-32 w-32 min-h-32 min-w-32 object-cover rounded-full"
+                  root-class="h-32 w-32 min-h-32 min-w-32 rounded-full"
+                  img-class="h-full w-full object-cover rounded-full"
                 />
                 <Icon
                   v-else
