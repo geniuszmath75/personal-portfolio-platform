@@ -1,4 +1,10 @@
 import { UploadDriver } from "./shared/types/enums";
+import {
+  SEO_DEFAULT_DESCRIPTION,
+  SEO_DEFAULT_TITLE,
+  SEO_SITE_NAME,
+  SEO_TITLE_TEMPLATE,
+} from "./shared/seo/siteSeo";
 import { uploadCdnDomains } from "./shared/utils/uploadCdnDomains";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -16,6 +22,37 @@ export default defineNuxtConfig({
   ],
   typescript: {
     typeCheck: true,
+  },
+  /**
+   * Global head defaults. Page-specific title/description/og via `usePageSeo`.
+   */
+  app: {
+    head: {
+      htmlAttrs: {
+        lang: "en",
+      },
+      title: SEO_DEFAULT_TITLE,
+      titleTemplate: SEO_TITLE_TEMPLATE,
+      meta: [
+        {
+          name: "author",
+          content: SEO_SITE_NAME,
+        },
+        {
+          name: "description",
+          content: SEO_DEFAULT_DESCRIPTION,
+        },
+      ],
+      link: [
+        { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+        { rel: "icon", type: "image/svg+xml", href: "/logo/logo.svg" },
+        {
+          rel: "apple-touch-icon",
+          sizes: "180x180",
+          href: "/logo/logo_180_180.png",
+        },
+      ],
+    },
   },
   /**
    * Default IPX provider optimizes local `/uploads` and `/images` from `public/`.
@@ -55,6 +92,11 @@ export default defineNuxtConfig({
       baseApiPath: process.env.BASE_API_PATH || "/api/v1",
       /** Public CDN/base URL for uploaded assets*/
       uploadPublicBaseUrl: process.env.UPLOAD_PUBLIC_BASE_URL || "",
+      /**
+       * Canonical site origin for og:url / canonical links
+       * Leave empty in local dev.
+       */
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || process.env.SITE_URL || "",
     },
     mongoDbUri: process.env.MONGODB_URI,
 
@@ -69,11 +111,29 @@ export default defineNuxtConfig({
     s3SecretAccessKey: process.env.S3_SECRET_ACCESS_KEY || "",
   },
   routeRules: {
-    "/admin/**": { ssr: false },
-    "/projects/create": { ssr: false },
-    "/projects/*/edit": { ssr: false },
-    "/sections/create": { ssr: false },
-    "/sections/*/edit": { ssr: false },
+    "/admin/**": {
+      ssr: false,
+      headers: { "X-Robots-Tag": "noindex, nofollow" },
+    },
+    "/auth/**": {
+      headers: { "X-Robots-Tag": "noindex, nofollow" },
+    },
+    "/projects/create": {
+      ssr: false,
+      headers: { "X-Robots-Tag": "noindex, nofollow" },
+    },
+    "/projects/*/edit": {
+      ssr: false,
+      headers: { "X-Robots-Tag": "noindex, nofollow" },
+    },
+    "/sections/create": {
+      ssr: false,
+      headers: { "X-Robots-Tag": "noindex, nofollow" },
+    },
+    "/sections/*/edit": {
+      ssr: false,
+      headers: { "X-Robots-Tag": "noindex, nofollow" },
+    },
   },
   vite: {
     plugins: [

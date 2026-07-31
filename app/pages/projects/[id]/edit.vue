@@ -40,8 +40,16 @@
   </div>
 </template>
 <script setup lang="ts">
+import { usePageSeo } from "~/composables/usePageSeo";
+import { SEO_ROBOTS_NOINDEX } from "~~/shared/seo/siteSeo";
+
 definePageMeta({
   middleware: ["02-admin"],
+});
+
+usePageSeo({
+  title: "Edit project",
+  robots: SEO_ROBOTS_NOINDEX,
 });
 
 const projectStore = useProjectsStore();

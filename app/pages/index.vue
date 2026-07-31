@@ -44,11 +44,13 @@
 </template>
 
 <script setup lang="ts">
+import { usePageSeo } from "~/composables/usePageSeo";
 import { provideSectionInsertBoundaries } from "~/composables/useSectionInsertBoundaries";
 import {
   buildSectionInsertCreateUrl,
   getSectionInsertAriaLabel,
 } from "~/utils/buildSectionInsertCreateUrl";
+import { SEO_DEFAULT_TITLE } from "~~/shared/seo/siteSeo";
 
 const sectionStore = useSectionsStore();
 const authStore = useAuthStore();
@@ -62,4 +64,8 @@ const emptyPageLinkClasses =
   "pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full bg-secondary-500 text-additional-500 shadow-primary transition-all duration-200 ease-out hover:bg-secondary-400";
 
 await callOnce("sections", () => sectionStore.fetchSections());
+
+usePageSeo({
+  title: SEO_DEFAULT_TITLE,
+});
 </script>

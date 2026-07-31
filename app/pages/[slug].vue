@@ -22,6 +22,8 @@
 </template>
 
 <script setup lang="ts">
+import { usePageSeo } from "~/composables/usePageSeo";
+
 definePageMeta({
   name: "section-by-slug",
 });
@@ -35,5 +37,10 @@ const slug = useRouteParam("slug");
 
 await callOnce("section", () => sectionsStore.fetchSection(slug), {
   mode: "navigation",
+});
+
+usePageSeo({
+  title: () =>
+    sectionDetails.value?.title?.trim() || sectionDetails.value?.slug || slug,
 });
 </script>

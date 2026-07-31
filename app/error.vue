@@ -89,6 +89,10 @@ const headEntry = useHead({
   title: () => `${statusCode.value} Page`,
 });
 
+useSeoMeta({
+  robots: "noindex, nofollow",
+});
+
 const goHome = async () => {
   // Drop error title before leaving — otherwise Unhead keeps "404 Page"
   headEntry.dispose();

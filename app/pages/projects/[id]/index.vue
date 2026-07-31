@@ -185,6 +185,8 @@
 </template>
 
 <script setup lang="ts">
+import { usePageSeo } from "~/composables/usePageSeo";
+
 const projectStore = useProjectsStore();
 const authStore = useAuthStore();
 
@@ -219,5 +221,15 @@ const projectId = useRouteParam("id");
 
 await callOnce("project", () => projectStore.fetchProject(projectId), {
   mode: "navigation",
+});
+
+usePageSeo({
+  title: () => projectDetails.value?.title?.trim() || "Project",
+  description: () => projectDetails.value?.shortDescription,
+  image: () =>
+    projectDetails.value?.mainImage?.srcPath
+      ? resolveSectionImageSrc(projectDetails.value.mainImage.srcPath)
+      : undefined,
+  ogType: "article",
 });
 </script>

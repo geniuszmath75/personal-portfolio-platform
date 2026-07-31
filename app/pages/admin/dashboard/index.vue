@@ -125,11 +125,19 @@
 </template>
 <script setup lang="ts">
 import type FileUpload from "~/components/FileUpload.vue";
+import { usePageSeo } from "~/composables/usePageSeo";
 import type { UploadFileInfo } from "~/types/components";
+
+import { SEO_ROBOTS_NOINDEX } from "~~/shared/seo/siteSeo";
 
 definePageMeta({
   layout: "dashboard",
   middleware: ["02-admin"],
+});
+
+usePageSeo({
+  title: "Dashboard",
+  robots: SEO_ROBOTS_NOINDEX,
 });
 
 const adminStore = useAdminStore();

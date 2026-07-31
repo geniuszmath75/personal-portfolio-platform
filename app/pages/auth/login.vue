@@ -82,10 +82,18 @@
 <script setup lang="ts">
 import BaseInput from "~/components/BaseInput.vue";
 import { useLoginForm } from "~/composables/useLoginForm";
+import { usePageSeo } from "~/composables/usePageSeo";
+
+import { SEO_ROBOTS_NOINDEX } from "~~/shared/seo/siteSeo";
 
 definePageMeta({
   layout: "auth",
   middleware: ["03-guest"],
+});
+
+usePageSeo({
+  title: "Login",
+  robots: SEO_ROBOTS_NOINDEX,
 });
 
 const authStore = useAuthStore();

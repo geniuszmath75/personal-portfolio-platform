@@ -65,6 +65,9 @@
   </div>
 </template>
 <script setup lang="ts">
+import { usePageSeo } from "~/composables/usePageSeo";
+import { SEO_PROJECTS_DESCRIPTION } from "~~/shared/seo/siteSeo";
+
 const projectStore = useProjectsStore();
 const authStore = useAuthStore();
 
@@ -119,4 +122,9 @@ watchEffect(async () => {
 });
 
 await callOnce("projects", () => projectStore.fetchProjects());
+
+usePageSeo({
+  title: "Projects",
+  description: SEO_PROJECTS_DESCRIPTION,
+});
 </script>
