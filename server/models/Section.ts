@@ -8,7 +8,7 @@ import type {
   ButttonBlock,
   GroupBlockItem,
   GroupBlock,
-} from "~~/shared/types/index.d.ts";
+} from "../../shared/types";
 import type { SectionModel } from "~~/server/types";
 import { ImageSchema } from "./Image";
 

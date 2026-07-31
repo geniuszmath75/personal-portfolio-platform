@@ -4,7 +4,9 @@ import {
   SEO_ROBOTS_INDEX,
 } from "~~/shared/seo/siteSeo";
 import { toAbsoluteUrl } from "~~/shared/utils/toAbsoluteUrl";
-import type { PageSeoOptions } from "~~/shared/types";
+import type { PageSeoOptions } from "~/types/seo";
+
+export type { PageSeoOptions };
 
 /**
  * Applies page-level `useSeoMeta` / `useHead` with absolute og:url and images.

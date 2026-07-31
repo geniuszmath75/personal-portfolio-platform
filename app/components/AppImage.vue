@@ -1,14 +1,14 @@
 <template>
   <NuxtImg
     v-slot="{ src: resolvedSrc, isLoaded, imgAttrs }"
-    :src="src"
-    :preset="preset"
-    :width="width"
-    :height="height"
-    :sizes="sizes"
+    :src="props.src"
+    :preset="props.preset"
+    :width="props.width"
+    :height="props.height"
+    :sizes="props.sizes"
     custom
   >
-    <div class="relative overflow-hidden" :class="rootClass">
+    <div class="relative overflow-hidden" :class="props.rootClass">
       <div
         v-show="!isLoaded"
         class="absolute inset-0 flex items-center justify-center bg-primary-600 animate-pulse"
@@ -23,10 +23,10 @@
       <img
         v-bind="imgAttrs"
         :src="resolvedSrc"
-        :alt="alt"
-        :loading="loading"
+        :alt="props.alt"
+        :loading="props.loading"
         :class="[
-          imgClass,
+          props.imgClass,
           'transition-opacity duration-300',
           isLoaded ? 'opacity-100' : 'opacity-0',
         ]"
@@ -42,7 +42,7 @@ import type { AppImageProps } from "~/types/components";
  * Optimized image with a pulsing placeholder (large image icon) while loading.
  * Wraps NuxtImg `custom` slot so layout classes stay on one root element.
  */
-withDefaults(defineProps<AppImageProps>(), {
+const props = withDefaults(defineProps<AppImageProps>(), {
   alt: "",
   rootClass: "",
   imgClass: "h-full w-full object-cover",

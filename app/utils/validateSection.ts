@@ -1,6 +1,6 @@
 import z from "zod";
-import { ISectionType } from "../../shared/types/enums";
-import { blockSchema } from "../../shared/utils/validateSectionBlocks";
+import { ISectionType } from "#shared/types/enums";
+import { blockSchema } from "#shared/utils/validateSectionBlocks";
 
 export const sectionSchema = z.object({
   _id: z.string(),

@@ -1,4 +1,6 @@
 import type { ButtonHTMLAttributes, InputTypeHTMLAttribute } from "vue";
+import type { ErrorObject } from "@vuelidate/core";
+import type { createProjectValidationRules } from "~/utils/formValidationRules";
 
 /**
  * Utility type to make certain properties required while keeping others optional

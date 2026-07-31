@@ -489,35 +489,3 @@ export interface UploadImageResponse {
    */
   mimetype: string;
 }
-
-/**
- * PAGE SEO OPTIONS
- *
- * Options for configuring page-level SEO meta tags and head elements.
- */
-export type PageSeoOptions = {
-  /**
-   * Page title segment (Unhead applies the global titleTemplate).
-   */
-  title: MaybeRefOrGetter<string>;
-
-  /**
-   * Meta / OG description. Empty or null omits the tags.
-   */
-  description?: MaybeRefOrGetter<string | undefined | null>;
-
-  /**
-   * Relative path or absolute image URL for og:image / twitter:image.
-   */
-  image?: MaybeRefOrGetter<string | undefined | null>;
-
-  /**
-   * Robots meta; defaults to index,follow for public pages.
-   */
-  robots?: MaybeRefOrGetter<string | undefined>;
-
-  /**
-   * Open Graph type.
-   */
-  ogType?: "website" | "article";
-};
