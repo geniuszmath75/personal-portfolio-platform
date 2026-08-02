@@ -1,0 +1,32 @@
+# Production-like stack: Nuxt app only (MongoDB Atlas, no local mongo).
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NUXT_PUBLIC_SITE_URL: ${NUXT_PUBLIC_SITE_URL:-}
+        UPLOAD_PUBLIC_BASE_URL: ${UPLOAD_PUBLIC_BASE_URL:-}
+    image: personal-portfolio-platform:prod
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${APP_PORT:-3000}:3000"
+    env_file:
+      - .env.production
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3000
+      NUXT_MONGO_DB_URI: ${NUXT_MONGO_DB_URI:?Set NUXT_MONGO_DB_URI (Atlas) in env file}
+      NUXT_JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in env file}
+      NUXT_JWT_LIFETIME: ${JWT_LIFETIME:-1200}
+      NUXT_UPLOAD_DRIVER: ${UPLOAD_DRIVER:-s3}
+      NUXT_S3_ENDPOINT: ${S3_ENDPOINT:-}
+      NUXT_S3_REGION: ${S3_REGION:-}
+      NUXT_S3_BUCKET: ${S3_BUCKET:-}
+      NUXT_S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
+      NUXT_S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
+      NUXT_PUBLIC_ENVIRONMENT: ${ENV:-production}
+      NUXT_PUBLIC_BASE_API_PATH: ${BASE_API_PATH:-/api/v1}
+      NUXT_PUBLIC_UPLOAD_PUBLIC_BASE_URL: ${UPLOAD_PUBLIC_BASE_URL:-}
+      NUXT_PUBLIC_SITE_URL: ${NUXT_PUBLIC_SITE_URL:?Set NUXT_PUBLIC_SITE_URL in env file}
