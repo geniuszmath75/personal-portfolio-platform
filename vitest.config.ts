@@ -32,7 +32,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reportsDirectory: "./test/coverage",
-      include: ["app/**", "server/**", "shared/**"],
+      include: ["app/**", "server/**", "shared/**", "scripts/**"],
     },
   },
 });
