@@ -27,7 +27,7 @@
 /**
  * Two-way binding for selected limit value
  */
-const currentLimit = defineModel<number>("limit");
+const currentLimit = defineModel<number>("limit", { required: true });
 
 /**
  * List of available limit options
