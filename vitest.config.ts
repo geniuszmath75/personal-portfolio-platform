@@ -33,6 +33,9 @@ export default defineConfig({
       provider: "v8",
       reportsDirectory: "./test/coverage",
       include: ["app/**", "server/**", "shared/**", "scripts/**"],
+      // Declaration files have no runtime code to cover; the v8 provider's
+      // AST remap step also fails to parse `import type { ... }` in them.
+      exclude: ["**/*.d.ts"],
     },
   },
 });
