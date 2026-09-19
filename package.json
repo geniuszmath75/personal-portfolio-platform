@@ -9,6 +9,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "seed": "tsx --tsconfig .nuxt/tsconfig.server.json scripts/seed.ts",
+    "check-updates": "node scripts/checkMinorUpdates.mjs",
     "test:unit": "vitest --project unit",
     "test:nuxt": "vitest --project nuxt",
     "coverage": "vitest run --coverage",
