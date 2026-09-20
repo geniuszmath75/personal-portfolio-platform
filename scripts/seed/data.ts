@@ -17,11 +17,6 @@ export const SEED_SECTION_SLUGS = {
   aboutMe: "about-me",
 } as const;
 
-const sampleImage = {
-  srcPath: "/logo/og-default.png",
-  altText: "Portfolio preview",
-} as const;
-
 export type SeedSectionInput = {
   slug: string;
   title?: string;
@@ -42,11 +37,16 @@ export const seedSections: SeedSectionInput[] = [
       },
       {
         kind: BlockKind.BUTTON,
-        buttons: ["Projects", "About Me"],
+        buttons: ["PROJECTS", "ABOUT ME"],
       },
       {
         kind: BlockKind.IMAGE,
-        images: [{ ...sampleImage, altText: "Hero portrait placeholder" }],
+        images: [
+          {
+            srcPath: "/images/hero-image.png",
+            altText: "Hero portrait placeholder",
+          },
+        ],
       },
     ],
   },
@@ -56,10 +56,6 @@ export const seedSections: SeedSectionInput[] = [
     type: ISectionType.SKILLS,
     order: 2,
     blocks: [
-      {
-        kind: BlockKind.PARAGRAPH,
-        paragraphs: ["Skills"],
-      },
       {
         kind: BlockKind.GROUP,
         header: "FRONTEND",
@@ -95,6 +91,14 @@ export const seedSections: SeedSectionInput[] = [
         header: "BACKEND/DATABASES",
         items: [
           {
+            icon: "mdi:language-java",
+            label: "Java",
+          },
+          {
+            icon: "simple-icons:spring",
+            label: "Spring",
+          },
+          {
             icon: "simple-icons:postgresql",
             label: "PostgreSQL",
           },
@@ -119,10 +123,19 @@ export const seedSections: SeedSectionInput[] = [
         ],
       },
       {
+        kind: BlockKind.GROUP,
+        header: "AI TOOLS",
+        items: [
+          {
+            icon: "simple-icons:githubcopilot",
+            label: "GitHub Copilot",
+          },
+        ],
+      },
+      {
         kind: BlockKind.PARAGRAPH,
         paragraphs: [
-          "Nice quote to start with, but what about some technologies/languages/frameworks?",
-          "Here there are!",
+          "A quick look at the languages, frameworks, and tools I'm comfortable working with.",
         ],
       },
     ],

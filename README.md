@@ -64,61 +64,61 @@ flowchart TB
 
 `Image` is an embedded object (no own collection), reused by `Section` `IMAGE` blocks and by `Project`.
 
-| Field      | Type   | Required | Notes                                                |
-| ---------- | ------ | -------- | ----------------------------------------------------- |
-| `srcPath`  | String | Yes      | must end in `.png`, `.jpg`, `.jpeg`, `.webp` or `.svg` |
-| `altText`  | String | Yes      | —                                                       |
+| Field     | Type   | Required | Notes                                                  |
+| --------- | ------ | -------- | ------------------------------------------------------ |
+| `srcPath` | String | Yes      | must end in `.png`, `.jpg`, `.jpeg`, `.webp` or `.svg` |
+| `altText` | String | Yes      | —                                                      |
 
 ### User
 
-| Field       | Type                    | Required | Notes                                          |
-| ----------- | ----------------------- | -------- | ----------------------------------------------- |
-| `email`     | String                  | Yes      | unique, must be a valid email                   |
-| `password`  | String                  | Yes      | min 8 chars; hashed before save, never returned as plain text |
-| `username`  | String                  | Yes      | 3-50 chars                                      |
-| `role`      | String enum: `ADMIN`, `GUEST` | No | default `GUEST`                                 |
-| `avatar`    | String                  | No       | default `null`                                  |
-| `createdAt` / `updatedAt` | Date      | auto     | timestamps                                      |
+| Field                     | Type                          | Required | Notes                                                         |
+| ------------------------- | ----------------------------- | -------- | ------------------------------------------------------------- |
+| `email`                   | String                        | Yes      | unique, must be a valid email                                 |
+| `password`                | String                        | Yes      | min 8 chars; hashed before save, never returned as plain text |
+| `username`                | String                        | Yes      | 3-50 chars                                                    |
+| `role`                    | String enum: `ADMIN`, `GUEST` | No       | default `GUEST`                                               |
+| `avatar`                  | String                        | No       | default `null`                                                |
+| `createdAt` / `updatedAt` | Date                          | auto     | timestamps                                                    |
 
 ### Section
 
-| Field       | Type                                       | Required | Notes                                          |
-| ----------- | ------------------------------------------- | -------- | ----------------------------------------------- |
-| `title`     | String                                       | No       | 3-64 chars, default `null`                      |
-| `slug`      | String                                       | Yes      | unique, 2-50 chars, used for routing            |
-| `type`      | String enum: `HERO`, `SKILLS`, `CONTACT`, `ABOUT_ME` | No | default `HERO`                                  |
-| `order`     | Number                                       | Yes      | position among sections in the same context     |
-| `blocks`    | Array of Block                               | Yes      | at least 1 block                                |
-| `createdAt` / `updatedAt` | Date                            | auto     | timestamps                                      |
+| Field                     | Type                                                 | Required | Notes                                       |
+| ------------------------- | ---------------------------------------------------- | -------- | ------------------------------------------- |
+| `title`                   | String                                               | No       | 3-64 chars, default `null`                  |
+| `slug`                    | String                                               | Yes      | unique, 2-50 chars, used for routing        |
+| `type`                    | String enum: `HERO`, `SKILLS`, `CONTACT`, `ABOUT_ME` | No       | default `HERO`                              |
+| `order`                   | Number                                               | Yes      | position among sections in the same context |
+| `blocks`                  | Array of Block                                       | Yes      | at least 1 block                            |
+| `createdAt` / `updatedAt` | Date                                                 | auto     | timestamps                                  |
 
 Each entry in `blocks` is discriminated by `kind`:
 
-| `kind`      | Field   | Type              | Required | Notes                                  |
-| ----------- | ------- | ----------------- | -------- | ---------------------------------------- |
-| `PARAGRAPH` | `paragraphs` | String[]      | Yes      | at least 1 entry, each non-empty          |
-| `IMAGE`     | `images`     | Image[]       | Yes      | at least 1 entry                          |
-| `BUTTON`    | `buttons`    | String[]      | Yes      | at least 1 entry, each non-empty          |
-| `GROUP`     | `header`     | String        | No       | at least 1 char if present                |
-| `GROUP`     | `items`      | GroupItem[]   | Yes      | at least 1 entry; each item: `icon` (String, required), `label` (String, required) |
+| `kind`      | Field        | Type        | Required | Notes                                                                              |
+| ----------- | ------------ | ----------- | -------- | ---------------------------------------------------------------------------------- |
+| `PARAGRAPH` | `paragraphs` | String[]    | Yes      | at least 1 entry, each non-empty                                                   |
+| `IMAGE`     | `images`     | Image[]     | Yes      | at least 1 entry                                                                   |
+| `BUTTON`    | `buttons`    | String[]    | Yes      | at least 1 entry, each non-empty                                                   |
+| `GROUP`     | `header`     | String      | No       | at least 1 char if present                                                         |
+| `GROUP`     | `items`      | GroupItem[] | Yes      | at least 1 entry; each item: `icon` (String, required), `label` (String, required) |
 
 ### Project
 
-| Field              | Type                                  | Required | Notes                                        |
-| ------------------ | -------------------------------------- | -------- | ---------------------------------------------- |
-| `title`            | String                                  | Yes      | unique, 3-32 chars                             |
-| `technologies`     | String[]                                | Yes      | at least 1 entry, each >1 char                 |
-| `startDate`        | Date                                     | Yes      | —                                                |
-| `endDate`          | Date                                     | No       | must be after `startDate` if present            |
-| `shortDescription` | String                                  | Yes      | max 64 chars                                   |
-| `longDescription`  | String                                  | Yes      | 64-1024 chars                                  |
-| `githubLink`       | String                                   | No       | must match a `github.com` URL, default `null`   |
-| `websiteLink`      | String                                   | No       | must match a URL, default `null`                |
-| `projectSource`    | String enum: `UNIVERSITY`, `COMPANY`, `HOBBY` | No | default `HOBBY`                                |
-| `mainImage`        | Image                                    | Yes      | —                                                |
-| `otherImages`      | Image[]                                  | No       | —                                                |
-| `status`           | String enum: `IN PROGRESS`, `COMPLETED` | No       | default `COMPLETED`                            |
-| `gainedExperience` | String[]                                | Yes      | at least 1 entry, each >1 char                  |
-| `createdAt` / `updatedAt` | Date                              | auto     | timestamps                                      |
+| Field                     | Type                                          | Required | Notes                                         |
+| ------------------------- | --------------------------------------------- | -------- | --------------------------------------------- |
+| `title`                   | String                                        | Yes      | unique, 3-32 chars                            |
+| `technologies`            | String[]                                      | Yes      | at least 1 entry, each >1 char                |
+| `startDate`               | Date                                          | Yes      | —                                             |
+| `endDate`                 | Date                                          | No       | must be after `startDate` if present          |
+| `shortDescription`        | String                                        | Yes      | max 64 chars                                  |
+| `longDescription`         | String                                        | Yes      | 64-1024 chars                                 |
+| `githubLink`              | String                                        | No       | must match a `github.com` URL, default `null` |
+| `websiteLink`             | String                                        | No       | must match a URL, default `null`              |
+| `projectSource`           | String enum: `UNIVERSITY`, `COMPANY`, `HOBBY` | No       | default `HOBBY`                               |
+| `mainImage`               | Image                                         | Yes      | —                                             |
+| `otherImages`             | Image[]                                       | No       | —                                             |
+| `status`                  | String enum: `IN PROGRESS`, `COMPLETED`       | No       | default `COMPLETED`                           |
+| `gainedExperience`        | String[]                                      | Yes      | at least 1 entry, each >1 char                |
+| `createdAt` / `updatedAt` | Date                                          | auto     | timestamps                                    |
 
 ## Development
 
@@ -138,10 +138,10 @@ Seeding (either setup) fills minimal data — 1 admin, homepage sections, "About
    docker compose --env-file .env.development up --build
    ```
 
-2. Seed — once, or after every Mongo volume reset:
+2. Seed — once, after every Mongo volume reset, or after editing `scripts/seed/data.ts` (`--build` is required: the `seed` service is a built image, so `run` alone reuses a stale cached build and silently re-applies old seed data):
 
    ```bash
-   docker compose --env-file .env.development --profile seed run --rm seed
+   docker compose --env-file .env.development --profile seed run --build --rm seed
    ```
 
 App: http://localhost:3000 (`APP_PORT` in `.env.development`).
