@@ -2,6 +2,8 @@
 FROM node:22.23.2-slim AS deps
 WORKDIR /app
 
+RUN npm i -g npm@12.0.2
+
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
 
