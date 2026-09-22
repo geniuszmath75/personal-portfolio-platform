@@ -177,6 +177,7 @@ npm run coverage
 - Database: MongoDB Atlas (connection string in `NUXT_MONGO_DB_URI`, see [.env.production.example](.env.production.example)) — the production Compose stack has no local Mongo.
 - File uploads: S3-compatible storage (e.g. Cloudflare R2) via `UPLOAD_DRIVER=s3`.
 - Healthcheck: `GET /api/v1/health` (process liveness + Mongo connection state), used by the Docker image's `HEALTHCHECK`.
+- Deploy: pushing a `v*` tag runs [.github/workflows/deploy.yml](.github/workflows/deploy.yml) — builds & pushes the image to GHCR, then SSHes into the VPS to pull and restart it.
 
 ## Environment variables
 
