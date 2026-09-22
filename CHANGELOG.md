@@ -1,5 +1,49 @@
 ## Changelog
 
+### [v0.11.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.10.0...v0.11.0) - 22 September 2026
+
+#### New Features
+
+-  support local and S3-compatible object storage [`4011e2a`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/4011e2a4184acf8fcfebd167627a39cbe936f392)
+-  add Nuxt Image optimization with AppImage wrapper [`c608226`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/c60822682b35fe6c5c4543e1b7394bdacc58edc0)
+-  add basic SEO with useHead and useSeoMeta [`0843696`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/0843696826fc2b588047414438604536dd0cdae4)
+-  add custom error page and fix SSR route error handling [`5491dae`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/5491dae18f2c1e79a9894ba1b6c4ef67ea2d06d0)
+
+#### Fixes
+
+-  unify API error handling for clients and controllers [`f3834b0`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/f3834b0888fb306eacbe3d38d1df6c697d4c0b83)
+-  apply npm audit fix (1 low, 2 high vulnerabilities) [`1e56a38`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/1e56a3837754208fa5ec288ccf944eb301643085)
+-  disable public user registration with 403 [`6299965`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/6299965f11ef031d3b7303013adee705094fdd80)
+-  require admin for uploads and add .env.example [`e98692a`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/e98692a56a54f99c043e4612e3507a8651f65c73)
+-  make production typecheck and Nitro resolve shared imports [`17b8424`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/17b8424fcc96b78ce35b061010f0a5c9bca73aec)
+-  align unknown routes and invalid project ids to 404 [`52695e9`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/52695e93c1a1a74d020861b304460a2ce3bf3773)
+-  require limit model on BaseFilterBar [`ed301a0`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/ed301a0c8a73c788d29b7c3e1baec4ec0acf6b1e)
+
+#### Chores And Housekeeping
+
+-  bump nuxt to 4.5.2 and @nuxt/test-utils to 4.3.2 [`3b345cd`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/3b345cd81fd7035cab9f77b76ec2083893093171)
+-  update dependencies within current major (batch 1) [`8dc754c`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/8dc754c6e8225541ad901173a4a8af3306c245a3)
+-  add idempotent MongoDB seed for local Docker [`a37fb2c`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/a37fb2ce7c03f2ed776030228a94d3236ce504fb)
+-  bump vitest, coverage-v8, vue, prettier and tsx [`2ab598a`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/2ab598a187eaf20e96c7ae0f1be4165c964a4572)
+-  add same-major npm update planner [`86c9eff`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/86c9effaca3acfa35375f46519f50ad59c1b2840)
+-  add slim image, health endpoint, and split Compose stacks [`5b27c13`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/5b27c132c6bd6d6577862747c21da729f5913687)
+-  bump vue-router, zod, vue-tsc and pin npm in Docker deps stage [`855175c`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/855175c65e5276985f91bfa624b8b6a08c375225)
+-  bump minor dependency versions [`58d1d11`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/58d1d11d8c0c91760a8bed10d0483bfac696b96b)
+-  remove vite-plugin-checker runtime base-path workaround [`c298a4d`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/c298a4d1ad23b7a5ed213eeaecba1859647b0163)
+
+#### Documentation Changes
+
+-  add architecture, models, and dev/prod overview [`74c5f12`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/74c5f129281c2a252327ed75598c6eaa36214362)
+-  rewrite Skills intro copy; document --build for seed rebuilds [`11c97c5`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/11c97c572b35c1adf2fe7b4de7f482f5c3faa529)
+
+#### Refactoring and Updates
+
+-  drop unused event param in getAllSections [`bca1d07`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/bca1d077a27618f9462e73bf4ac22ee0ccf0c5ad)
+
+#### Changes to Test Assests
+
+-  add unit tests for checkMinorUpdates [`71d55b0`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/71d55b0f6c028f0a4a78115441a09b178a09c6aa)
+
 ### [v0.10.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.9.0...v0.10.0) - 22 July 2026
 
 #### New Features
@@ -28,6 +72,10 @@
 #### Changes to Test Assests
 
 -  adapt Nuxt tests for Vitest and test-utils v4 [`f29b3b2`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/f29b3b2f5aca33b8b81ca3e49d77c021df76e1c0)
+
+#### General Changes
+
+- release: 0.10.0 [`2b6b739`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/2b6b739d33ea2bd17868fb5829bc560ee03b48c2)
 
 ### [v0.9.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.8.0...v0.9.0) - 15 July 2026
 
