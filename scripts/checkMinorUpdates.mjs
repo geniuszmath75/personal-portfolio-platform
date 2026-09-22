@@ -20,7 +20,7 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -30,25 +30,25 @@ const batchSizeArg = process.argv
 const BATCH_SIZE = Math.max(1, Math.min(5, Number(batchSizeArg) || 5));
 
 /** Minimal semver: {major, minor, patch, prerelease}. Ignores build metadata. */
-function parseVersion(raw) {
+export function parseVersion(raw) {
   const clean = String(raw).trim();
   const [main, prerelease] = clean.split("-", 2);
   const [major, minor, patch] = main.split(".").map((n) => parseInt(n, 10));
   return { major, minor, patch, prerelease, raw: clean };
 }
 
-function isStable(version) {
+export function isStable(version) {
   return !version.prerelease && Number.isFinite(version.major);
 }
 
 /** Ascending compare; ignores prerelease ordering (stable versions only). */
-function compareVersions(a, b) {
+export function compareVersions(a, b) {
   if (a.major !== b.major) return a.major - b.major;
   if (a.minor !== b.minor) return a.minor - b.minor;
   return a.patch - b.patch;
 }
 
-function readOutdated() {
+export function readOutdated() {
   let stdout;
   try {
     stdout = execFileSync("npm", ["outdated", "--json"], {
@@ -65,7 +65,7 @@ function readOutdated() {
   return JSON.parse(stdout);
 }
 
-function readPublishedVersions(name) {
+export function readPublishedVersions(name) {
   const stdout = execFileSync("npm", ["view", name, "versions", "--json"], {
     cwd: ROOT,
     encoding: "utf8",
@@ -75,7 +75,7 @@ function readPublishedVersions(name) {
 }
 
 /** Highest published version with the same major as `current`, if any. */
-function findSameMajorTarget(current, publishedVersions) {
+export function findSameMajorTarget(current, publishedVersions) {
   const candidates = publishedVersions
     .map(parseVersion)
     .filter(isStable)
@@ -86,13 +86,13 @@ function findSameMajorTarget(current, publishedVersions) {
   return candidates.at(-1) ?? null;
 }
 
-function readLockfile() {
+export function readLockfile() {
   const raw = readFileSync(path.join(ROOT, "package-lock.json"), "utf8");
   return JSON.parse(raw);
 }
 
 /** Direct dependency names of `name`'s installed version, per package-lock.json. */
-function directDependenciesOf(name, lockPackages) {
+export function directDependenciesOf(name, lockPackages) {
   const direct = lockPackages[`node_modules/${name}`];
   const entry =
     direct ??
@@ -109,7 +109,7 @@ function directDependenciesOf(name, lockPackages) {
 }
 
 /** Longest dependency chain within `updateSet` ending at `name` (0 = leaf). */
-function levelOf(name, edges, memo, visiting) {
+export function levelOf(name, edges, memo, visiting) {
   if (memo.has(name)) return memo.get(name);
   if (visiting.has(name)) return 0; // defensive cycle guard
 
@@ -125,7 +125,7 @@ function levelOf(name, edges, memo, visiting) {
 }
 
 /** Tiny union-find so "update together" pairs resolve to one group id. */
-function createUnionFind(names) {
+export function createUnionFind(names) {
   const parent = new Map(names.map((name) => [name, name]));
 
   function find(name) {
@@ -149,7 +149,7 @@ function createUnionFind(names) {
  * "together" group across batches (a group may push a batch slightly over
  * `size` — acceptable, since groups here are small, tightly-coupled pairs).
  */
-function chunkKeepingGroupsTogether(sorted, size, together) {
+export function chunkKeepingGroupsTogether(sorted, size, together) {
   const placed = new Set();
   const batches = [];
   let current = [];
@@ -179,8 +179,17 @@ function chunkKeepingGroupsTogether(sorted, size, together) {
   return batches;
 }
 
-function main() {
-  const outdated = readOutdated();
+/**
+ * Orchestrates the whole check. I/O is injectable (defaults to the real
+ * `npm`/filesystem calls above) so this can run against fixtures in tests
+ * without touching the registry or the real lockfile.
+ */
+export function main({
+  readOutdated: readOutdatedFn = readOutdated,
+  readPublishedVersions: readPublishedVersionsFn = readPublishedVersions,
+  readLockfile: readLockfileFn = readLockfile,
+} = {}) {
+  const outdated = readOutdatedFn();
   const names = Object.keys(outdated);
 
   if (names.length === 0) {
@@ -205,7 +214,7 @@ function main() {
     }
 
     const current = parseVersion(entry.current);
-    const versions = readPublishedVersions(name);
+    const versions = readPublishedVersionsFn(name);
     const target = findSameMajorTarget(current, versions);
 
     if (!target) {
@@ -240,7 +249,7 @@ function main() {
     return;
   }
 
-  const lock = readLockfile();
+  const lock = readLockfileFn();
   const lockPackages = lock.packages ?? {};
   const updatableNames = new Set(updatable.map((p) => p.name));
 
@@ -340,4 +349,17 @@ function main() {
   });
 }
 
-main();
+function isCliEntry() {
+  const entry = process.argv[1];
+  if (!entry) return false;
+
+  try {
+    return import.meta.url === pathToFileURL(entry).href;
+  } catch {
+    return false;
+  }
+}
+
+if (isCliEntry()) {
+  main();
+}
