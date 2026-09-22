@@ -58,6 +58,8 @@ jobs:
     name: Deploy to VPS
     needs: build-and-push
     runs-on: ubuntu-latest
+    # Gates VPS secrets behind the "production" GitHub Environment.
+    environment: production
     steps:
       # Pulls the image tag that was just pushed and restarts the app via
       # docker-compose.prod.yml.
