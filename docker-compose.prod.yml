@@ -2,13 +2,12 @@
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        NUXT_PUBLIC_SITE_URL: ${NUXT_PUBLIC_SITE_URL:-}
-        UPLOAD_PUBLIC_BASE_URL: ${UPLOAD_PUBLIC_BASE_URL:-}
-    image: personal-portfolio-platform:prod
+    # Built by CI (.github/workflows/deploy.yml) and pushed to GHCR; the VPS
+    # only pulls a tagged image, it never builds locally. `IMAGE_TAG` is set
+    # by the deploy step (e.g. the git tag / release version) and defaults
+    # to `latest` for manual `docker compose pull && up -d` runs.
+    image: ghcr.io/geniuszmath75/personal-portfolio-platform:${IMAGE_TAG:-latest}
+    pull_policy: always
     restart: unless-stopped
     ports:
       - "127.0.0.1:${APP_PORT:-3000}:3000"

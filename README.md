@@ -173,7 +173,7 @@ npm run coverage
 
 ## Production (overview)
 
-- The app image is built from [Dockerfile](Dockerfile) (multi-stage, `node:22-slim`), published to a container registry, and run via [docker-compose.prod.yml](docker-compose.prod.yml).
+- The app image is built from [Dockerfile](Dockerfile) (multi-stage, `node:22-slim`), published to GHCR (`ghcr.io/geniuszmath75/personal-portfolio-platform`), and run on the VPS via [docker-compose.prod.yml](docker-compose.prod.yml) — the VPS only pulls a tagged image (`IMAGE_TAG`, default `latest`).
 - Database: MongoDB Atlas (connection string in `NUXT_MONGO_DB_URI`, see [.env.production.example](.env.production.example)) — the production Compose stack has no local Mongo.
 - File uploads: S3-compatible storage (e.g. Cloudflare R2) via `UPLOAD_DRIVER=s3`.
 - Healthcheck: `GET /api/v1/health` (process liveness + Mongo connection state), used by the Docker image's `HEALTHCHECK`.
