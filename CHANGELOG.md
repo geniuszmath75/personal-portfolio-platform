@@ -1,6 +1,16 @@
 ## Changelog
 
-### [v1.0.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.12.0...v1.0.0) - 25 September 2026
+### [v1.0.1](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v1.0.0...v1.0.1) - 25 September 2026
+
+#### Fixes
+
+-  avoid doubling https in S3 public URLs [`b6894c5`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/b6894c5ce6ca79e8cbdaade04423f7b1c3c11ea9)
+
+## [v1.0.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.12.0...v1.0.0) - 25 September 2026
+
+#### General Changes
+
+- release: 1.0.0 [`9dd0103`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/9dd01037d5014e1d8f7d6085a15f02a7d23e82aa)
 
 ### [v0.12.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.11.0...v0.12.0) - 22 September 2026
 
