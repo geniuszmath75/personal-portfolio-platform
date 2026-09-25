@@ -56,8 +56,11 @@ export class S3StorageProvider implements StorageProvider {
         accessKeyId: config.s3AccessKeyId,
         secretAccessKey: config.s3SecretAccessKey,
       },
-      // Required for many S3-compatible providers (R2, MinIO).
-      forcePathStyle: true,
+      // R2: leave false (virtual-hosted). Path-style embeds the bucket name
+      // into the object key (`bucket/projects/...`), so public CDN URLs 404.
+      // MinIO often needs forcePathStyle: true — set via a dedicated env later
+      // if you add a MinIO driver profile.
+      forcePathStyle: false,
     });
   }
 

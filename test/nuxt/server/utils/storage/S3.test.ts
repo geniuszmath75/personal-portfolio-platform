@@ -90,7 +90,7 @@ describe("S3StorageProvider", async () => {
   });
 
   describe("constructor", () => {
-    it("should initialize S3Client with runtime config and forcePathStyle", () => {
+    it("should initialize S3Client with runtime config and virtual-hosted style", () => {
       new S3StorageProvider();
 
       expect(S3ClientMock).toHaveBeenCalledWith({
@@ -100,7 +100,7 @@ describe("S3StorageProvider", async () => {
           accessKeyId: "test-access-key-id",
           secretAccessKey: "test-secret-access-key",
         },
-        forcePathStyle: true,
+        forcePathStyle: false,
       });
     });
 
