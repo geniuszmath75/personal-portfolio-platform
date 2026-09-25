@@ -1,10 +1,20 @@
 ## Changelog
 
+### [v1.0.2](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v1.0.1...v1.0.2) - 25 September 2026
+
+#### Fixes
+
+-  disable S3 path-style for R2 object keys [`0ce752b`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/0ce752b381def15706b75490a801be8f6fe667ef)
+
 ### [v1.0.1](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v1.0.0...v1.0.1) - 25 September 2026
 
 #### Fixes
 
 -  avoid doubling https in S3 public URLs [`b6894c5`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/b6894c5ce6ca79e8cbdaade04423f7b1c3c11ea9)
+
+#### General Changes
+
+- release: 1.0.1 [`b076f00`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/b076f006eeeaa3655d03e5b60df45bbbb6143f05)
 
 ## [v1.0.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.12.0...v1.0.0) - 25 September 2026
 
