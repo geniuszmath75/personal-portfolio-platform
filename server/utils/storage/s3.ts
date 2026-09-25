@@ -11,6 +11,17 @@ function trimSlashes(value: string): string {
 }
 
 /**
+ * Join UPLOAD_PUBLIC_BASE_URL with an object key.
+ * Accepts a bare host (`cdn.example.com`) or an absolute URL (`https://...`).
+ */
+function toPublicObjectUrl(baseUrl: string, key: string): string {
+  const base = trimSlashes(baseUrl.trim());
+  const objectKey = key.replace(/^\/+/g, "");
+  const withProtocol = /^https?:\/\//i.test(base) ? base : `https://${base}`;
+  return `${withProtocol}/${objectKey}`;
+}
+
+/**
  * Stores objects via the S3 API (AWS S3, Cloudflare R2, MinIO, etc.)
  */
 export class S3StorageProvider implements StorageProvider {
@@ -71,7 +82,7 @@ export class S3StorageProvider implements StorageProvider {
     }
 
     return {
-      publicUrl: `https://${this.publicBaseUrl}/${input.key}`,
+      publicUrl: toPublicObjectUrl(this.publicBaseUrl, input.key),
     };
   }
 }

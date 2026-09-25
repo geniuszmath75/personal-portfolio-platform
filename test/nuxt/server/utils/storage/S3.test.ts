@@ -192,6 +192,48 @@ describe("S3StorageProvider", async () => {
       );
     });
 
+    it("should not double the protocol when UPLOAD_PUBLIC_BASE_URL is absolute", async () => {
+      runtimeConfigOverride.value = {
+        ...validS3Config,
+        public: {
+          uploadPublicBaseUrl: "https://cdn.example.com/",
+        },
+      };
+
+      const provider = new S3StorageProvider();
+
+      const result = await provider.putObject({
+        key: "projects/photo.jpg",
+        body: Buffer.from("jpg"),
+        contentType: "image/jpeg",
+      });
+
+      expect(result.publicUrl).toBe(
+        "https://cdn.example.com/projects/photo.jpg",
+      );
+    });
+
+    it("should preserve path prefix on absolute UPLOAD_PUBLIC_BASE_URL", async () => {
+      runtimeConfigOverride.value = {
+        ...validS3Config,
+        public: {
+          uploadPublicBaseUrl: "https://cdn.example.com/uploads",
+        },
+      };
+
+      const provider = new S3StorageProvider();
+
+      const result = await provider.putObject({
+        key: "projects/photo.jpg",
+        body: Buffer.from("jpg"),
+        contentType: "image/jpeg",
+      });
+
+      expect(result.publicUrl).toBe(
+        "https://cdn.example.com/uploads/projects/photo.jpg",
+      );
+    });
+
     it("should throw when UPLOAD_PUBLIC_BASE_URL is missing after upload", async () => {
       runtimeConfigOverride.value = {
         ...validS3Config,
