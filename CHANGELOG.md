@@ -1,5 +1,22 @@
 ## Changelog
 
+### [v1.0.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.12.0...v1.0.0) - 25 September 2026
+
+### [v0.12.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.11.0...v0.12.0) - 22 September 2026
+
+#### Fixes
+
+-  pass --env-file .env.production to docker compose on the VPS [`afc7b7d`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/afc7b7df323c5ece236994d1bef30d2c5ac7411a)
+
+#### Chores And Housekeeping
+
+-  pull the prod app image from GHCR instead of building locally [`b8e3e36`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/b8e3e369023376b0a374b3ad5f0ab53d5d89b481)
+
+#### General Changes
+
+- ci(deploy): add GHCR build/push + SSH deploy workflow [`6594c10`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/6594c10821bffc0123f79ff9319cd70943276a9a)
+- ci(deploy): gate VPS secrets behind a production GitHub Environment [`d73a3f3`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/d73a3f37ebc4057d8d6cbbf8c52feba10f34ca87)
+
 ### [v0.11.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.10.0...v0.11.0) - 22 September 2026
 
 #### New Features
@@ -43,6 +60,10 @@
 #### Changes to Test Assests
 
 -  add unit tests for checkMinorUpdates [`71d55b0`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/71d55b0f6c028f0a4a78115441a09b178a09c6aa)
+
+#### General Changes
+
+- release: 0.11.0 [`92eb01c`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/92eb01ccbbeb8170851c38793d2d2ebc6d6bc532)
 
 ### [v0.10.0](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v0.9.0...v0.10.0) - 22 July 2026
 
