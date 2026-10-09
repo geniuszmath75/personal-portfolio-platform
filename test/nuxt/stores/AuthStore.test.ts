@@ -70,6 +70,8 @@ describe("authStore", () => {
     expect(store.user).toBeNull();
     expect(store.loggedIn).toBe(false);
     expect(store.loading).toBe(false);
+    expect(store.authChecked).toBe(false);
+    expect(store.lastAuthCheckAt).toBe(0);
   });
 
   it("should 'setAuthUser' correctly update state", () => {
@@ -233,6 +235,60 @@ describe("authStore", () => {
     expect(store.user).toEqual(mockAuthUser);
     expect(store.loggedIn).toBe(true);
     expect(store.loading).toBe(false);
+    expect(store.authChecked).toBe(true);
+    expect(store.lastAuthCheckAt).toBeGreaterThan(0);
+    expect($fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("should skip '/auth/me' when 'checkAuth' is called again within TTL", async () => {
+    $fetchMock.mockResolvedValue({
+      user: mockAuthUser,
+    });
+
+    const store = useAuthStore();
+
+    await store.checkAuth();
+    await store.checkAuth();
+
+    expect($fetchMock).toHaveBeenCalledTimes(1);
+    expect(store.user).toEqual(mockAuthUser);
+    expect(store.loggedIn).toBe(true);
+  });
+
+  it("should refetch '/auth/me' when 'checkAuth' is forced within TTL", async () => {
+    $fetchMock.mockResolvedValue({
+      user: mockAuthUser,
+    });
+
+    const store = useAuthStore();
+
+    await store.checkAuth();
+    await store.checkAuth({ force: true });
+
+    expect($fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("should refetch '/auth/me' when 'checkAuth' TTL has expired", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-09T12:00:00.000Z"));
+
+    try {
+      $fetchMock.mockResolvedValue({
+        user: mockAuthUser,
+      });
+
+      const store = useAuthStore();
+
+      await store.checkAuth();
+      expect($fetchMock).toHaveBeenCalledTimes(1);
+
+      vi.advanceTimersByTime(5 * 60 * 1000);
+      await store.checkAuth();
+
+      expect($fetchMock).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("should clear auth state silently when 'checkAuth' gets 401", async () => {
@@ -253,6 +309,7 @@ describe("authStore", () => {
     expect(store.user).toBeNull();
     expect(store.loggedIn).toBe(false);
     expect(store.loading).toBe(false);
+    expect(store.authChecked).toBe(true);
     expect(handleError).not.toHaveBeenCalled();
   });
 
@@ -270,6 +327,7 @@ describe("authStore", () => {
 
     expect(store.user).toBeNull();
     expect(store.loggedIn).toBe(false);
+    expect(store.authChecked).toBe(true);
     expect(handleError).not.toHaveBeenCalled();
   });
 
@@ -287,6 +345,7 @@ describe("authStore", () => {
     // Assert
     expect(store.user).toBeNull();
     expect(store.loggedIn).toBe(false);
+    expect(store.authChecked).toBe(true);
     expect(handleError).toHaveBeenCalledWith(
       expect.any(Error),
       "Failed to verify authentication",

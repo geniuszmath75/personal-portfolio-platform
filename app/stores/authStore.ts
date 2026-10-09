@@ -17,6 +17,11 @@ export const useAuthStore = defineStore("auth", {
        * Indicates if the login request is in progress
        */
       loading: false,
+      /**
+       * Indicates if the authentication check has been performed
+       */
+      authChecked: false,
+      lastAuthCheckAt: 0 as number,
     };
   },
   getters: {
@@ -113,7 +118,17 @@ export const useAuthStore = defineStore("auth", {
      * Checks if the user is authenticated
      * @async
      */
-    async checkAuth() {
+    async checkAuth(options?: { force?: boolean }) {
+      const AUTH_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+      if (
+        !options?.force &&
+        this.authChecked &&
+        Date.now() - this.lastAuthCheckAt < AUTH_TTL_MS
+      ) {
+        return;
+      }
+
       const { baseApiPath } = useRuntimeConfig().public;
       try {
         this.loading = true;
@@ -140,6 +155,8 @@ export const useAuthStore = defineStore("auth", {
           handleError(error, "Failed to verify authentication");
         }
       } finally {
+        this.authChecked = true;
+        this.lastAuthCheckAt = Date.now();
         this.loading = false;
       }
     },
