@@ -1,10 +1,20 @@
 ## Changelog
 
+### [v1.0.3](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v1.0.2...v1.0.3) - 9 October 2026
+
+#### Fixes
+
+-  cache checkAuth to reduce /auth/me calls [`6fb7f57`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/6fb7f575de0809bd5e5c7125c99a023ecb8a232e)
+
 ### [v1.0.2](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v1.0.1...v1.0.2) - 25 September 2026
 
 #### Fixes
 
 -  disable S3 path-style for R2 object keys [`0ce752b`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/0ce752b381def15706b75490a801be8f6fe667ef)
+
+#### General Changes
+
+- release: 1.0.2 [`9b9890c`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/9b9890ca0cf27abf6a76a10d465bda3ffa9b9b4a)
 
 ### [v1.0.1](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v1.0.0...v1.0.1) - 25 September 2026
 
