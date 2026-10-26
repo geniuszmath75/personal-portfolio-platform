@@ -1,5 +1,5 @@
 # --- Stage 1: install dependencies (no lifecycle scripts) ---
-FROM node:22.23.2-slim AS deps
+FROM node:22.23.4-slim AS deps
 WORKDIR /app
 
 RUN npm i -g npm@12.0.2
