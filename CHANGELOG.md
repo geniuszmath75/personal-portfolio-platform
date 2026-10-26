@@ -1,10 +1,24 @@
 ## Changelog
 
+### [v1.0.4](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v1.0.3...v1.0.4) - 26 October 2026
+
+#### Fixes
+
+-  preserve H3 HTTP errors [`607a4f2`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/607a4f22f6fc39c845f7a1233e227e06e1c06fc9)
+
+#### Chores And Housekeeping
+
+-  update nuxt version to 4.6.2 and allow specific scripts for vue-demi and esbuild [`26e0d70`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/26e0d70e7f70c8780914fa4e0e3745abfca6c8b0)
+
 ### [v1.0.3](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v1.0.2...v1.0.3) - 9 October 2026
 
 #### Fixes
 
 -  cache checkAuth to reduce /auth/me calls [`6fb7f57`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/6fb7f575de0809bd5e5c7125c99a023ecb8a232e)
+
+#### General Changes
+
+- release: 1.0.3 [`6d35b44`](https://github.com/geniuszmath75/personal-portfolio-platform/commit/6d35b44ac3e75f1e916d61e96e7e338a49bf1fdf)
 
 ### [v1.0.2](https://github.com/geniuszmath75/personal-portfolio-platform/compare/v1.0.1...v1.0.2) - 25 September 2026
 
