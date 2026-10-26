@@ -3,6 +3,7 @@ import { Types } from "mongoose";
 import { Section } from "~~/server/models/Section";
 import { requireAdmin } from "~~/server/utils/auth";
 import { handleDatabaseError } from "~~/server/utils/handleDatabaseError";
+import { isH3ErrorLike } from "~~/server/utils/isH3ErrorLike";
 import { createSectionSchema } from "~~/server/utils/validateCreateSection";
 
 export default defineEventHandler(async (event) => {
@@ -101,16 +102,16 @@ export default defineEventHandler(async (event) => {
       section: updatedSection,
     };
   } catch (error) {
-    if (error instanceof H3Error) {
+    if (error instanceof H3Error || isH3ErrorLike(error)) {
       throw error;
     }
 
     const customError = handleDatabaseError(error);
 
     throw createError({
-      statusCode: customError.code,
-      statusMessage: customError.statusMessage,
-      message: customError.message,
+      statusCode: customError.code ?? 500,
+      statusMessage: customError.statusMessage ?? "Internal Server Error",
+      message: customError.message ?? "Something went wrong, please try again later.",
     });
   }
 });

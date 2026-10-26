@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { createError, H3Error } from "h3";
+import { isH3ErrorLike } from "../../server/utils/isH3ErrorLike";
 
 /**
  * Represents a custom error object
@@ -15,6 +16,12 @@ interface CustomError {
   message?: string;
 }
 
+const DEFAULT_CUSTOM_ERROR: CustomError = {
+  code: 500,
+  statusMessage: "Internal Server Error",
+  message: "Something went wrong, please try again later.",
+};
+
 /**
  *  Handles MongoDB errors and returns a custom error object.
  *
@@ -23,11 +30,7 @@ interface CustomError {
  */
 export const handleDatabaseError = (error: unknown): CustomError => {
   // Default error response
-  const customError: CustomError = {
-    code: 500,
-    statusMessage: "Internal Server Error",
-    message: "Something went wrong, please try again later.",
-  };
+  const customError: CustomError = { ...DEFAULT_CUSTOM_ERROR };
 
   // Mongoose Validation Error
   if (error instanceof mongoose.Error.ValidationError) {
@@ -74,11 +77,28 @@ export function rethrowAsHttpError(error: unknown): never {
     throw error;
   }
 
-  const customError = handleDatabaseError(error);
+  if (isH3ErrorLike(error)) {
+    const httpError = error as {
+      statusCode?: number;
+      code?: number;
+      statusMessage?: string;
+      message?: string;
+    };
+
+    throw createError({
+      statusCode: httpError.statusCode ?? httpError.code ?? 500,
+      statusMessage:
+        httpError.statusMessage ?? "Internal Server Error",
+      message: httpError.message ?? "Something went wrong, please try again later.",
+    });
+  }
+
+  const customError = handleDatabaseError(error) ?? { ...DEFAULT_CUSTOM_ERROR };
 
   throw createError({
-    statusCode: customError.code,
-    statusMessage: customError.statusMessage,
-    message: customError.message,
+    statusCode: customError.code ?? 500,
+    statusMessage: customError.statusMessage ?? "Internal Server Error",
+    message:
+      customError.message ?? "Something went wrong, please try again later.",
   });
 }

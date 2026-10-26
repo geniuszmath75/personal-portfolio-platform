@@ -5,6 +5,7 @@ import { extname } from "path";
 import { randomUUID } from "crypto";
 import { UploadCategory } from "~~/shared/types/enums";
 import { getStorageProvider } from "~~/server/utils/storage";
+import { isH3ErrorLike } from "~~/server/utils/isH3ErrorLike";
 
 const ALLOWED_MIME_TYPES = [
   "image/jpeg",
@@ -123,7 +124,7 @@ export async function uploadImage(
       mimetype: mimeType,
     };
   } catch (error) {
-    if (error instanceof H3Error) {
+    if (error instanceof H3Error || isH3ErrorLike(error)) {
       throw error;
     }
 
